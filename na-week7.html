@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numerical Analysis — Week 7: Curves</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --bg-warning: #fdf3e0;
+    --bg-danger: #fdf0f0;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-warning: #854f0b;
+    --text-danger: #a32d2d;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-primary: rgba(0,0,0,0.22);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --border-danger: #f7c1c1;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
+      --bg-danger: #2a0808;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --text-warning: #d08830;
+      --text-danger: #e06060;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-primary: rgba(255,255,255,0.22);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
+      --border-danger: #5a1818;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .site-header a { text-decoration: none; font-size: 13px; color: var(--text-secondary); font-weight: 400; }
+  .site-header a:hover { color: var(--text-primary); }
+  .sep { color: var(--text-tertiary); font-size: 13px; }
+  .header-title { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .page-title { margin-bottom: 1.5rem; }
+  .page-title .eyebrow { font-size: 12px; color: var(--text-tertiary); font-weight: 400; margin-bottom: .35rem; letter-spacing: .04em; }
+  .page-title h1 { font-size: 22px; font-weight: 500; line-height: 1.3; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .35rem; }
+  .tab-bar {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .tab {
+    font-size: 13px; padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: transparent;
+    font-family: var(--font-sans);
+    transition: all .12s;
+    font-weight: 400;
+  }
+  .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .tab.active {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+    font-weight: 500;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  h2 { font-size: 18px; font-weight: 500; margin-bottom: 1rem; padding-bottom: .6rem; border-bottom: 0.5px solid var(--border-tertiary); }
+  h3 { font-size: 15px; font-weight: 500; margin-bottom: .5rem; margin-top: .75rem; }
+  p { font-size: 14px; margin-bottom: .6rem; }
+  .key-box {
+    border-left: 3px solid var(--border-info);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-info);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-info);
+  }
+  .warn-box {
+    border-left: 3px solid var(--border-danger);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-danger);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-danger);
+  }
+  .insight-box {
+    border-left: 3px solid var(--border-success);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-success);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-success);
+  }
+  code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary); padding: 2px 5px;
+    border-radius: 4px; color: var(--text-primary);
+  }
+  .code-block {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem; margin: .75rem 0;
+    line-height: 1.6; overflow-x: auto; white-space: pre;
+    color: var(--text-primary);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: .75rem 0; }
+  th {
+    text-align: left; padding: 7px 10px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-weight: 500; font-size: 12px;
+    border-bottom: 0.5px solid var(--border-secondary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  td { padding: 7px 10px; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+  .badge {
+    display: inline-block; font-size: 12px;
+    padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .badge-blue { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); }
+  .badge-green { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
+  .badge-amber { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
+  .math-block {
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: .75rem 1rem; margin: .75rem 0;
+    font-family: var(--font-mono); font-size: 13px;
+    overflow-x: auto;
+  }
+  .step-box {
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: .75rem 1rem; margin: .5rem 0;
+    font-size: 13px;
+  }
+  .step-box .step-num {
+    font-size: 11px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: .05em;
+    margin-bottom: .3rem;
+  }
+  /* Quiz */
+  .q-container {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .q-num { font-size: 12px; color: var(--text-tertiary); margin-bottom: .3rem; }
+  .q-text { font-size: 14px; font-weight: 500; margin-bottom: .75rem; }
+  .quiz-btn {
+    display: block; width: 100%;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: 9px 14px; cursor: pointer;
+    font-size: 13px; color: var(--text-primary);
+    text-align: left; margin: 4px 0;
+    transition: all .12s;
+    font-family: var(--font-sans);
+  }
+  .quiz-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+  .quiz-btn.correct { border-color: var(--border-success); background: var(--bg-success); color: var(--text-success); }
+  .quiz-btn.wrong   { border-color: var(--border-danger);  background: var(--bg-danger);  color: var(--text-danger);  }
+  .quiz-feedback { font-size: 13px; margin-top: 8px; padding: 8px 12px; border-radius: var(--radius-md); display: none; }
+  #score-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; text-align: center;
+    margin-bottom: 1.5rem; display: none;
+  }
+  #score-text { font-size: 24px; font-weight: 500; margin-bottom: .4rem; }
+  #score-msg  { font-size: 13px; color: var(--text-secondary); }
+  .reset-btn {
+    margin-top: .75rem;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: 20px; padding: 5px 16px;
+    cursor: pointer; font-size: 13px;
+    color: var(--text-secondary); font-family: var(--font-sans);
+    transition: all .12s;
+  }
+  .reset-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html">← Home</a>
+  <span class="sep">/</span>
+  <a href="#">Numerical Analysis</a>
+  <span class="sep">/</span>
+  <span class="header-title">Week 7 — Curves</span>
+</header>
+
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">Numerical Analysis · Week 7</div>
+    <h1>곡선 표현 (Curves)</h1>
+    <div class="sub">Cubic · Hermite · Bezier · B-Spline 완전 정리</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('overview',this)">📐 개요</button>
+    <button class="tab" onclick="showTab('cubic',this)">📦 Cubic 곡선</button>
+    <button class="tab" onclick="showTab('hermite',this)">🔗 Hermite</button>
+    <button class="tab" onclick="showTab('bezier',this)">🎨 Bezier</button>
+    <button class="tab" onclick="showTab('spline',this)">〰️ B-Spline</button>
+    <button class="tab" onclick="showTab('compare',this)">⚖️ 비교</button>
+    <button class="tab" onclick="showTab('quiz',this)">🧪 Quiz</button>
+  </div>
+
+  <!-- ===== 개요 TAB ===== -->
+  <div class="section active" id="tab-overview">
+    <div class="card">
+      <h2>곡선이란? — 두 가지 표현 방식</h2>
+      <p>컴퓨터 그래픽에서 곡선을 수학적으로 표현하는 방법은 크게 두 가지입니다.</p>
+
+      <h3>① 음함수 표현 (Implicit Representation)</h3>
+      <p>곡선을 <strong>f(x, y) = 0</strong> 형태의 방정식으로 표현합니다.</p>
+      <div class="math-block">직선:  ax + by + c = 0
+원:    x² + y² - r² = 0   (반지름 r인 원)
+
+3D 평면: ax + by + cz + d = 0
+3D 구:  x² + y² + z² - r² = 0</div>
+      <div class="key-box">💡 음함수는 "이 점이 곡선 위에 있는가?"를 확인하기 쉽지만, 곡선 위의 점을 순서대로 나열하기 어렵습니다.</div>
+
+      <h3>② 매개변수 표현 (Parametric Representation)</h3>
+      <p>독립 변수 <strong>u</strong>에 따라 x, y, z 좌표가 결정됩니다. 마치 시간(u)에 따라 물체가 이동하는 궤적처럼 생각하면 됩니다.</p>
+      <div class="math-block">x = x(u)
+y = y(u)
+z = z(u)
+
+→ p(u) = [x(u), y(u), z(u)]ᵀ</div>
+      <div class="insight-box">🚗 비유: u를 "시간"이라고 생각하세요. u=0일 때 출발점, u=1일 때 도착점. 그 사이의 u 값마다 곡선 위의 위치가 결정됩니다.</div>
+
+      <h3>매개변수 표현의 미분 = 접선 벡터</h3>
+      <div class="math-block">dp(u)/du = [dx(u)/du, dy(u)/du, dz(u)/du]ᵀ
+
+방향 = 접선 방향
+크기 = u 변화에 따른 속도</div>
+    </div>
+
+    <div class="card">
+      <h2>왜 다항식(Polynomial)을 쓸까?</h2>
+      <p>좋은 곡선 표현이 갖춰야 할 조건들:</p>
+      <table>
+        <tr><th>조건</th><th>의미</th></tr>
+        <tr><td>국소 제어 (Local control)</td><td>한 부분을 바꿔도 전체에 영향 최소화</td></tr>
+        <tr><td>매끄러움 (Smoothness)</td><td>연결점에서 불연속이 없음</td></tr>
+        <tr><td>미분 가능 (Differentiable)</td><td>접선 벡터를 계산할 수 있음</td></tr>
+        <tr><td>수치 안정성 (Stability)</td><td>작은 입력 변화가 큰 출력 변화를 유발하지 않음</td></tr>
+        <tr><td>렌더링 용이성</td><td>화면에 그리기 쉬움</td></tr>
+      </table>
+      <div class="key-box"><strong>결론:</strong> 다항식 x(u) = c₀ + c₁u + c₂u² + ... + cₙuⁿ이 이 조건들을 잘 만족합니다.</div>
+
+      <h3>왜 3차(Cubic)?</h3>
+      <div class="grid-2">
+        <div class="step-box">
+          <div class="step-num">고차 다항식의 문제</div>
+          급격한 변화, 진동(Runge 현상), 계산 복잡
+        </div>
+        <div class="step-box">
+          <div class="step-num">저차 다항식의 문제</div>
+          표현력 부족, 복잡한 모양 불가
+        </div>
+      </div>
+      <div class="insight-box">⚖️ 3차(Cubic)가 절충점! 충분한 표현력 + 계산 효율성 + 부드러운 곡선</div>
+      <div class="math-block">p(u) = c₀ + c₁u + c₂u² + c₃u³     (0 ≤ u ≤ 1)</div>
+      <p>미지수: c₀, c₁, c₂, c₃ (x, y, z 각각) → 총 12개 미지수</p>
+    </div>
+
+    <div class="card">
+      <h2>여러 세그먼트로 긴 곡선 만들기</h2>
+      <p>복잡한 곡선은 짧은 3차 곡선 조각(segment)들을 이어 붙여서 만듭니다.</p>
+
+      <svg viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:.75rem auto;">
+        <defs>
+          <marker id="arrowG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#3b6d11"/>
+          </marker>
+        </defs>
+        <!-- 매끄러운 연결 -->
+        <text x="20" y="25" font-size="11" fill="var(--text-secondary)" font-family="system-ui">✅ 매끄러운 연결 (Smooth Join)</text>
+        <path d="M 30 80 C 80 40, 130 40, 180 80" stroke="#185fa5" stroke-width="2" fill="none"/>
+        <path d="M 180 80 C 230 120, 280 120, 330 80" stroke="#3b6d11" stroke-width="2" fill="none"/>
+        <circle cx="180" cy="80" r="4" fill="#185fa5"/>
+        <text x="170" y="100" font-size="10" fill="var(--text-secondary)" font-family="system-ui">연결점</text>
+
+        <!-- 불연속 연결 -->
+        <text x="280" y="25" font-size="11" fill="var(--text-secondary)" font-family="system-ui">❌ 불연속 연결</text>
+        <path d="M 290 80 C 330 40, 360 40, 380 65" stroke="#a32d2d" stroke-width="2" fill="none"/>
+        <path d="M 380 80 C 410 120, 440 120, 480 80" stroke="#854f0b" stroke-width="2" fill="none"/>
+        <circle cx="380" cy="72" r="3" fill="#a32d2d" stroke="none"/>
+      </svg>
+
+      <div class="warn-box">⚠️ 단순히 이어 붙이면 연결점에서 꺾임(불연속 미분)이 생길 수 있습니다. → 이것이 Hermite, Bezier, B-Spline이 발전한 이유!</div>
+    </div>
+  </div>
+
+  <!-- ===== CUBIC TAB ===== -->
+  <div class="section" id="tab-cubic">
+    <div class="card">
+      <h2>Cubic 보간법 (Interpolation)</h2>
+      <p><strong>핵심 아이디어:</strong> 4개의 점을 지나는 3차 곡선을 구한다. 1개의 점 = 3개의 방정식(x,y,z), 4점 = 12개 방정식 = 12개 미지수 → 풀 수 있다!</p>
+
+      <h3>u 값 배분</h3>
+      <p>4개의 점을 [0, 1] 구간에 균등하게 배치합니다:</p>
+      <div class="math-block">p₀ = p(0)
+p₁ = p(1/3)
+p₂ = p(2/3)
+p₃ = p(1)</div>
+
+      <h3>행렬 방정식으로 변환</h3>
+      <p>4개 점의 방정식을 행렬로 묶으면:</p>
+      <div class="math-block">p = A·c    여기서 A는 4×4 행렬
+
+⎡ 1    0        0        0     ⎤
+⎢ 1   1/3    (1/3)²   (1/3)³  ⎥
+⎢ 1   2/3    (2/3)²   (2/3)³  ⎥
+⎣ 1    1        1        1     ⎦</div>
+
+      <div class="step-box">
+        <div class="step-num">풀이 과정</div>
+        <strong>p = A·c</strong><br>
+        → A를 역행렬로 이항:<br>
+        <strong>c = A⁻¹·p = Mᵢ·p</strong><br><br>
+        Mᵢ (보간 기하행렬):
+        <div class="math-block" style="margin-top:.5rem">Mᵢ = A⁻¹ =
+⎡  1     0     0    0  ⎤
+⎢ -5.5   9   -4.5   1  ⎥
+⎢  9   -22.5  18  -4.5 ⎥
+⎣ -4.5  13.5 -13.5  4.5⎦</div>
+      </div>
+
+      <h3>블렌딩 함수 (Blending Functions)</h3>
+      <p>곡선을 4개의 제어점의 가중 합으로 표현합니다:</p>
+      <div class="math-block">p(u) = b₀(u)·p₀ + b₁(u)·p₁ + b₂(u)·p₂ + b₃(u)·p₃
+
+b₀(u) = -(9/2)(u - 1/3)(u - 2/3)(u - 1)
+b₁(u) =  (27/2)u(u - 2/3)(u - 1)
+b₂(u) = -(27/2)u(u - 1/3)(u - 1)
+b₃(u) =  (9/2)u(u - 1/3)(u - 2/3)</div>
+
+      <div class="key-box">📌 각 bₖ(u)는 u=k/3일 때 1이고 나머지 점에서 0입니다. 즉 각 제어점이 자기 위치 근처에서만 강하게 영향을 미칩니다.</div>
+
+      <!-- 블렌딩 함수 시각화 -->
+      <h3>블렌딩 함수 그래프</h3>
+      <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:.75rem auto;background:var(--bg-secondary);border-radius:8px;padding:8px;">
+        <!-- 축 -->
+        <line x1="40" y1="160" x2="460" y2="160" stroke="var(--text-tertiary)" stroke-width="1"/>
+        <line x1="40" y1="10" x2="40" y2="160" stroke="var(--text-tertiary)" stroke-width="1"/>
+        <!-- u 레이블 -->
+        <text x="40" y="175" font-size="10" fill="var(--text-tertiary)" font-family="system-ui">0</text>
+        <text x="160" y="175" font-size="10" fill="var(--text-tertiary)" font-family="system-ui">1/3</text>
+        <text x="280" y="175" font-size="10" fill="var(--text-tertiary)" font-family="system-ui">2/3</text>
+        <text x="450" y="175" font-size="10" fill="var(--text-tertiary)" font-family="system-ui">1</text>
+        <!-- y=1 선 -->
+        <line x1="40" y1="20" x2="460" y2="20" stroke="var(--border-tertiary)" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <text x="20" y="23" font-size="10" fill="var(--text-tertiary)" font-family="system-ui">1</text>
+        <!-- b0 (시작에서 1, 감소) -->
+        <polyline points="40,20 80,50 120,100 160,160 200,155 240,160 280,165 320,162 360,160 400,162 440,160" stroke="#185fa5" stroke-width="2" fill="none"/>
+        <!-- b1 (1/3에서 최대) -->
+        <polyline points="40,155 80,90 120,40 160,20 200,55 240,115 280,155 320,160 360,160 400,160 440,160" stroke="#3b6d11" stroke-width="2" fill="none"/>
+        <!-- b2 (2/3에서 최대) -->
+        <polyline points="40,160 80,160 120,155 160,120 200,70 240,30 280,20 320,60 360,110 400,155 440,160" stroke="#854f0b" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+        <!-- b3 (끝에서 1) -->
+        <polyline points="40,160 80,162 120,160 160,160 200,162 240,155 280,160 320,100 360,50 400,20 440,20" stroke="#a32d2d" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+        <!-- 범례 -->
+        <rect x="350" y="12" width="100" height="72" fill="var(--bg-primary)" rx="4" opacity="0.9"/>
+        <line x1="355" y1="22" x2="375" y2="22" stroke="#185fa5" stroke-width="2"/>
+        <text x="378" y="26" font-size="10" fill="var(--text-primary)" font-family="system-ui">b₀(u)</text>
+        <line x1="355" y1="37" x2="375" y2="37" stroke="#3b6d11" stroke-width="2"/>
+        <text x="378" y="41" font-size="10" fill="var(--text-primary)" font-family="system-ui">b₁(u)</text>
+        <line x1="355" y1="52" x2="375" y2="52" stroke="#854f0b" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="378" y="56" font-size="10" fill="var(--text-primary)" font-family="system-ui">b₂(u)</text>
+        <line x1="355" y1="67" x2="375" y2="67" stroke="#a32d2d" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="378" y="71" font-size="10" fill="var(--text-primary)" font-family="system-ui">b₃(u)</text>
+      </svg>
+
+      <h3>4개 이상의 점: 세그먼트 분할</h3>
+      <p>7개의 점이 있다면, 4개씩 묶어서 두 개의 세그먼트를 만듭니다:</p>
+      <div class="math-block">1번 세그먼트: p₀, p₁, p₂, p₃ 사용
+2번 세그먼트: p₃, p₄, p₅, p₆ 사용 (p₃는 공유)</div>
+      <div class="warn-box">⚠️ 연결점(p₃)에서 미분이 일치하지 않을 수 있어 꺾임이 생깁니다. 이게 문제!</div>
+    </div>
+  </div>
+
+  <!-- ===== HERMITE TAB ===== -->
+  <div class="section" id="tab-hermite">
+    <div class="card">
+      <h2>Hermite 곡선</h2>
+      <div class="key-box">💡 핵심 아이디어: 보간법은 중간 점 2개를 씁니다. Hermite는 대신 <strong>양 끝점의 미분(접선 벡터)</strong>을 씁니다. → 연결점에서 매끄럽게!</div>
+
+      <h3>왜 Hermite인가?</h3>
+      <p>보간법의 문제: "점들의 위치만으로는 곡선의 방향을 제어하기 어렵다"</p>
+      <p>Hermite 해결책: 끝점의 위치 + 끝점의 접선벡터(방향) 제공 → 총 4개의 조건으로 3차 곡선 결정</p>
+
+      <!-- Hermite 시각화 -->
+      <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:.75rem auto;">
+        <!-- 곡선 -->
+        <path d="M 60 120 C 120 40, 350 170, 420 80" stroke="#185fa5" stroke-width="2.5" fill="none"/>
+        <!-- p(0) 점과 접선 -->
+        <circle cx="60" cy="120" r="5" fill="#185fa5"/>
+        <line x1="60" y1="120" x2="120" y2="70" stroke="#185fa5" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="120,70 108,72 112,84" fill="#185fa5"/>
+        <text x="30" y="130" font-size="11" fill="#185fa5" font-family="system-ui">p(0)</text>
+        <text x="122" y="67" font-size="11" fill="#185fa5" font-family="system-ui">p'(0)</text>
+        <!-- p(1) 점과 접선 -->
+        <circle cx="420" cy="80" r="5" fill="#3b6d11"/>
+        <line x1="420" y1="80" x2="480" y2="50" stroke="#3b6d11" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="480,50 465,55 470,65" fill="#3b6d11"/>
+        <text x="422" y="98" font-size="11" fill="#3b6d11" font-family="system-ui">p(1)</text>
+        <text x="465" y="47" font-size="11" fill="#3b6d11" font-family="system-ui">p'(1)</text>
+      </svg>
+
+      <h3>4가지 조건</h3>
+      <div class="math-block">p(0) = p₀  (시작점 위치)
+p(1) = p₃  (끝점 위치)
+p'(0) = 접선벡터₀  (시작점 방향)
+p'(1) = 접선벡터₁  (끝점 방향)</div>
+
+      <h3>행렬 방정식 유도</h3>
+      <p>p(u) = c₀ + c₁u + c₂u² + c₃u³, p'(u) = c₁ + 2c₂u + 3c₃u² 를 조건에 대입:</p>
+      <div class="math-block">p(0)  = c₀
+p'(0) = c₁
+p(1)  = c₀ + c₁ + c₂ + c₃
+p'(1) = c₁ + 2c₂ + 3c₃
+
+→ q = A·c  형태로:
+
+A =
+⎡1  0  0  0⎤
+⎢1  1  1  1⎥
+⎢0  1  0  0⎥
+⎣0  1  2  3⎦
+
+→ c = A⁻¹·q = Mₕ·q</div>
+
+      <div class="step-box">
+        <div class="step-num">Hermite 기하행렬 Mₕ</div>
+        <div class="math-block">Mₕ =
+⎡ 1   0   0   0⎤
+⎢ 0   0   1   0⎥
+⎢-3   3  -2  -1⎥
+⎣ 2  -2   1   1⎦</div>
+      </div>
+
+      <h3>Hermite 블렌딩 함수</h3>
+      <div class="math-block">p(u) = uᵀ·Mₕ·q = b(u)ᵀ·q
+
+b₀(u) = 1 - 3u² + 2u³    (시작점 위치 가중치)
+b₁(u) = 3u² - 2u³        (끝점 위치 가중치)
+b₂(u) = u - 2u² + u³     (시작점 접선 가중치)
+b₃(u) = -u² + u³         (끝점 접선 가중치)</div>
+
+      <div class="key-box">✅ 장점: 연결점에서 접선 벡터를 맞춰주면 C¹ 연속성(매끄러운 연결) 보장!</div>
+      <div class="warn-box">⚠️ 단점: 최적의 접선 벡터를 어떻게 설정할지 모를 수 있습니다. 데이터 점만 있을 때 어렵습니다.</div>
+
+      <h3>손으로 푸는 예제</h3>
+      <div class="step-box">
+        <div class="step-num">예제 조건</div>
+        p(0) = (0, 0), p(1) = (1, 0), p'(0) = (1, 2), p'(1) = (1, -2)
+      </div>
+      <div class="step-box">
+        <div class="step-num">Step 1: 조건 벡터 구성 (x성분만 계산)</div>
+        q = [p(0)ₓ, p(1)ₓ, p'(0)ₓ, p'(1)ₓ] = [0, 1, 1, 1]
+      </div>
+      <div class="step-box">
+        <div class="step-num">Step 2: c = Mₕ·q 계산 (x성분)</div>
+        c₀ = 1·0 + 0·1 + 0·1 + 0·1 = 0<br>
+        c₁ = 0·0 + 0·1 + 1·1 + 0·1 = 1<br>
+        c₂ = -3·0 + 3·1 + (-2)·1 + (-1)·1 = 0<br>
+        c₃ = 2·0 + (-2)·1 + 1·1 + 1·1 = 0
+      </div>
+      <div class="step-box">
+        <div class="step-num">Step 3: x(u) = 0 + 1·u + 0·u² + 0·u³ = u</div>
+        x성분은 단순히 u에 비례! y성분도 같은 방법으로 계산.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BEZIER TAB ===== -->
+  <div class="section" id="tab-bezier">
+    <div class="card">
+      <h2>Bezier 곡선</h2>
+      <div class="key-box">💡 핵심 아이디어: Hermite는 접선벡터를 직접 입력해야 합니다. Bezier는 <strong>인접 점의 차이</strong>로 접선을 자동 추정합니다!</div>
+
+      <h3>접선 추정 방법</h3>
+      <!-- Bezier 제어점 시각화 -->
+      <svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:.75rem auto;">
+        <!-- 제어 다각형 -->
+        <line x1="60" y1="140" x2="160" y2="60" stroke="var(--text-tertiary)" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="160" y1="60" x2="340" y2="60" stroke="var(--text-tertiary)" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="340" y1="60" x2="440" y2="140" stroke="var(--text-tertiary)" stroke-width="1" stroke-dasharray="4,3"/>
+        <!-- 실제 곡선 -->
+        <path d="M 60 140 C 160 60, 340 60, 440 140" stroke="#185fa5" stroke-width="2.5" fill="none"/>
+        <!-- 접선 벡터 표시 -->
+        <line x1="60" y1="140" x2="110" y2="107" stroke="#a32d2d" stroke-width="2"/>
+        <polygon points="110,107 97,108 100,120" fill="#a32d2d"/>
+        <text x="112" y="103" font-size="10" fill="#a32d2d" font-family="system-ui">p'(0) = 3(p₁-p₀)</text>
+        <!-- 제어점 -->
+        <circle cx="60" cy="140" r="5" fill="#185fa5"/>
+        <circle cx="160" cy="60" r="5" fill="#854f0b" stroke="var(--border-secondary)" stroke-width="1"/>
+        <circle cx="340" cy="60" r="5" fill="#854f0b" stroke="var(--border-secondary)" stroke-width="1"/>
+        <circle cx="440" cy="140" r="5" fill="#185fa5"/>
+        <!-- 레이블 -->
+        <text x="45" y="158" font-size="11" fill="var(--text-primary)" font-family="system-ui">p₀</text>
+        <text x="152" y="52" font-size="11" fill="#854f0b" font-family="system-ui">p₁</text>
+        <text x="332" y="52" font-size="11" fill="#854f0b" font-family="system-ui">p₂</text>
+        <text x="443" y="158" font-size="11" fill="var(--text-primary)" font-family="system-ui">p₃</text>
+        <!-- 볼록 껍질 -->
+        <polygon points="60,140 160,60 340,60 440,140" fill="none" stroke="var(--border-success)" stroke-width="1" stroke-dasharray="2,4"/>
+        <text x="230" y="130" font-size="10" fill="#3b6d11" font-family="system-ui">볼록 껍질 (Convex Hull)</text>
+      </svg>
+
+      <div class="math-block">시작 접선: p'(0) = 3(p₁ - p₀) / (1/3) = 3(p₁ - p₀)
+끝 접선:   p'(1) = 3(p₃ - p₂)</div>
+      <div class="insight-box">🎯 비유: p₁과 p₂는 "당기는 손잡이". 직접 곡선 위에 있지 않지만, 곡선의 방향을 조종합니다!</div>
+
+      <h3>Bezier 행렬 유도</h3>
+      <div class="math-block">방정식 4개:
+p₀ = c₀
+p₁ = c₀ + (1/3)c₁
+p₂ = c₀ + (2/3)c₁ + (1/3)c₂
+p₃ = c₀ + c₁ + c₂ + c₃
+
+→ c = Mʙ·p</div>
+
+      <div class="step-box">
+        <div class="step-num">Bezier 기하행렬 Mʙ</div>
+        <div class="math-block">Mʙ =
+⎡ 1   0   0  0⎤
+⎢-3   3   0  0⎥
+⎢ 3  -6   3  0⎥
+⎣-1   3  -3  1⎦</div>
+      </div>
+
+      <h3>Bernstein 다항식 (Bezier 블렌딩 함수)</h3>
+      <div class="math-block">p(u) = b(u)ᵀ·p
+
+b₀(u) = (1-u)³              ← p₀의 영향력
+b₁(u) = 3u(1-u)²            ← p₁의 영향력
+b₂(u) = 3u²(1-u)            ← p₂의 영향력
+b₃(u) = u³                  ← p₃의 영향력</div>
+
+      <div class="key-box">
+        <strong>Bernstein 다항식의 중요 성질:</strong><br>
+        1. b₀+b₁+b₂+b₃ = 1 (항상 합이 1 → 아핀 불변성)<br>
+        2. 모든 bₖ ≥ 0 (음수 없음)<br>
+        3. 따라서 p(u)는 항상 제어점들의 <strong>볼록 껍질(Convex Hull) 내부</strong>에 있음!
+      </div>
+
+      <h3>직접 계산 예제</h3>
+      <p>제어점: p₀=(0,0), p₁=(1,2), p₂=(3,2), p₃=(4,0), u=0.5일 때 점 계산</p>
+      <div class="step-box">
+        <div class="step-num">Step 1: Bernstein 값 계산 (u=0.5)</div>
+        b₀(0.5) = (0.5)³ = 0.125 × ... = (1-0.5)³ = 0.125<br>
+        b₁(0.5) = 3×0.5×(0.5)² = 3×0.5×0.25 = 0.375<br>
+        b₂(0.5) = 3×(0.5)²×0.5 = 0.375<br>
+        b₃(0.5) = (0.5)³ = 0.125
+      </div>
+      <div class="step-box">
+        <div class="step-num">Step 2: 합이 1인지 확인</div>
+        0.125 + 0.375 + 0.375 + 0.125 = <strong>1.0 ✓</strong>
+      </div>
+      <div class="step-box">
+        <div class="step-num">Step 3: 점 계산</div>
+        x = 0.125×0 + 0.375×1 + 0.375×3 + 0.125×4 = 0 + 0.375 + 1.125 + 0.5 = <strong>2.0</strong><br>
+        y = 0.125×0 + 0.375×2 + 0.375×2 + 0.125×0 = 0 + 0.75 + 0.75 + 0 = <strong>1.5</strong><br>
+        → u=0.5일 때 점: <strong>(2.0, 1.5)</strong>
+      </div>
+
+      <h3>연속성 (Continuity)</h3>
+      <table>
+        <tr><th>연속성</th><th>조건</th><th>의미</th></tr>
+        <tr><td><span class="badge badge-blue">C⁰</span></td><td>끝점 위치 일치</td><td>연결되어 있지만 꺾일 수 있음</td></tr>
+        <tr><td><span class="badge badge-green">C¹</span></td><td>끝점 위치 + 미분 일치</td><td>매끄럽게 연결</td></tr>
+        <tr><td><span class="badge badge-amber">C²</span></td><td>위치 + 1차 + 2차 미분 일치</td><td>더 부드럽게 연결</td></tr>
+        <tr><td>G⁰</td><td>= C⁰</td><td>기하적 연속</td></tr>
+        <tr><td>G¹</td><td>접선 방향 일치 (크기 무관)</td><td>방향만 같으면 됨</td></tr>
+      </table>
+      <div class="warn-box">⚠️ Bezier는 기본적으로 C⁰만 보장. C¹을 위해선 연결점에서 접선 조건을 수동으로 맞춰야 합니다.</div>
+    </div>
+  </div>
+
+  <!-- ===== B-SPLINE TAB ===== -->
+  <div class="section" id="tab-spline">
+    <div class="card">
+      <h2>B-Spline</h2>
+      <div class="key-box">💡 목표: Hermite의 매끄러움 + Bezier의 편리한 제어점 사용 + <strong>C² 연속성 자동 보장!</strong></div>
+
+      <h3>B-Spline의 핵심 개념</h3>
+      <p>4개의 제어점 {pᵢ₋₂, pᵢ₋₁, pᵢ, pᵢ₊₁}으로 pᵢ₋₁과 pᵢ 사이의 곡선을 그립니다. 단, 곡선이 제어점을 <strong>통과하지 않습니다!</strong></p>
+
+      <!-- B-Spline 시각화 -->
+      <svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:.75rem auto;">
+        <!-- 제어 다각형 -->
+        <polyline points="50,140 150,50 280,150 400,60 460,120" fill="none" stroke="var(--border-secondary)" stroke-width="1" stroke-dasharray="4,3"/>
+        <!-- B-Spline 곡선 (근사) -->
+        <path d="M 100 110 C 130 75, 180 95, 215 105 C 250 115, 300 100, 340 80 C 370 65, 410 75, 430 90" stroke="#185fa5" stroke-width="2.5" fill="none"/>
+        <!-- 제어점 -->
+        <circle cx="50" cy="140" r="5" fill="var(--text-tertiary)"/>
+        <circle cx="150" cy="50" r="5" fill="var(--text-tertiary)"/>
+        <circle cx="280" cy="150" r="5" fill="var(--text-tertiary)"/>
+        <circle cx="400" cy="60" r="5" fill="var(--text-tertiary)"/>
+        <circle cx="460" cy="120" r="5" fill="var(--text-tertiary)"/>
+        <!-- 레이블 -->
+        <text x="35" y="158" font-size="11" fill="var(--text-secondary)" font-family="system-ui">p₀</text>
+        <text x="143" y="43" font-size="11" fill="var(--text-secondary)" font-family="system-ui">p₁</text>
+        <text x="270" y="165" font-size="11" fill="var(--text-secondary)" font-family="system-ui">p₂</text>
+        <text x="393" y="53" font-size="11" fill="var(--text-secondary)" font-family="system-ui">p₃</text>
+        <text x="453" y="137" font-size="11" fill="var(--text-secondary)" font-family="system-ui">p₄</text>
+        <!-- 실제 곡선 구간 표시 -->
+        <circle cx="215" cy="105" r="4" fill="#3b6d11"/>
+        <circle cx="340" cy="80" r="4" fill="#3b6d11"/>
+        <text x="200" y="122" font-size="10" fill="#3b6d11" font-family="system-ui">구간 시작</text>
+        <text x="342" y="72" font-size="10" fill="#3b6d11" font-family="system-ui">구간 끝</text>
+        <text x="145" y="175" font-size="11" fill="#185fa5" font-family="system-ui">곡선은 제어점을 통과하지 않습니다!</text>
+      </svg>
+
+      <h3>경계 조건 설정</h3>
+      <p>자연스러운 연결을 위해 다음 조건을 사용합니다:</p>
+      <div class="math-block">연속성: q(1) = p(0) = (1/6)(pᵢ₋₁ + 4pᵢ + pᵢ₊₁)
+매끄러움: q'(1) = p'(0) = (1/2)(pᵢ₊₁ - pᵢ₋₁)
+
+다음 구간: p(1) = (1/6)(pᵢ + 4pᵢ₊₁ + pᵢ₊₂)
+            p'(1) = (1/2)(pᵢ₊₂ - pᵢ)</div>
+
+      <div class="insight-box">🧮 가중 평균: p(0) = (pᵢ₋₁ + 4pᵢ + pᵢ₊₁)/6 은 마치 주변 점들을 "1:4:1" 비율로 섞은 것. 자연스럽게 중간 어딘가에 곡선이 놓입니다.</div>
+
+      <h3>B-Spline 기하행렬</h3>
+      <div class="math-block">c = Mₛ·p    (여기서 p = {p₀, p₁, p₂, p₃})
+
+Mₛ = (1/6)·
+⎡ 1   4   1   0⎤
+⎢-3   0   3   0⎥
+⎢ 3  -6   3   0⎥
+⎣-1   3  -3   1⎦
+
+p(u) = uᵀ·Mₛ·p</div>
+
+      <h3>B-Spline 블렌딩 함수</h3>
+      <div class="math-block">b₀(u) = (1-u)³ / 6
+b₁(u) = (4 - 6u² + 3u³) / 6
+b₂(u) = (1 + 3u + 3u² - 3u³) / 6
+b₃(u) = u³ / 6</div>
+
+      <h3>세그먼트 추가</h3>
+      <p>점 하나를 추가할 때마다 새 세그먼트가 생깁니다:</p>
+      <div class="math-block">점 추가: pᵢ₊₂ 추가
+새 세그먼트: {pᵢ₋₁, pᵢ, pᵢ₊₁, pᵢ₊₂} 사용 → pᵢ~pᵢ₊₁ 사이 곡선</div>
+      <div class="warn-box">⚠️ B-Spline은 각 세그먼트가 점 2개 사이만 커버. Bezier보다 세그먼트당 계산량이 많습니다.</div>
+    </div>
+  </div>
+
+  <!-- ===== 비교 TAB ===== -->
+  <div class="section" id="tab-compare">
+    <div class="card">
+      <h2>곡선 방법론 비교 요약</h2>
+      <table>
+        <tr>
+          <th>방법</th>
+          <th>입력</th>
+          <th>통과 여부</th>
+          <th>연속성</th>
+          <th>특징</th>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">보간 (Interpolation)</span></td>
+          <td>4개 데이터 점</td>
+          <td>✅ 모두 통과</td>
+          <td>C⁰ (기본)</td>
+          <td>연결점 꺾임 가능</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">Hermite</span></td>
+          <td>2 끝점 + 2 접선벡터</td>
+          <td>✅ 끝점 통과</td>
+          <td>C¹ 가능</td>
+          <td>접선벡터 직접 지정</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-amber">Bezier</span></td>
+          <td>4 제어점</td>
+          <td>✅ 끝점만 통과</td>
+          <td>C⁰ 기본</td>
+          <td>직관적 조형, 볼록 껍질</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">B-Spline</span></td>
+          <td>4 제어점</td>
+          <td>❌ 근사만</td>
+          <td><strong>C² 자동!</strong></td>
+          <td>가장 매끄러움, 로컬 제어</td>
+        </tr>
+      </table>
+
+      <h3>언제 어떤 방법을 쓰나?</h3>
+      <table>
+        <tr><th>상황</th><th>추천</th><th>이유</th></tr>
+        <tr><td>정확히 점을 통과해야 함</td><td>보간 또는 Hermite</td><td>제어점을 곡선이 지남</td></tr>
+        <tr><td>직관적인 모양 조형</td><td>Bezier</td><td>제어점이 곡선을 "당긴다"</td></tr>
+        <tr><td>매우 부드러운 곡선 필요</td><td>B-Spline</td><td>C² 연속성 자동 보장</td></tr>
+        <tr><td>접선 방향을 직접 알고 있음</td><td>Hermite</td><td>접선 정보를 직접 활용</td></tr>
+      </table>
+
+      <h3>행렬 관계</h3>
+      <div class="math-block">모든 방법: p(u) = uᵀ·M·(제어점)
+
+- 보간:  M = Mᵢ = A⁻¹
+- Hermite: M = Mₕ
+- Bezier:  M = Mʙ
+- B-Spline: M = Mₛ</div>
+
+      <div class="insight-box">🔄 변환 가능: q = Mʙ⁻¹·M·p 공식으로 다른 방법의 제어점을 Bezier 제어점으로 변환할 수 있습니다!</div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ TAB ===== -->
+  <div class="section" id="tab-quiz">
+    <div id="score-card">
+      <div id="score-text"></div>
+      <div id="score-msg"></div>
+      <button class="reset-btn" onclick="resetQuiz()">🔄 다시 풀기</button>
+    </div>
+
+    <div class="q-container" id="q1">
+      <div class="q-num">Q1 / 9</div>
+      <div class="q-text">매개변수 곡선 p(u)의 미분 dp/du가 나타내는 것은?</div>
+      <button class="quiz-btn" onclick="answer(this,'q1',false)">곡선 위의 점의 위치</button>
+      <button class="quiz-btn" onclick="answer(this,'q1',true)">접선 방향과 u에 따른 속도</button>
+      <button class="quiz-btn" onclick="answer(this,'q1',false)">곡률(curvature)</button>
+      <button class="quiz-btn" onclick="answer(this,'q1',false)">호의 길이</button>
+      <div class="quiz-feedback" id="fb-q1"></div>
+    </div>
+
+    <div class="q-container" id="q2">
+      <div class="q-num">Q2 / 9</div>
+      <div class="q-text">3차(Cubic) 다항식으로 곡선을 표현할 때, x(u), y(u), z(u) 합쳐서 총 몇 개의 미지수가 있는가?</div>
+      <button class="quiz-btn" onclick="answer(this,'q2',false)">4개</button>
+      <button class="quiz-btn" onclick="answer(this,'q2',false)">8개</button>
+      <button class="quiz-btn" onclick="answer(this,'q2',true)">12개</button>
+      <button class="quiz-btn" onclick="answer(this,'q2',false)">16개</button>
+      <div class="quiz-feedback" id="fb-q2"></div>
+    </div>
+
+    <div class="q-container" id="q3">
+      <div class="q-num">Q3 / 9</div>
+      <div class="q-text">보간법(Interpolation)에서 4개의 점을 [0,1] 구간에 균등 배치할 때 u 값은?</div>
+      <button class="quiz-btn" onclick="answer(this,'q3',false)">0, 0.25, 0.5, 1</button>
+      <button class="quiz-btn" onclick="answer(this,'q3',true)">0, 1/3, 2/3, 1</button>
+      <button class="quiz-btn" onclick="answer(this,'q3',false)">0, 0.5, 0.75, 1</button>
+      <button class="quiz-btn" onclick="answer(this,'q3',false)">0, 1, 2, 3</button>
+      <div class="quiz-feedback" id="fb-q3"></div>
+    </div>
+
+    <div class="q-container" id="q4">
+      <div class="q-num">Q4 / 9</div>
+      <div class="q-text">Hermite 곡선이 Cubic 보간법과 다른 핵심 차이는?</div>
+      <button class="quiz-btn" onclick="answer(this,'q4',false)">더 많은 제어점을 사용한다</button>
+      <button class="quiz-btn" onclick="answer(this,'q4',false)">3차가 아닌 4차 다항식을 쓴다</button>
+      <button class="quiz-btn" onclick="answer(this,'q4',true)">내부 점 대신 끝점의 접선벡터(미분)를 조건으로 사용한다</button>
+      <button class="quiz-btn" onclick="answer(this,'q4',false)">제어점을 곡선이 통과하지 않는다</button>
+      <div class="quiz-feedback" id="fb-q4"></div>
+    </div>
+
+    <div class="q-container" id="q5">
+      <div class="q-num">Q5 / 9</div>
+      <div class="q-text">Bezier 곡선에서 p'(0) = 3(p₁ - p₀) 공식의 의미는?</div>
+      <button class="quiz-btn" onclick="answer(this,'q5',false)">곡선의 길이를 나타낸다</button>
+      <button class="quiz-btn" onclick="answer(this,'q5',true)">시작점의 접선벡터를 인접 제어점 차이로 근사한다</button>
+      <button class="quiz-btn" onclick="answer(this,'q5',false)">끝점의 위치를 결정한다</button>
+      <button class="quiz-btn" onclick="answer(this,'q5',false)">곡률을 계산한다</button>
+      <div class="quiz-feedback" id="fb-q5"></div>
+    </div>
+
+    <div class="q-container" id="q6">
+      <div class="q-num">Q6 / 9</div>
+      <div class="q-text">Bezier 블렌딩 함수(Bernstein 다항식)의 중요한 성질로 틀린 것은?</div>
+      <button class="quiz-btn" onclick="answer(this,'q6',false)">모든 값의 합이 1이다</button>
+      <button class="quiz-btn" onclick="answer(this,'q6',false)">모든 값이 0 이상이다</button>
+      <button class="quiz-btn" onclick="answer(this,'q6',true)">곡선이 반드시 모든 제어점을 통과한다</button>
+      <button class="quiz-btn" onclick="answer(this,'q6',false)">곡선이 제어점의 볼록 껍질 내부에 있다</button>
+      <div class="quiz-feedback" id="fb-q6"></div>
+    </div>
+
+    <div class="q-container" id="q7">
+      <div class="q-num">Q7 / 9</div>
+      <div class="q-text">Bezier 곡선에서 u=0.5일 때 b₁(u) = 3u(1-u)² 의 값은?</div>
+      <button class="quiz-btn" onclick="answer(this,'q7',false)">0.125</button>
+      <button class="quiz-btn" onclick="answer(this,'q7',true)">0.375</button>
+      <button class="quiz-btn" onclick="answer(this,'q7',false)">0.5</button>
+      <button class="quiz-btn" onclick="answer(this,'q7',false)">0.25</button>
+      <div class="quiz-feedback" id="fb-q7"></div>
+    </div>
+
+    <div class="q-container" id="q8">
+      <div class="q-num">Q8 / 9</div>
+      <div class="q-text">B-Spline이 Bezier보다 뛰어난 점은?</div>
+      <button class="quiz-btn" onclick="answer(this,'q8',false)">제어점을 더 적게 사용한다</button>
+      <button class="quiz-btn" onclick="answer(this,'q8',false)">계산이 더 빠르다</button>
+      <button class="quiz-btn" onclick="answer(this,'q8',true)">C² 연속성이 자동으로 보장된다</button>
+      <button class="quiz-btn" onclick="answer(this,'q8',false)">곡선이 반드시 제어점을 통과한다</button>
+      <div class="quiz-feedback" id="fb-q8"></div>
+    </div>
+
+    <div class="q-container" id="q9">
+      <div class="q-num">Q9 / 9</div>
+      <div class="q-text">B-Spline에서 연결점의 조건 q(1)=p(0)=(pᵢ₋₁+4pᵢ+pᵢ₊₁)/6 은 무엇을 의미하는가?</div>
+      <button class="quiz-btn" onclick="answer(this,'q9',false)">제어점의 평균점을 지난다</button>
+      <button class="quiz-btn" onclick="answer(this,'q9',true)">주변 점들의 가중 평균(1:4:1) 위치에서 세그먼트가 이어진다</button>
+      <button class="quiz-btn" onclick="answer(this,'q9',false)">pᵢ 점을 정확히 통과한다</button>
+      <button class="quiz-btn" onclick="answer(this,'q9',false)">세 점이 일직선임을 의미한다</button>
+      <div class="quiz-feedback" id="fb-q9"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const totalQ = 9;
+  let answered = {};
+  let score = 0;
+
+  function showTab(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function answer(btn, qid, correct) {
+    if (answered[qid]) return;
+    answered[qid] = true;
+    const btns = btn.parentElement.querySelectorAll('.quiz-btn');
+    btns.forEach(b => b.disabled = true);
+    const fb = document.getElementById('fb-' + qid);
+    if (correct) {
+      btn.classList.add('correct');
+      fb.style.display = 'block';
+      fb.style.background = 'var(--bg-success)';
+      fb.style.color = 'var(--text-success)';
+      fb.textContent = '✅ 정답입니다!';
+      score++;
+    } else {
+      btn.classList.add('wrong');
+      btns.forEach(b => {
+        if (b.onclick.toString().includes('true')) b.classList.add('correct');
+      });
+      fb.style.display = 'block';
+      fb.style.background = 'var(--bg-danger)';
+      fb.style.color = 'var(--text-danger)';
+      fb.textContent = '❌ 틀렸습니다. 초록색이 정답입니다.';
+    }
+    if (Object.keys(answered).length === totalQ) showScore();
+  }
+
+  function showScore() {
+    const card = document.getElementById('score-card');
+    card.style.display = 'block';
+    document.getElementById('score-text').textContent = score + ' / ' + totalQ;
+    const pct = score / totalQ;
+    document.getElementById('score-msg').textContent =
+      pct === 1 ? '🏆 완벽합니다! 모든 개념을 마스터했습니다.' :
+      pct >= 0.7 ? '👍 잘했습니다! 조금 더 복습해 보세요.' :
+      '📚 더 열심히 공부해 보세요. 다시 도전!';
+    card.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetQuiz() {
+    answered = {}; score = 0;
+    document.getElementById('score-card').style.display = 'none';
+    document.querySelectorAll('.quiz-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    document.querySelectorAll('.quiz-feedback').forEach(f => f.style.display = 'none');
+  }
+</script>
+</body>
+</html>

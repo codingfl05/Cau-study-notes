@@ -20,6 +20,9 @@
     --border-secondary: rgba(0,0,0,0.14);
     --border-info: #b5d4f4;
     --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --text-warning: #854f0b;
+    --bg-warning: #fdf3e0;
     --radius-md: 8px;
     --radius-lg: 12px;
     --font-sans: system-ui, -apple-system, sans-serif;
@@ -31,15 +34,18 @@
       --bg-tertiary: #2e2e2c;
       --bg-info: #0c2a4a;
       --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
       --text-primary: #e8e7e0;
       --text-secondary: #a0a098;
       --text-tertiary: #68685e;
       --text-info: #5ba0e8;
       --text-success: #5aaa6a;
+      --text-warning: #d08830;
       --border-tertiary: rgba(255,255,255,0.08);
       --border-secondary: rgba(255,255,255,0.14);
       --border-info: #1a4a7a;
       --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
     }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -101,6 +107,9 @@
 
   .week-card.ds { border-left: 3px solid var(--border-info); }
   .week-card.ds .wk-num { color: var(--text-info); }
+
+  .week-card.na { border-left: 3px solid var(--border-warning); }
+  .week-card.na .wk-num { color: var(--text-warning); }
 </style>
 </head>
 <body>
@@ -134,10 +143,21 @@
         <div class="wk-title">Linked List 심화</div>
         <div class="wk-sub">이중 연결 리스트, 다항식, Skip List</div>
       </a>
-      <a href="ds-week6.html" class="week-card ds">
-        <div class="wk-num">Week 6</div>
-        <div class="wk-title">Tree &amp; BST</div>
-        <div class="wk-sub">트리 용어, 이진 트리, 순회, BST 연산</div>
+    </div>
+  </div>
+
+  <div class="subject-section">
+    <div class="subject-title">📐 Numerical Analysis</div>
+    <div class="week-grid">
+      <a href="na-week7.html" class="week-card na">
+        <div class="wk-num">Week 7</div>
+        <div class="wk-title">Curves</div>
+        <div class="wk-sub">Cubic · Hermite · Bezier · B-Spline</div>
+      </a>
+      <a href="na-week8.html" class="week-card na">
+        <div class="wk-num">Week 8</div>
+        <div class="wk-title">Surfaces</div>
+        <div class="wk-sub">Bilinear · Bi-cubic · Bezier · Spline 곡면</div>
       </a>
     </div>
   </div>
