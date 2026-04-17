@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Notes</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --bg-warning: #fdf3e0;
+    --bg-danger: #fdf0f0;
+    --bg-purple: #eeedfe;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-warning: #854f0b;
+    --text-danger: #a32d2d;
+    --text-purple: #3c3489;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --border-danger: #f7c1c1;
+    --border-purple: #afa9ec;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
+      --bg-danger: #2a0808;
+      --bg-purple: #26215c22;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --text-warning: #d08830;
+      --text-danger: #e06060;
+      --text-purple: #afa9ec;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
+      --border-danger: #5a1818;
+      --border-purple: #3c3489;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  /* Header */
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .site-header .logo {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .site-header .semester {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+  /* Page title */
+  .page-title { margin-bottom: 2.5rem; }
+  .page-title .eyebrow {
+    font-size: 12px; color: var(--text-tertiary);
+    font-family: var(--font-mono); margin-bottom: .4rem;
+    letter-spacing: .04em;
+  }
+  .page-title h1 { font-size: 22px; font-weight: 500; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .3rem; }
+
+  /* Subject grid */
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  /* Subject card */
+  .subject-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color .15s;
+  }
+  .subject-card:hover { border-color: var(--border-secondary); }
+
+  .card-header {
+    padding: 1rem 1.25rem .75rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .card-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 500;
+    padding: 2px 9px; border-radius: 20px;
+    margin-bottom: .5rem;
+    font-family: var(--font-mono);
+  }
+  .card-title { font-size: 15px; font-weight: 500; line-height: 1.3; }
+  .card-desc { font-size: 12px; color: var(--text-secondary); margin-top: .25rem; }
+
+  /* Week links */
+  .card-body { padding: .6rem 0; }
+  .week-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem 1.25rem;
+    font-size: 13px;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background .1s;
+    gap: 8px;
+  }
+  .week-link:hover { background: var(--bg-secondary); }
+  .week-link .week-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-tertiary);
+    min-width: 32px;
+    flex-shrink: 0;
+  }
+  .week-link .week-title { flex: 1; }
+  .week-link .arrow {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    opacity: 0;
+    transition: opacity .1s;
+  }
+  .week-link:hover .arrow { opacity: 1; }
+
+  /* Coming soon placeholder */
+  .coming-soon {
+    padding: .75rem 1.25rem;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+  }
+
+  /* Color themes per subject */
+  .theme-blue .card-tag { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); }
+  .theme-green .card-tag { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
+  .theme-amber .card-tag { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
+  .theme-red .card-tag { background: var(--bg-danger); color: var(--text-danger); border: 0.5px solid var(--border-danger); }
+  .theme-purple .card-tag { background: var(--bg-purple); color: var(--text-purple); border: 0.5px solid var(--border-purple); }
+
+  /* Footer */
+  .site-footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    border-top: 0.5px solid var(--border-tertiary);
+    margin-top: 3rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <span class="logo">Study Notes</span>
+  <span class="semester">2025 Spring</span>
+</header>
+
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">personal study notes</div>
+    <h1>과목별 강의 노트</h1>
+    <div class="sub">강의 내용 정리 · 핵심 개념 · 연습 문제</div>
+  </div>
+
+  <div class="subject-grid">
+
+    <!-- Data Structures -->
+    <div class="subject-card theme-blue">
+      <div class="card-header">
+        <div class="card-tag">CS</div>
+        <div class="card-title">Data Structures</div>
+        <div class="card-desc">자료구조 — 배열, 스택, 큐, 트리, 그래프</div>
+      </div>
+      <div class="card-body">
+        <a href="ds-week3.html" class="week-link">
+          <span class="week-num">W03</span>
+          <span class="week-title">Array &amp; Stack</span>
+          <span class="arrow">→</span>
+        </a>
+        <div class="coming-soon">더 많은 노트가 추가될 예정...</div>
+      </div>
+    </div>
+
+    <!-- Numerical Analysis -->
+    <div class="subject-card theme-green">
+      <div class="card-header">
+        <div class="card-tag">MATH</div>
+        <div class="card-title">Numerical Analysis</div>
+        <div class="card-desc">수치해석 — 오차, 보간법, 수치미분/적분</div>
+      </div>
+      <div class="card-body">
+        <div class="coming-soon">노트 준비 중...</div>
+      </div>
+    </div>
+
+    <!-- Probability -->
+    <div class="subject-card theme-amber">
+      <div class="card-header">
+        <div class="card-tag">MATH</div>
+        <div class="card-title">Probability</div>
+        <div class="card-desc">확률론 — 확률 공리, 조건부 확률, 확률변수</div>
+      </div>
+      <div class="card-body">
+        <div class="coming-soon">노트 준비 중...</div>
+      </div>
+    </div>
+
+    <!-- Computer Graphics -->
+    <div class="subject-card theme-purple">
+      <div class="card-header">
+        <div class="card-tag">CS</div>
+        <div class="card-title">Computer Graphics</div>
+        <div class="card-desc">컴퓨터 그래픽스 — 변환, 곡선, 좌표계</div>
+      </div>
+      <div class="card-body">
+        <div class="coming-soon">노트 준비 중...</div>
+      </div>
+    </div>
+
+    <!-- Korean History -->
+    <div class="subject-card theme-red">
+      <div class="card-header">
+        <div class="card-tag">GE</div>
+        <div class="card-title">Korean History</div>
+        <div class="card-desc">한국사 — 교양 필수</div>
+      </div>
+      <div class="card-body">
+        <div class="coming-soon">노트 준비 중...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  personal study notes · updated as lectures progress
+</footer>
+
+</body>
+</html>
