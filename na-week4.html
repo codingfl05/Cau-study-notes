@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numerical Analysis — Week 4: Transformations</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --bg-warning: #fdf3e0;
+    --bg-danger: #fdf0f0;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-warning: #854f0b;
+    --text-danger: #a32d2d;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-primary: rgba(0,0,0,0.22);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --border-danger: #f7c1c1;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
+      --bg-danger: #2a0808;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --text-warning: #d08830;
+      --text-danger: #e06060;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-primary: rgba(255,255,255,0.22);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
+      --border-danger: #5a1818;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .site-header a { text-decoration: none; font-size: 13px; color: var(--text-secondary); font-weight: 400; }
+  .site-header a:hover { color: var(--text-primary); }
+  .sep { color: var(--text-tertiary); font-size: 13px; }
+  .header-title { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .page-title { margin-bottom: 1.5rem; }
+  .page-title .eyebrow { font-size: 12px; color: var(--text-tertiary); font-weight: 400; margin-bottom: .35rem; letter-spacing: .04em; }
+  .page-title h1 { font-size: 22px; font-weight: 500; line-height: 1.3; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .35rem; }
+  .tab-bar {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .tab {
+    font-size: 13px; padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: transparent;
+    font-family: var(--font-sans);
+    transition: all .12s;
+    font-weight: 400;
+  }
+  .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .tab.active {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+    font-weight: 500;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  h2 { font-size: 18px; font-weight: 500; margin-bottom: 1rem; padding-bottom: .6rem; border-bottom: 0.5px solid var(--border-tertiary); }
+  h3 { font-size: 15px; font-weight: 500; margin-bottom: .5rem; }
+  p { font-size: 14px; margin-bottom: .6rem; }
+  .key-box {
+    border-left: 3px solid var(--border-info);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-info);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-info);
+  }
+  .warn-box {
+    border-left: 3px solid var(--border-danger);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-danger);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-danger);
+  }
+  .insight-box {
+    border-left: 3px solid var(--border-success);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-success);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-success);
+  }
+  code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary); padding: 2px 5px;
+    border-radius: 4px; color: var(--text-primary);
+  }
+  .code-block {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem; margin: .75rem 0;
+    line-height: 1.6; overflow-x: auto; white-space: pre;
+    color: var(--text-primary);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: .75rem 0; }
+  th {
+    text-align: left; padding: 7px 10px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-weight: 500; font-size: 12px;
+    border-bottom: 0.5px solid var(--border-secondary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  td { padding: 7px 10px; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+  .badge {
+    display: inline-block; font-size: 12px;
+    padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .badge-blue { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); }
+  .badge-green { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
+  .badge-amber { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
+  .badge-red { background: var(--bg-danger); color: var(--text-danger); border: 0.5px solid var(--border-danger); }
+
+  /* Math formula display */
+  .math-block {
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: .75rem 1.25rem;
+    margin: .75rem 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    overflow-x: auto;
+    line-height: 1.8;
+    color: var(--text-primary);
+  }
+  .math-label {
+    font-size: 11px; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: .25rem;
+  }
+  .step-box {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: .6rem 1rem;
+    margin: .4rem 0;
+    font-size: 13px;
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+  }
+  .step-num {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* Quiz */
+  .q-container {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .q-num { font-size: 12px; color: var(--text-tertiary); margin-bottom: .3rem; }
+  .q-text { font-size: 14px; font-weight: 500; margin-bottom: .75rem; }
+  .quiz-btn {
+    display: block; width: 100%;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: 9px 14px; cursor: pointer;
+    font-size: 13px; color: var(--text-primary);
+    text-align: left; margin: 4px 0;
+    transition: all .12s;
+    font-family: var(--font-sans);
+  }
+  .quiz-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+  .quiz-btn.correct { border-color: var(--border-success); background: var(--bg-success); color: var(--text-success); }
+  .quiz-btn.wrong   { border-color: var(--border-danger);  background: var(--bg-danger);  color: var(--text-danger);  }
+  .quiz-feedback {
+    font-size: 13px; margin-top: 8px;
+    padding: 8px 12px; border-radius: var(--radius-md);
+    display: none;
+  }
+  #score-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; text-align: center;
+    margin-bottom: 1.5rem; display: none;
+  }
+  #score-text { font-size: 24px; font-weight: 500; margin-bottom: .4rem; }
+  #score-msg  { font-size: 13px; color: var(--text-secondary); }
+  .reset-btn {
+    margin-top: .75rem;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: 20px; padding: 5px 16px;
+    cursor: pointer; font-size: 13px;
+    color: var(--text-secondary); font-family: var(--font-sans);
+    transition: all .12s;
+  }
+  .reset-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html">← Home</a>
+  <span class="sep">/</span>
+  <a href="#">Numerical Analysis</a>
+  <span class="sep">/</span>
+  <span class="header-title">Week 4 — Transformations</span>
+</header>
+
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">Numerical Analysis · Week 4</div>
+    <h1>기하 변환 (Transformations)</h1>
+    <div class="sub">등거리 변환, 유사 변환, 아핀 변환, 동차 좌표계 완벽 정리</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('overview',this)">🗺️ 개요</button>
+    <button class="tab" onclick="showTab('basic',this)">📐 기본 변환</button>
+    <button class="tab" onclick="showTab('types',this)">🔀 변환의 종류</button>
+    <button class="tab" onclick="showTab('homogeneous',this)">🧮 동차좌표</button>
+    <button class="tab" onclick="showTab('quiz',this)">🧪 Quiz</button>
+  </div>
+
+  <!-- ===== 개요 ===== -->
+  <div class="section active" id="tab-overview">
+    <h2>변환(Transformation)이란?</h2>
+
+    <div class="card">
+      <h3>🎯 변환의 직관적 이해</h3>
+      <p>변환이란 <strong>점, 선, 도형을 이동/크기변경/회전</strong>하는 것입니다. 하지만 종류마다 "무엇이 변하고 무엇이 유지되는가"가 다릅니다.</p>
+      <div class="insight-box">💡 핵심 아이디어: 변환의 종류는 <strong>어떤 기하학적 성질(불변량)을 보존하느냐</strong>에 따라 구분됩니다.</div>
+    </div>
+
+    <div class="card">
+      <h3>기하학적 성질 (Geometric Properties)</h3>
+      <table>
+        <tr><th>성질</th><th>설명</th></tr>
+        <tr><td><strong>Position (위치)</strong></td><td>원점으로부터의 거리</td></tr>
+        <tr><td><strong>Distance (거리)</strong></td><td>두 점 사이의 상대적 거리 (크기)</td></tr>
+        <tr><td><strong>Angle (각도)</strong></td><td>두 선 사이의 상대적 각도</td></tr>
+        <tr><td><strong>Orientation (방향)</strong></td><td>절대적인 방향각</td></tr>
+        <tr><td><strong>Collineation (선형성)</strong></td><td>직선 위의 점은 변환 후에도 직선 위</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>변환 계층 구조</h3>
+      <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="var(--text-tertiary)"/>
+          </marker>
+        </defs>
+        <!-- Boxes -->
+        <rect x="290" y="10" width="120" height="36" rx="8" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+        <text x="350" y="33" text-anchor="middle" font-size="13" fill="var(--text-info)" font-family="system-ui">Identity</text>
+
+        <rect x="170" y="80" width="120" height="36" rx="8" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+        <text x="230" y="103" text-anchor="middle" font-size="13" fill="var(--text-info)" font-family="system-ui">Translation</text>
+
+        <rect x="410" y="80" width="120" height="36" rx="8" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+        <text x="470" y="103" text-anchor="middle" font-size="13" fill="var(--text-info)" font-family="system-ui">Rotation</text>
+
+        <rect x="130" y="155" width="130" height="36" rx="8" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+        <text x="195" y="173" text-anchor="middle" font-size="12" fill="var(--text-success)" font-family="system-ui">Isometry (등거리)</text>
+        <text x="195" y="186" text-anchor="middle" font-size="10" fill="var(--text-success)" font-family="system-ui">+ Reflection</text>
+
+        <rect x="320" y="155" width="120" height="36" rx="8" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+        <text x="380" y="173" text-anchor="middle" font-size="12" fill="var(--text-success)" font-family="system-ui">Similarity</text>
+        <text x="380" y="186" text-anchor="middle" font-size="10" fill="var(--text-success)" font-family="system-ui">+ Isotropic Scale</text>
+
+        <rect x="150" y="235" width="120" height="36" rx="8" fill="var(--bg-warning)" stroke="var(--border-warning)" stroke-width="0.5"/>
+        <text x="210" y="253" text-anchor="middle" font-size="12" fill="var(--text-warning)" font-family="system-ui">Affine</text>
+        <text x="210" y="266" text-anchor="middle" font-size="10" fill="var(--text-warning)" font-family="system-ui">+ Shear, Scale</text>
+
+        <rect x="440" y="235" width="120" height="36" rx="8" fill="var(--bg-danger)" stroke="var(--border-danger)" stroke-width="0.5"/>
+        <text x="500" y="253" text-anchor="middle" font-size="12" fill="var(--text-danger)" font-family="system-ui">Projective</text>
+        <text x="500" y="266" text-anchor="middle" font-size="10" fill="var(--text-danger)" font-family="system-ui">Perspective</text>
+
+        <!-- Arrows -->
+        <line x1="310" y1="46" x2="255" y2="80" stroke="var(--text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+        <line x1="390" y1="46" x2="445" y2="80" stroke="var(--text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+        <line x1="230" y1="116" x2="210" y2="155" stroke="var(--text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+        <line x1="470" y1="116" x2="380" y2="155" stroke="var(--text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+        <line x1="250" y1="191" x2="240" y2="235" stroke="var(--text-tertiary)" stroke-width="0.5" marker-end="url(#arr)"/>
+      </svg>
+      <div class="key-box">아래로 갈수록 더 넓은 개념 (더 많은 것이 허용됨). 예: Affine ⊃ Similarity ⊃ Isometry</div>
+    </div>
+
+    <div class="card">
+      <h3>각 변환이 보존하는 성질 비교표</h3>
+      <table>
+        <tr><th>변환 종류</th><th>거리</th><th>각도</th><th>평행</th><th>직선</th><th>비율</th></tr>
+        <tr><td><span class="badge badge-blue">Isometry</span></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td><span class="badge badge-green">Similarity</span></td><td>❌ (비례)</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td><span class="badge badge-amber">Affine</span></td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>✅ (비율만)</td></tr>
+        <tr><td><span class="badge badge-red">Projective</span></td><td>❌</td><td>❌</td><td>❌</td><td>✅ (직선 유지)</td><td>❌</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== 기본 변환 ===== -->
+  <div class="section" id="tab-basic">
+    <h2>기본 변환: Translation, Scaling, Rotation</h2>
+
+    <div class="card">
+      <h3>📦 Translation (이동 변환)</h3>
+      <p>물체 전체를 일정량만큼 <strong>평행 이동</strong>시킵니다. 마치 책상 위의 컵을 옆으로 옮기는 것처럼요.</p>
+      <div class="math-block">x' = x + t_x
+y' = y + t_y
+
+행렬 표현: X' = X + T   (T = [tx, ty]^T)</div>
+      <div class="insight-box">✅ 보존: 거리, 각도, 크기, 형태 모두 유지<br>❌ 변화: 위치(절대 좌표)</div>
+
+      <h3 style="margin-top:1rem">직선 이동 예시</h3>
+      <p>직선 <code>ax + by + c = 0</code>을 <code>(tx, ty)</code>만큼 이동하면:</p>
+      <div class="math-block">x' = x + tx  →  x = x' - tx
+대입: a(x'-tx) + b(y'-ty) + c = 0
+결과: ax' + by' + (c - a·tx - b·ty) = 0</div>
+      <div class="key-box">💡 직선을 이동하면 기울기(a, b)는 그대로이고 상수항 c만 바뀜. 평행 이동!</div>
+
+      <h3 style="margin-top:1rem">방향이 있는 직선 이동</h3>
+      <p>방향 <strong>A</strong>, 점 <strong>B</strong>를 지나는 직선 <code>X = Au + B</code>를 이동하면:</p>
+      <div class="math-block">X' = X + T
+X' = Au + (B + T)  ← 방향 A는 변하지 않고, 지나는 점이 B+T로 이동!</div>
+    </div>
+
+    <div class="card">
+      <h3>📏 Scaling (크기 변환)</h3>
+      <p>물체를 크거나 작게 만드는 변환입니다.</p>
+      <div class="grid-2">
+        <div>
+          <p><strong>Uniform Scaling (균일 스케일링)</strong></p>
+          <p>모든 축에 같은 비율 s 적용</p>
+          <div class="math-block">M = sI = [s 0 0]
+          [0 s 0]
+          [0 0 s]</div>
+          <div class="insight-box">형태(모양)는 유지됨</div>
+        </div>
+        <div>
+          <p><strong>Non-uniform Scaling (비균일)</strong></p>
+          <p>축마다 다른 비율 적용</p>
+          <div class="math-block">M = [s1 0  0 ]
+    [0  s2 0 ]
+    [0  0  s3]</div>
+          <div class="warn-box">형태가 찌그러질 수 있음</div>
+        </div>
+      </div>
+      <h3 style="margin-top:.5rem">🔢 쉬운 예시</h3>
+      <div class="math-block">점 (3, 2)를 x방향으로 2배, y방향으로 3배 스케일:
+x' = 3 × 2 = 6
+y' = 2 × 3 = 6
+→ 결과: (6, 6)</div>
+    </div>
+
+    <div class="card">
+      <h3>🔄 Rotation (회전 변환)</h3>
+      <p>원점을 중심으로 θ만큼 반시계 방향으로 회전합니다.</p>
+      <div class="key-box">직관: 점 P = (r cosω, r sinω) 를 θ만큼 회전하면 P' = (r cos(ω+θ), r sin(ω+θ))</div>
+      <div class="math-block">x' = x·cosθ - y·sinθ
+y' = x·sinθ + y·cosθ
+
+행렬: R = [cosθ  -sinθ]
+          [sinθ   cosθ]</div>
+
+      <h3 style="margin-top:1rem">🔢 예시: 점 (1, 0)을 90° 회전</h3>
+      <div class="step-box"><div class="step-num">1</div><div>x' = 1·cos90° - 0·sin90° = 1·0 - 0·1 = 0</div></div>
+      <div class="step-box"><div class="step-num">2</div><div>y' = 1·sin90° + 0·cos90° = 1·1 + 0·0 = 1</div></div>
+      <div class="step-box"><div class="step-num">3</div><div>결과: (0, 1) ✅ 90° 반시계 회전 맞음!</div></div>
+
+      <h3 style="margin-top:1rem">역행렬 (Inverse)</h3>
+      <div class="math-block">R⁻¹ = Rᵀ = [cosθ   sinθ]
+              [-sinθ  cosθ]
+= R(-θ)  ← θ만큼 역방향으로 회전!</div>
+      <div class="insight-box">💡 회전 행렬의 역행렬 = 전치행렬 = 음의 각도로 회전 (이건 직교행렬의 성질!)</div>
+
+      <h3 style="margin-top:1rem">연속 회전 (Successive Rotations)</h3>
+      <p>θ₁만큼 회전 후 θ₂만큼 회전하면?</p>
+      <div class="math-block">X'' = R₂·R₁·X = R(θ₁+θ₂)·X
+→ 각도가 그냥 더해짐! R₂R₁ = R(θ₁+θ₂)</div>
+
+      <h3 style="margin-top:1rem">임의 점 P 중심으로 회전</h3>
+      <div class="step-box"><div class="step-num">1</div><div>P를 원점으로 이동: X' = X - P</div></div>
+      <div class="step-box"><div class="step-num">2</div><div>원점 중심으로 회전: X' = R·X'</div></div>
+      <div class="step-box"><div class="step-num">3</div><div>다시 P 위치로: X' = X' + P</div></div>
+      <div class="math-block">최종: X' = R(X - P) + P</div>
+
+      <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="var(--text-info)"/>
+          </marker>
+        </defs>
+        <!-- Coordinate axes -->
+        <line x1="40" y1="180" x2="380" y2="180" stroke="var(--border-secondary)" stroke-width="0.5"/>
+        <line x1="200" y1="20" x2="200" y2="200" stroke="var(--border-secondary)" stroke-width="0.5"/>
+        <text x="370" y="195" font-size="11" fill="var(--text-tertiary)" font-family="system-ui">x</text>
+        <text x="205" y="30" font-size="11" fill="var(--text-tertiary)" font-family="system-ui">y</text>
+        <!-- Center point P -->
+        <circle cx="200" cy="120" r="4" fill="var(--text-warning)"/>
+        <text x="206" y="118" font-size="11" fill="var(--text-warning)" font-family="system-ui">P (회전 중심)</text>
+        <!-- Original point -->
+        <circle cx="290" cy="120" r="4" fill="var(--text-info)"/>
+        <text x="294" y="118" font-size="11" fill="var(--text-info)" font-family="system-ui">X (원래 점)</text>
+        <!-- Rotated point -->
+        <circle cx="200" cy="50" r="4" fill="var(--text-success)"/>
+        <text x="206" y="48" font-size="11" fill="var(--text-success)" font-family="system-ui">X' (회전 후)</text>
+        <!-- Arc -->
+        <path d="M 290 120 A 90 90 0 0 0 200 50" fill="none" stroke="var(--text-tertiary)" stroke-width="0.5" stroke-dasharray="4,3"/>
+        <!-- Step arrows -->
+        <line x1="290" y1="120" x2="200" y2="120" stroke="var(--text-info)" stroke-width="1" marker-end="url(#arr2)" stroke-dasharray="4,2"/>
+        <text x="235" y="138" font-size="10" fill="var(--text-info)" font-family="system-ui">① P로 이동</text>
+        <text x="150" y="85" font-size="10" fill="var(--text-tertiary)" font-family="system-ui">② 회전</text>
+        <text x="155" y="50" font-size="10" fill="var(--text-success)" font-family="system-ui">③ P 복귀</text>
+      </svg>
+    </div>
+
+    <div class="card">
+      <h3>🪄 Shear (전단 변환)</h3>
+      <p>마치 책 페이지를 비스듬히 밀어 기울이는 것처럼 축 방향으로 비틀어주는 변환입니다.</p>
+      <div class="grid-2">
+        <div>
+          <p><strong>x 방향 Shear</strong></p>
+          <div class="math-block">x' = x + k·y
+y' = y
+
+행렬: [1 k] [x]   [x+ky]
+      [0 1] [y] = [  y  ]</div>
+          <div class="insight-box">y값에 비례해서 x가 이동</div>
+        </div>
+        <div>
+          <p><strong>y 방향 Shear</strong></p>
+          <div class="math-block">x' = x
+y' = k·x + y
+
+행렬: [1 0] [x]   [  x  ]
+      [k 1] [y] = [kx+y ]</div>
+          <div class="insight-box">x값에 비례해서 y가 이동</div>
+        </div>
+      </div>
+      <h3 style="margin-top:.5rem">🔢 예시: x 방향 Shear (k=2)</h3>
+      <div class="math-block">점 (1, 3) 에 k=2 shear 적용:
+x' = 1 + 2×3 = 7
+y' = 3
+결과: (7, 3)  ← y가 3이므로 x가 6만큼 이동!</div>
+      <svg viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <!-- 원래 사각형 -->
+        <polygon points="60,150 120,150 120,80 60,80" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="1"/>
+        <text x="75" y="175" font-size="11" fill="var(--text-info)" font-family="system-ui">원래 도형</text>
+        <!-- shear된 사각형 -->
+        <polygon points="200,150 290,150 260,80 170,80" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="1"/>
+        <text x="205" y="175" font-size="11" fill="var(--text-success)" font-family="system-ui">Shear 후</text>
+        <!-- 화살표 -->
+        <line x1="135" y1="115" x2="175" y2="115" stroke="var(--text-tertiary)" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="320" y="118" font-size="11" fill="var(--text-tertiary)" font-family="system-ui">x 방향으로</text>
+        <text x="320" y="132" font-size="11" fill="var(--text-tertiary)" font-family="system-ui">기울어짐</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ===== 변환의 종류 ===== -->
+  <div class="section" id="tab-types">
+    <h2>변환의 종류 (Types of Transformation)</h2>
+
+    <div class="card">
+      <h3>🔒 Isometry (등거리 변환 / 강체 변환)</h3>
+      <p>거리를 완벽히 보존하는 변환. <strong>"rigid-body motion"</strong>이라고도 함.</p>
+      <div class="key-box">포함: Translation + Rotation + Reflection<br>보존: 거리, 각도, 넓이, 부피 <strong>모두</strong></div>
+      <div class="math-block">일반 2D 등거리 변환:
+x' = ax + by + tx
+y' = cx + dy + ty
+
+조건: 행렬 [a b; c d] 의 역행렬이 자기 자신과 같아야 함
+      [a b]⁻¹  =  [a b]   (단, 행렬식 = ±1)
+      [c d]       [c d]</div>
+      <div class="insight-box">💡 비유: 종이를 구기지 않고 이리저리 움직이는 것. 모양이 절대 바뀌지 않음.</div>
+    </div>
+
+    <div class="card">
+      <h3>📐 Similarity (유사 변환)</h3>
+      <p>= <strong>Isometry + 균일 스케일링</strong>. 형태(shape)는 유지하되 크기가 비례적으로 바뀜.</p>
+      <div class="key-box">"Conformal transformation"이라고도 부름. 각도를 보존함!</div>
+      <div class="math-block">x' = ax + by + tx
+y' = cx + dy + ty
+
+조건: [a b] = k · M   (M은 등거리 행렬, k는 스케일 비율)
+      [c d]
+
+즉: M^T · M = I  (정규직교)</div>
+      <div class="insight-box">💡 비유: 사진을 축소/확대 복사. 비율은 달라지지만 모양은 같음.</div>
+    </div>
+
+    <div class="card">
+      <h3>⬛ Affine Transformation (아핀 변환)</h3>
+      <p>가장 일반적인 선형 변환 + 이동의 조합. 3가지 핵심 성질을 보존합니다.</p>
+      <div class="grid-2">
+        <div class="key-box">
+          <strong>① Collinearity</strong><br>
+          직선 위의 점 → 변환 후에도 직선 위
+        </div>
+        <div class="key-box">
+          <strong>② Parallelism</strong><br>
+          평행한 두 직선 → 변환 후에도 평행
+        </div>
+      </div>
+      <div class="key-box"><strong>③ Ratio Preservation</strong><br>
+        EA:EB = E'A':E'B' (선분의 내분비 유지)</div>
+
+      <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <!-- 원래 도형 -->
+        <polygon points="50,170 130,170 110,100 30,100" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="1" fill-opacity="0.5"/>
+        <text x="50" y="190" font-size="11" fill="var(--text-info)" font-family="system-ui">원래 (평행사변형)</text>
+        <text x="28" y="95" font-size="11" fill="var(--text-info)" font-family="system-ui">A</text>
+        <text x="128" y="95" font-size="11" fill="var(--text-info)" font-family="system-ui">B</text>
+        <text x="128" y="185" font-size="11" fill="var(--text-info)" font-family="system-ui">C</text>
+        <text x="28" y="185" font-size="11" fill="var(--text-info)" font-family="system-ui">D</text>
+        <!-- 화살표 -->
+        <text x="175" y="145" font-size="20" fill="var(--text-tertiary)" font-family="system-ui">→</text>
+        <text x="165" y="130" font-size="10" fill="var(--text-tertiary)" font-family="system-ui">Affine</text>
+        <!-- 변환 후 도형 -->
+        <polygon points="230,170 380,160 350,80 200,90" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="1" fill-opacity="0.5"/>
+        <text x="260" y="190" font-size="11" fill="var(--text-success)" font-family="system-ui">변환 후 (여전히 평행사변형!)</text>
+        <text x="198" y="88" font-size="11" fill="var(--text-success)" font-family="system-ui">A'</text>
+        <text x="348" y="78" font-size="11" fill="var(--text-success)" font-family="system-ui">B'</text>
+        <text x="378" y="175" font-size="11" fill="var(--text-success)" font-family="system-ui">C'</text>
+        <text x="218" y="185" font-size="11" fill="var(--text-success)" font-family="system-ui">D'</text>
+      </svg>
+
+      <div class="math-block">일반 아핀 변환:
+x' = ax + by + tx
+y' = cx + dy + ty
+
+조건: 행렬식 det([a b; c d]) ≠ 0  (역변환 가능해야 함)</div>
+    </div>
+
+    <div class="card">
+      <h3>🧩 Linear Transformation (선형 변환)</h3>
+      <p>이동(Translation) 없이 행렬 곱으로만 표현되는 변환.</p>
+      <div class="math-block">3D 선형 변환:
+x' = a11·x + a12·y + a13·z
+y' = a21·x + a22·y + a23·z
+z' = a31·x + a32·y + a33·z
+
+행렬식 표현: X' = M·X</div>
+      <div class="warn-box">⚠️ 조건: 계수 행렬의 행렬식(det) ≠ 0 이어야 역변환이 존재!</div>
+      <p>이동까지 포함하면 (아핀 변환):</p>
+      <div class="math-block">X' = M·X + T  (M: 변환 행렬, T: 이동 벡터)
+역변환: X = M⁻¹ · (X' - T)</div>
+    </div>
+  </div>
+
+  <!-- ===== 동차좌표 ===== -->
+  <div class="section" id="tab-homogeneous">
+    <h2>동차 좌표계 (Homogeneous Coordinates)</h2>
+
+    <div class="card">
+      <h3>왜 동차 좌표계가 필요한가?</h3>
+      <p>이동(Translation)은 행렬 곱으로 표현이 안 됩니다! <code>X' = MX</code>에 이동을 넣으면 <code>X' = MX + T</code>가 되어버려요.</p>
+      <div class="warn-box">문제: 이동 변환은 행렬 곱이 아닌 벡터 덧셈이라 연속 변환 계산이 불편!</div>
+      <div class="insight-box">💡 해결책: 차원을 하나 올려서 이동도 행렬 곱으로 표현!</div>
+    </div>
+
+    <div class="card">
+      <h3>동차 좌표 개념</h3>
+      <p>2D 점 (x, y)를 3D 점 (hx, hy, h)로 표현합니다. (보통 h=1 사용)</p>
+      <div class="math-block">2D: (x, y)  ↔  3D 동차좌표: [hx, hy, h]ᵀ
+
+h=1 일 때: [x, y, 1]ᵀ</div>
+      <div class="key-box">💡 직관: x-y 평면에서의 점이 3D 공간에서 원점을 지나는 직선(ray)에 대응됨. 방향만 같으면 같은 점!</div>
+
+      <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <defs>
+          <marker id="arr3" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="var(--text-info)"/>
+          </marker>
+        </defs>
+        <!-- 2D plane representation -->
+        <rect x="30" y="60" width="180" height="130" rx="8" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+        <text x="70" y="50" font-size="12" fill="var(--text-secondary)" font-family="system-ui">2D 좌표계 (x-y 평면)</text>
+        <line x1="50" y1="170" x2="190" y2="170" stroke="var(--border-secondary)" stroke-width="0.5"/>
+        <line x1="110" y1="80" x2="110" y2="180" stroke="var(--border-secondary)" stroke-width="0.5"/>
+        <circle cx="150" cy="130" r="5" fill="var(--text-info)"/>
+        <text x="155" y="128" font-size="11" fill="var(--text-info)" font-family="system-ui">(x, y)</text>
+        <!-- Arrow -->
+        <line x1="225" y1="125" x2="275" y2="125" stroke="var(--text-tertiary)" stroke-width="1" marker-end="url(#arr3)"/>
+        <text x="230" y="118" font-size="11" fill="var(--text-tertiary)" font-family="system-ui">동차좌표</text>
+        <!-- 3D homo coords -->
+        <rect x="285" y="60" width="190" height="130" rx="8" fill="var(--bg-success)" fill-opacity="0.3" stroke="var(--border-success)" stroke-width="0.5"/>
+        <text x="290" y="50" font-size="12" fill="var(--text-success)" font-family="system-ui">동차 좌표: h=1 고정</text>
+        <text x="300" y="100" font-size="13" fill="var(--text-success)" font-family="var(--font-mono)">[hx]   [x]</text>
+        <text x="300" y="118" font-size="13" fill="var(--text-success)" font-family="var(--font-mono)">[hy] = [y]</text>
+        <text x="300" y="136" font-size="13" fill="var(--text-success)" font-family="var(--font-mono)">[h ]   [1]</text>
+        <text x="295" y="175" font-size="11" fill="var(--text-success)" font-family="system-ui">h=1로 나눠서 2D로 복원 가능</text>
+      </svg>
+    </div>
+
+    <div class="card">
+      <h3>이동 변환을 행렬로 표현</h3>
+      <p>동차 좌표 덕분에 이동도 행렬 곱으로 표현 가능!</p>
+      <div class="math-block">3D 동차 좌표에서 2D 이동:
+
+[1  0  tx] [x]   [x + tx]
+[0  1  ty] [y] = [y + ty]
+[0  0   1] [1]   [  1   ]
+
+→ X' = T·X  ← 드디어 행렬 곱으로 이동 표현!</div>
+      <div class="key-box">4D 동차 좌표로 3D 이동도 같은 방식으로 표현:
+[1 0 0 tx] [x]   [x+tx]
+[0 1 0 ty] [y] = [y+ty]
+[0 0 1 tz] [z]   [z+tz]
+[0 0 0  1] [1]   [ 1  ]</div>
+    </div>
+
+    <div class="card">
+      <h3>동차 좌표에서 모든 변환의 행렬 표현</h3>
+      <div class="grid-2">
+        <div>
+          <p><strong>이동 (Translation)</strong></p>
+          <div class="math-block">T = [1 0 0 tx]
+    [0 1 0 ty]
+    [0 0 1 tz]
+    [0 0 0  1]</div>
+        </div>
+        <div>
+          <p><strong>스케일 (Scale)</strong></p>
+          <div class="math-block">S = [sx 0  0  0]
+    [0  sy 0  0]
+    [0  0  sz 0]
+    [0  0  0  1]</div>
+        </div>
+      </div>
+      <p><strong>회전 (Rotation)</strong> - 이동 없이 회전 부분만:</p>
+      <div class="math-block">R = [R₃ₓ₃  0]   ← 왼쪽 위: 3×3 회전 행렬
+    [0 0 0  1]</div>
+      <div class="insight-box">💡 이제 이동, 회전, 스케일 전부 4×4 행렬! 연속 변환도 그냥 행렬 곱으로 가능!</div>
+    </div>
+
+    <div class="card">
+      <h3>연속 변환과 역변환</h3>
+      <p>두 변환 H₁, H₂를 연속으로 적용:</p>
+      <div class="math-block">X' = H₁X = [M₁  T₁] [X]
+              [0   1 ] [1]
+
+X'' = H₂X' = [M₂  T₂] [M₁  T₁] [X]
+              [0   1 ] [0   1 ] [1]
+
+    = [M₂M₁  M₂T₁+T₂] [X]
+      [0         1   ] [1]</div>
+
+      <p>역변환:</p>
+      <div class="math-block">H = [M  T]  →  H⁻¹ = [M⁻¹   -M⁻¹T]
+    [0  1]             [0         1  ]</div>
+      <div class="warn-box">⚠️ TM ≠ MT : 이동 후 회전 vs 회전 후 이동은 결과가 다름! 순서가 중요!</div>
+
+      <h3 style="margin-top:1rem">🔢 구체 예시: Shear가 사실은 이동!</h3>
+      <p>동차 좌표에서 xy 방향 Shear:</p>
+      <div class="math-block">S = [1 0 a]   [hx]   [hx + ah]   [x + a]
+    [0 1 b] × [hy] = [hy + bh] → [y + b]
+    [0 0 1]   [h ]   [  h   ]   [  1  ]
+
+→ (x,y)가 (x+a, y+b)로 이동!
+동차 좌표에서 z축 방향 Shear = 2D에서 Translation!</div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div class="section" id="tab-quiz">
+    <h2>🧪 Quiz — 기하 변환</h2>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:1rem">선택지를 클릭하면 즉시 채점됩니다.</p>
+
+    <div id="score-card">
+      <div id="score-text"></div>
+      <div id="score-msg"></div>
+      <button class="reset-btn" onclick="resetQuiz()">🔄 다시 풀기</button>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-container" id="q1">
+      <div class="q-num">Q1 / 10</div>
+      <div class="q-text">Translation(이동 변환)이 보존하지 <strong>않는</strong> 기하학적 성질은?</div>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">① 거리 (Distance)</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">② 각도 (Angle)</button>
+      <button class="quiz-btn" onclick="answer('q1',this,true)">③ 위치 (Position / 절대 좌표)</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">④ 크기 (Size)</button>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-container" id="q2">
+      <div class="q-num">Q2 / 10</div>
+      <div class="q-text">Isometry(등거리 변환)에 해당하지 <strong>않는</strong> 것은?</div>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">① Reflection (반사)</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">② Rotation (회전)</button>
+      <button class="quiz-btn" onclick="answer('q2',this,true)">③ Non-uniform Scaling (비균일 스케일)</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">④ Translation (이동)</button>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-container" id="q3">
+      <div class="q-num">Q3 / 10</div>
+      <div class="q-text">점 (2, 0)을 90° 반시계 방향으로 회전했을 때 결과 좌표는?</div>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">① (2, 0)</button>
+      <button class="quiz-btn" onclick="answer('q3',this,true)">② (0, 2)</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">③ (-2, 0)</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">④ (0, -2)</button>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-container" id="q4">
+      <div class="q-num">Q4 / 10</div>
+      <div class="q-text">Affine 변환이 반드시 보존하는 성질이 <strong>아닌</strong> 것은?</div>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">① 직선성 (Collinearity)</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">② 평행성 (Parallelism)</button>
+      <button class="quiz-btn" onclick="answer('q4',this,true)">③ 각도 (Angle)</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">④ 선분 비율 (Ratio)</button>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-container" id="q5">
+      <div class="q-num">Q5 / 10</div>
+      <div class="q-text">동차 좌표(Homogeneous Coordinates)를 사용하는 주된 이유는?</div>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">① 메모리를 절약하기 위해</button>
+      <button class="quiz-btn" onclick="answer('q5',this,true)">② 이동(Translation)을 행렬 곱으로 표현하기 위해</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">③ 계산 속도를 빠르게 하기 위해</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">④ 3D 좌표를 2D로 변환하기 위해</button>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="q-container" id="q6">
+      <div class="q-num">Q6 / 10</div>
+      <div class="q-text">Similarity(유사 변환)을 정확히 설명한 것은?</div>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">① 거리와 각도 모두 보존</button>
+      <button class="quiz-btn" onclick="answer('q6',this,true)">② Isometry + 균일 스케일링, 각도 보존</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">③ 평행선만 보존, 거리 변함</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">④ 직선만 보존, 각도와 거리 변함</button>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="q-container" id="q7">
+      <div class="q-num">Q7 / 10</div>
+      <div class="q-text">x 방향 Shear 변환 (k=3)을 점 (2, 4)에 적용하면?</div>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">① (2, 16)</button>
+      <button class="quiz-btn" onclick="answer('q7',this,true)">② (14, 4)</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">③ (6, 4)</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">④ (2, 10)</button>
+      <div class="quiz-feedback" id="q7-fb"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="q-container" id="q8">
+      <div class="q-num">Q8 / 10</div>
+      <div class="q-text">점 P=(3,3) 중심으로 45° 회전하는 올바른 순서는?</div>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">① 회전 → 이동(P로) → 역이동</button>
+      <button class="quiz-btn" onclick="answer('q8',this,true)">② 이동(원점으로) → 회전 → 이동(P로 복귀)</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">③ 이동(원점으로) → 이동(P로) → 회전</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">④ 순서 상관없음</button>
+      <div class="quiz-feedback" id="q8-fb"></div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="q-container" id="q9">
+      <div class="q-num">Q9 / 10</div>
+      <div class="q-text">선형 변환에서 역변환이 존재하려면?</div>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">① 행렬의 대각 원소가 모두 0</button>
+      <button class="quiz-btn" onclick="answer('q9',this,true)">② 계수 행렬의 행렬식(det) ≠ 0</button>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">③ 변환 행렬이 단위행렬과 같아야 함</button>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">④ 이동 벡터 T가 영벡터여야 함</button>
+      <div class="quiz-feedback" id="q9-fb"></div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="q-container" id="q10">
+      <div class="q-num">Q10 / 10</div>
+      <div class="q-text">동차 좌표에서 TM ≠ MT가 의미하는 것은?</div>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">① 회전과 스케일만 순서가 중요함</button>
+      <button class="quiz-btn" onclick="answer('q10',this,true)">② 이동 후 회전과 회전 후 이동의 결과가 다름</button>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">③ 동차 좌표에서는 교환 법칙이 항상 성립</button>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">④ 행렬 곱의 연산 순서는 무관함</button>
+      <div class="quiz-feedback" id="q10-fb"></div>
+    </div>
+
+  </div><!-- /quiz section -->
+</div>
+
+<script>
+const feedbacks = {
+  q1:  "✓ 이동 변환은 절대 위치(좌표)를 바꾸지만 거리·각도·크기는 모두 보존합니다.",
+  q2:  "✓ 등거리 변환(Isometry)은 거리를 보존해야 합니다. Non-uniform Scaling은 거리를 바꿉니다.",
+  q3:  "✓ cos90°=0, sin90°=1 → x'=2·0-0·1=0, y'=2·1+0·0=2 → (0,2)",
+  q4:  "✓ Affine 변환은 직선성·평행성·비율을 보존하지만 각도는 보존 보장 없음.",
+  q5:  "✓ 이동은 X'=MX+T로 덧셈이 필요하지만, 동차 좌표를 쓰면 순수 행렬 곱 X'=HX 로 통합됩니다.",
+  q6:  "✓ Similarity = Isometry + 균일 스케일링. 모양(각도)은 보존되고 크기만 비례적으로 변합니다.",
+  q7:  "✓ x 방향 shear: x'=x+k·y=2+3×4=14, y'=y=4 → (14,4)",
+  q8:  "✓ X'=R(X-P)+P: ① X-P로 원점이동 ② R로 회전 ③ +P로 복귀",
+  q9:  "✓ det(M)≠0 이어야 역행렬 M⁻¹이 존재하고 역변환이 가능합니다.",
+  q10: "✓ 행렬 곱은 비가환(non-commutative). TM≠MT이므로 이동 후 회전 ≠ 회전 후 이동!"
+};
+
+let score = 0, answered = 0;
+const total = 10;
+
+function answer(qid, btn, isCorrect) {
+  const c = document.getElementById(qid);
+  if (c.dataset.done) return;
+  c.dataset.done = '1';
+  c.querySelectorAll('.quiz-btn').forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('onclick').includes('true')) b.classList.add('correct');
+  });
+  if (!isCorrect) btn.classList.add('wrong');
+  else score++;
+  answered++;
+  const fb = document.getElementById(qid + '-fb');
+  fb.style.display = 'block';
+  fb.style.background = isCorrect ? 'var(--bg-success)' : 'var(--bg-danger)';
+  fb.style.color = isCorrect ? 'var(--text-success)' : 'var(--text-danger)';
+  fb.style.padding = '8px 12px';
+  fb.style.borderRadius = 'var(--radius-md)';
+  fb.textContent = feedbacks[qid];
+  if (answered === total) setTimeout(showScore, 500);
+}
+
+function showScore() {
+  const card = document.getElementById('score-card');
+  card.style.display = 'block';
+  document.getElementById('score-text').textContent = score + ' / ' + total;
+  const msgs = ['더 열심히 해보자! 💪', '조금 더 공부하면 완벽해!', '잘했어! 거의 다 왔어! 👍', '완벽해! 시험 준비 완료! 🎉'];
+  document.getElementById('score-msg').textContent = msgs[score <= 3 ? 0 : score <= 5 ? 1 : score <= 8 ? 2 : 3];
+  card.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  score = 0; answered = 0;
+  document.getElementById('score-card').style.display = 'none';
+  document.querySelectorAll('.q-container').forEach(c => {
+    delete c.dataset.done;
+    c.querySelectorAll('.quiz-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    const fb = c.querySelector('.quiz-feedback');
+    if (fb) fb.style.display = 'none';
+  });
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
