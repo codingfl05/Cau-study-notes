@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Structures — Week 5: Linked List</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --bg-warning: #fdf3e0;
+    --bg-danger: #fdf0f0;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-warning: #854f0b;
+    --text-danger: #a32d2d;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-primary: rgba(0,0,0,0.22);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --border-danger: #f7c1c1;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
+      --bg-danger: #2a0808;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --text-warning: #d08830;
+      --text-danger: #e06060;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-primary: rgba(255,255,255,0.22);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
+      --border-danger: #5a1818;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex; align-items: center; gap: .75rem;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .site-header a { text-decoration: none; font-size: 13px; color: var(--text-secondary); font-weight: 400; }
+  .site-header a:hover { color: var(--text-primary); }
+  .sep { color: var(--text-tertiary); font-size: 13px; }
+  .header-title { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .page-title { margin-bottom: 1.5rem; }
+  .page-title .eyebrow { font-size: 12px; color: var(--text-tertiary); font-weight: 400; margin-bottom: .35rem; letter-spacing: .04em; }
+  .page-title h1 { font-size: 22px; font-weight: 500; line-height: 1.3; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .35rem; }
+  .tab-bar {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 1.5rem; padding-bottom: 1rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .tab {
+    font-size: 13px; padding: 5px 14px; border-radius: 20px;
+    border: 0.5px solid transparent; cursor: pointer;
+    color: var(--text-secondary); background: transparent;
+    font-family: var(--font-sans); transition: all .12s; font-weight: 400;
+  }
+  .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .tab.active { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); font-weight: 500; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .card {
+    background: var(--bg-primary); border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem;
+  }
+  h2 { font-size: 18px; font-weight: 500; margin-bottom: 1rem; padding-bottom: .6rem; border-bottom: 0.5px solid var(--border-tertiary); }
+  h3 { font-size: 15px; font-weight: 500; margin-bottom: .5rem; }
+  p { font-size: 14px; margin-bottom: .6rem; }
+  .key-box {
+    border-left: 3px solid var(--border-info); padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-info); border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-info);
+  }
+  .warn-box {
+    border-left: 3px solid var(--border-danger); padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-danger); border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-danger);
+  }
+  .insight-box {
+    border-left: 3px solid var(--border-success); padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-success); border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-success);
+  }
+  code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary); padding: 2px 5px; border-radius: 4px; color: var(--text-primary);
+  }
+  .code-block {
+    font-family: var(--font-mono); font-size: 12px; background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary); border-radius: var(--radius-md);
+    padding: 1rem 1.25rem; margin: .75rem 0; line-height: 1.6; overflow-x: auto; white-space: pre;
+    color: var(--text-primary);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: .75rem 0; }
+  th {
+    text-align: left; padding: 7px 10px; background: var(--bg-secondary);
+    color: var(--text-secondary); font-weight: 500; font-size: 12px;
+    border-bottom: 0.5px solid var(--border-secondary); text-transform: uppercase; letter-spacing: .04em;
+  }
+  td { padding: 7px 10px; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Node visualizations */
+  .ll-vis { display: flex; align-items: center; gap: 4px; margin: .75rem 0; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12px; }
+  .ll-label { font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); }
+  .ll-node { display: flex; border: 0.5px solid var(--border-secondary); border-radius: var(--radius-md); overflow: hidden; }
+  .ll-data { padding: 6px 12px; background: var(--bg-primary); border-right: 0.5px solid var(--border-secondary); min-width: 36px; text-align: center; }
+  .ll-next { padding: 6px 8px; background: var(--bg-tertiary); color: var(--text-tertiary); font-size: 11px; }
+  .ll-node.hl .ll-data { background: var(--bg-info); color: var(--text-info); border-right-color: var(--border-info); }
+  .ll-node.hl { border-color: var(--border-info); }
+  .ll-node.hl-green .ll-data { background: var(--bg-success); color: var(--text-success); }
+  .ll-node.hl-green { border-color: var(--border-success); }
+  .ll-node.hl-red .ll-data { background: var(--bg-danger); color: var(--text-danger); }
+  .ll-node.hl-red { border-color: var(--border-danger); }
+  .ll-arrow { display: flex; align-items: center; color: var(--text-tertiary); font-size: 13px; padding: 0 2px; }
+  .ll-null { padding: 6px 10px; background: var(--bg-secondary); border: 0.5px solid var(--border-tertiary); border-radius: var(--radius-md); font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); }
+
+  /* Doubly node */
+  .dll-node { display: flex; border: 0.5px solid var(--border-secondary); border-radius: var(--radius-md); overflow: hidden; }
+  .dll-prev { padding: 6px 8px; background: var(--bg-warning); color: var(--text-warning); font-size: 10px; border-right: 0.5px solid var(--border-secondary); }
+  .dll-data { padding: 6px 12px; background: var(--bg-primary); border-right: 0.5px solid var(--border-secondary); min-width: 32px; text-align: center; font-family: var(--font-mono); font-size: 12px; }
+  .dll-next { padding: 6px 8px; background: var(--bg-tertiary); color: var(--text-tertiary); font-size: 10px; }
+
+  /* Steps */
+  .step-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: .45rem; }
+  .step-num { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; margin-top: 1px; }
+  .step-text { font-size: 13px; }
+
+  /* Skip list */
+  .skip-list-vis { overflow-x: auto; margin: .75rem 0; }
+  .skip-level { display: flex; align-items: center; margin-bottom: 5px; font-family: var(--font-mono); font-size: 11px; }
+  .skip-label { font-size: 10px; color: var(--text-tertiary); width: 48px; flex-shrink: 0; }
+  .skip-node { border: 0.5px solid var(--border-secondary); border-radius: 4px; padding: 4px 7px; background: var(--bg-primary); margin-right: 3px; text-align: center; min-width: 30px; }
+  .skip-node.inf { background: var(--bg-tertiary); color: var(--text-tertiary); font-size: 10px; }
+  .skip-node.tgt { background: var(--bg-info); color: var(--text-info); border-color: var(--border-info); font-weight: 600; }
+  .skip-line { flex: 1; height: 1px; background: var(--border-secondary); min-width: 6px; }
+
+  /* Quiz */
+  .q-container { background: var(--bg-primary); border: 0.5px solid var(--border-tertiary); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .q-num { font-size: 12px; color: var(--text-tertiary); margin-bottom: .3rem; }
+  .q-text { font-size: 14px; font-weight: 500; margin-bottom: .75rem; }
+  .quiz-btn { display: block; width: 100%; background: transparent; border: 0.5px solid var(--border-secondary); border-radius: var(--radius-md); padding: 9px 14px; cursor: pointer; font-size: 13px; color: var(--text-primary); text-align: left; margin: 4px 0; transition: all .12s; font-family: var(--font-sans); }
+  .quiz-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+  .quiz-btn.correct { border-color: var(--border-success); background: var(--bg-success); color: var(--text-success); }
+  .quiz-btn.wrong { border-color: var(--border-danger); background: var(--bg-danger); color: var(--text-danger); }
+  .quiz-feedback { font-size: 13px; margin-top: 8px; padding: 8px 12px; border-radius: var(--radius-md); display: none; }
+  #score-card { background: var(--bg-primary); border: 0.5px solid var(--border-tertiary); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; margin-bottom: 1.5rem; display: none; }
+  #score-text { font-size: 24px; font-weight: 500; margin-bottom: .4rem; }
+  #score-msg { font-size: 13px; color: var(--text-secondary); }
+  .reset-btn { margin-top: .75rem; background: transparent; border: 0.5px solid var(--border-secondary); border-radius: 20px; padding: 5px 16px; cursor: pointer; font-size: 13px; color: var(--text-secondary); font-family: var(--font-sans); transition: all .12s; }
+  .reset-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html">← Home</a>
+  <span class="sep">/</span>
+  <a href="#">Data Structures</a>
+  <span class="sep">/</span>
+  <span class="header-title">Week 5 — Linked List</span>
+</header>
+
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">Data Structures · Week 5</div>
+    <h1>Linked List — 심화</h1>
+    <div class="sub">탐색 · 삭제 · 이중 연결 리스트 · 다항식 · Skip List</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('ops',this)">🔍 Search &amp; Delete</button>
+    <button class="tab" onclick="showTab('dll',this)">↔️ Doubly LL</button>
+    <button class="tab" onclick="showTab('compare',this)">📊 LL vs Array</button>
+    <button class="tab" onclick="showTab('apps',this)">💡 다항식</button>
+    <button class="tab" onclick="showTab('skip',this)">⚡ Skip List</button>
+    <button class="tab" onclick="showTab('quiz',this)">🧪 Quiz</button>
+  </div>
+
+  <!-- ===== SEARCH & DELETE ===== -->
+  <div class="section active" id="tab-ops">
+    <h2>Search &amp; Deletion (탐색 &amp; 삭제)</h2>
+
+    <div class="card">
+      <h3>Search — 두 가지 방식</h3>
+      <p>연결 리스트는 인덱스로 바로 접근이 불가능하다. Head부터 next 포인터를 따라 하나씩 이동하며 탐색해야 한다.</p>
+
+      <div class="ll-vis">
+        <span class="ll-label">Head→</span>
+        <div class="ll-node"><div class="ll-data">15</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node"><div class="ll-data">8</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node hl"><div class="ll-data">23</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node"><div class="ll-data">14</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node"><div class="ll-data">3</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">NULL</div>
+      </div>
+      <p style="font-size:12px; color:var(--text-tertiary);">Key = 23 검색 → 15 → 8 → <strong>23 발견! ✓</strong></p>
+
+      <div class="grid-2" style="margin-top:.75rem;">
+        <div>
+          <h3>반복(Iterative)</h3>
+          <div class="code-block">bool search_iterative(
+    Node* head, int key) {
+  Node *cur = head;
+  while (cur != NULL) {
+    if (cur->element == key)
+      return true;
+    cur = cur->next;
+  }
+  return false; // 못 찾음
+}</div>
+        </div>
+        <div>
+          <h3>재귀(Recursive)</h3>
+          <div class="code-block">bool search_recursive(
+    Node* head, int key) {
+  // Base case: 리스트 끝
+  if (head == NULL)
+    return false;
+  // 현재 노드 확인
+  if (head->element == key)
+    return true;
+  // 나머지 재귀 탐색
+  return search_recursive(
+      head->next, key);
+}</div>
+        </div>
+      </div>
+      <div class="key-box"><strong>시간복잡도: O(n)</strong> — 최악의 경우 모든 노드 방문. 배열의 O(1) Random Access와 달리 순차 탐색만 가능!</div>
+    </div>
+
+    <div class="card">
+      <h3>Deletion — 삭제 3가지 경우</h3>
+      <table>
+        <tr><th>케이스</th><th>핵심 동작</th><th>복잡도</th></tr>
+        <tr><td>첫 번째 노드 (head)</td><td>temp = head → head = head→next → free(temp)</td><td>O(1)</td></tr>
+        <tr><td>마지막 노드 (tail)</td><td>끝까지 traverse → prev→next = NULL → free(tail)</td><td>O(n)</td></tr>
+        <tr><td>중간 노드 (key 검색)</td><td>key 찾을 때까지 traverse → prev→next = cur→next → free(cur)</td><td>O(n)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>① 첫 번째 노드 삭제</h3>
+      <p>Head가 가리키는 노드를 삭제하고, 그 다음 노드를 새 Head로 설정. O(1)으로 처리 가능!</p>
+
+      <div class="ll-vis" style="margin-bottom:4px;">
+        <span class="ll-label" style="font-size:10px;">Before:</span>
+        <div class="ll-node hl-red"><div class="ll-data">15</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node"><div class="ll-data">8</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node"><div class="ll-data">23</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">NULL</div>
+      </div>
+      <div class="ll-vis">
+        <span class="ll-label" style="font-size:10px;">After:</span>
+        <span class="ll-label">Head→</span>
+        <div class="ll-node hl-green"><div class="ll-data">8</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node"><div class="ll-data">23</div><div class="ll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">NULL</div>
+      </div>
+
+      <div class="step-row" style="margin-top:.75rem;"><div class="step-num">1</div><div class="step-text"><code>Node *temp = *head_ref;</code> — temp가 삭제할 노드(15)를 가리킴</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-text"><code>*head_ref = (*head_ref)->next;</code> — Head를 다음 노드(8)로 이동</div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-text"><code>free(temp);</code> — 15 노드 메모리 해제</div></div>
+    </div>
+
+    <div class="card">
+      <h3>② 중간 / 마지막 노드 삭제 — 통합 코드</h3>
+      <p><code>prev_node</code>와 <code>cur_node</code> 두 포인터를 함께 이동하며 key를 탐색. 발견 시 prev의 next를 cur의 next로 연결하여 cur를 우회한 뒤 해제.</p>
+
+      <div class="code-block">void deleteNode(Node** head_ref, int key) {
+  if (*head_ref == NULL) { printf("List is Empty.\n"); return; }
+
+  // Case 1: 첫 번째 노드가 key
+  if ((*head_ref)->element == key) {
+    Node *temp = *head_ref;
+    *head_ref = (*head_ref)->next;
+    free(temp);
+    return;
+  }
+
+  // Case 2 & 3: 중간 또는 마지막 노드
+  Node *prev_node = *head_ref;
+  Node *cur_node  = (*head_ref)->next;
+
+  while (cur_node->next != NULL && cur_node->element != key) {
+    prev_node = cur_node;
+    cur_node  = cur_node->next;
+  }
+
+  if (cur_node->element != key) {
+    printf("Deletion failed: No key in the list.\n");
+    return;
+  }
+
+  Node *temp = cur_node;
+  prev_node->next = cur_node->next; // 우회 연결!
+  free(temp);                        // 메모리 해제
+}</div>
+      <div class="warn-box"><strong>순서 중요:</strong> <code>prev_node->next = cur_node->next</code> 연결 <em>후</em>에 <code>free(temp)</code>. 먼저 free하면 <code>cur_node->next</code> 주소를 잃는다!</div>
+    </div>
+
+    <div class="card">
+      <h3>③ 전체 리스트 삭제 (Delete Entire List)</h3>
+      <p>단순히 head = NULL로 설정해도 메모리는 해제되지 않는다! 각 노드를 하나씩 순회하며 직접 해제해야 한다.</p>
+
+      <div class="step-row"><div class="step-num">1</div><div class="step-text">현재 노드의 <code>next</code> 주소를 <code>next_node</code>에 먼저 저장</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-text"><code>free(cur_node)</code> — 현재 노드 해제</div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-text"><code>cur_node = next_node</code> — 다음으로 이동, NULL까지 반복</div></div>
+
+      <div class="code-block">void deleteList(struct Node** head_ref) {
+  Node* cur_node  = *head_ref;
+  Node* next_node;
+  while (cur_node != NULL) {
+    next_node = cur_node->next; // ① next 먼저 저장
+    free(cur_node);             // ② 현재 해제
+    cur_node = next_node;       // ③ 다음으로 이동
+  }
+  *head_ref = NULL; // head 초기화
+}</div>
+      <div class="warn-box">next를 먼저 저장하지 않고 free()하면 다음 노드 주소를 잃어 나머지 노드를 영원히 해제할 수 없다 → <strong>Memory Leak!</strong></div>
+    </div>
+  </div>
+
+  <!-- ===== DOUBLY LINKED LIST ===== -->
+  <div class="section" id="tab-dll">
+    <h2>Doubly Linked List (이중 연결 리스트)</h2>
+
+    <div class="card">
+      <h3>정의 — prev 포인터 추가</h3>
+      <p>단순 연결 리스트는 한 방향(next)만 이동 가능. 이중 연결 리스트는 각 노드가 <strong>next</strong>와 <strong>prev</strong> 두 포인터를 가져 양방향 탐색이 가능하다.</p>
+
+      <div class="ll-vis" style="flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; gap:2px;">
+        <div style="font-size:10px; color:var(--text-tertiary); font-family:var(--font-mono); margin-right:4px; line-height:1.4;">Head→<br>NULL←</div>
+        <div class="dll-node"><div class="dll-prev">←</div><div class="dll-data">15</div><div class="dll-next">→</div></div>
+        <div class="ll-arrow" style="font-size:16px;">⇄</div>
+        <div class="dll-node"><div class="dll-prev">←</div><div class="dll-data">8</div><div class="dll-next">→</div></div>
+        <div class="ll-arrow" style="font-size:16px;">⇄</div>
+        <div class="dll-node"><div class="dll-prev">←</div><div class="dll-data">23</div><div class="dll-next">→</div></div>
+        <div class="ll-arrow" style="font-size:16px;">⇄</div>
+        <div class="dll-node"><div class="dll-prev">←</div><div class="dll-data">7</div><div class="dll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">NULL</div>
+      </div>
+
+      <div class="code-block" style="margin-top:.75rem;">typedef struct Node {
+  int element;
+  struct Node* prev;  // 이전 노드 포인터 (새로 추가!)
+  struct Node* next;
+} Node;</div>
+
+      <div class="grid-2" style="margin-top:.75rem;">
+        <div style="background:var(--bg-success); border:0.5px solid var(--border-success); border-radius:var(--radius-md); padding:.75rem;">
+          <p style="font-size:12px; font-weight:600; color:var(--text-success); margin-bottom:4px;">✅ 장점</p>
+          <p style="font-size:12px; color:var(--text-success);">양방향 탐색 가능<br>이전 주소 없이도 삭제 가능<br>동적 크기 조절</p>
+        </div>
+        <div style="background:var(--bg-danger); border:0.5px solid var(--border-danger); border-radius:var(--radius-md); padding:.75rem;">
+          <p style="font-size:12px; font-weight:600; color:var(--text-danger); margin-bottom:4px;">❌ 단점</p>
+          <p style="font-size:12px; color:var(--text-danger);">노드당 포인터 2개 → 메모리 증가<br>삽입/삭제 시 prev, next 모두 업데이트 → 복잡</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Insertion at Beginning (맨 앞 삽입)</h3>
+      <p>단순 LL: new→next = head, head = new (2단계). DLL: 기존 head의 prev도 업데이트해야 한다.</p>
+      <div class="step-row"><div class="step-num">1</div><div class="step-text">새 노드 생성</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-text"><code>new_node->next = *head_ref</code>, <code>new_node->prev = NULL</code></div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-text"><code>(*head_ref)->prev = new_node</code> (기존 head의 prev → 새 노드), <code>*head_ref = new_node</code></div></div>
+      <div class="key-box">포인터 업데이트 4개: new→next, new→prev, 기존head→prev, head 자체. 단순 LL의 2개보다 복잡!</div>
+    </div>
+
+    <div class="card">
+      <h3>Insertion at End (맨 끝 삽입)</h3>
+      <div class="step-row"><div class="step-num">1</div><div class="step-text">새 노드 생성</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-text"><code>new_node->prev = tail</code> (현재 tail을 prev로), <code>new_node->next = NULL</code></div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-text"><code>tail->next = new_node</code> (기존 tail의 next → 새 노드)</div></div>
+      <div class="insight-box">새 노드의 prev가 기존 tail을 가리키고, 기존 tail의 next가 새 노드를 가리킨다 → 양방향 연결 완성!</div>
+    </div>
+
+    <div class="card">
+      <h3>Insertion at Middle (중간 삽입)</h3>
+      <p>position 노드 뒤에 삽입. <strong>4개</strong>의 포인터를 정확한 순서로 업데이트해야 한다.</p>
+      <div class="step-row"><div class="step-num">1</div><div class="step-text">새 노드 생성</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-text"><code>new_node->prev = position</code>, <code>new_node->next = position->next</code></div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-text"><code>position->next = new_node</code>, <code>position->next->prev = new_node</code> ← 뒤 노드의 prev도 업데이트!</div></div>
+      <div class="warn-box"><strong>순서 필수:</strong> step 3에서 <code>position->next = new_node</code>를 먼저 하면, <code>position->next->prev</code>가 이미 new_node를 가리키므로 오류. step 2를 완전히 마친 후 step 3 진행!</div>
+    </div>
+
+    <div class="card">
+      <h3>Deletion in DLL — 3가지 경우 비교</h3>
+      <table>
+        <tr><th>케이스</th><th>핵심 추가 단계 (단순 LL과의 차이)</th></tr>
+        <tr>
+          <td><strong>첫 번째 노드</strong></td>
+          <td>temp = head → head = head→next → <strong style="color:var(--text-info)">head→prev = NULL</strong> → free(temp)</td>
+        </tr>
+        <tr>
+          <td><strong>마지막 노드</strong></td>
+          <td>traverse → temp = tail → <strong style="color:var(--text-info)">prev 노드→next = NULL (새 tail의 next를 NULL로)</strong> → free(temp)</td>
+        </tr>
+        <tr>
+          <td><strong>중간 노드</strong></td>
+          <td>temp = target → prev→next = temp→next → <strong style="color:var(--text-info)">temp→next→prev = prev</strong> → free(temp)</td>
+        </tr>
+      </table>
+      <div class="key-box">DLL 삭제의 핵심 차이: 단순 LL은 <code>prev→next</code>만 연결. DLL은 반드시 <code>next→prev</code>도 업데이트해야 양방향 일관성이 유지된다!</div>
+    </div>
+
+    <div class="card">
+      <h3>중간 노드 삭제 시각화 (DLL)</h3>
+      <p style="font-size:12px; color:var(--text-tertiary); margin-bottom:.5rem;">15 ⇄ <span style="color:var(--text-danger)"><strong>8 (삭제)</strong></span> ⇄ 23 ⇄ 7</p>
+
+      <div class="step-row"><div class="step-num">1</div><div class="step-text">8 노드 찾기 → <code>temp = position (8번 노드)</code></div></div>
+      <div class="step-row"><div class="step-num">2a</div><div class="step-text"><code>prev_node->next = temp->next</code> → 15의 next = 23</div></div>
+      <div class="step-row"><div class="step-num">2b</div><div class="step-text"><code>temp->next->prev = prev_node</code> → 23의 prev = 15</div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-text"><code>free(temp)</code> → 8 노드 메모리 해제</div></div>
+
+      <div class="ll-vis" style="margin-top:.5rem;">
+        <span class="ll-label">Result:</span>
+        <div class="dll-node"><div class="dll-prev">NULL</div><div class="dll-data">15</div><div class="dll-next">→</div></div>
+        <div class="ll-arrow" style="font-size:16px;">⇄</div>
+        <div class="dll-node"><div class="dll-prev">←</div><div class="dll-data">23</div><div class="dll-next">→</div></div>
+        <div class="ll-arrow" style="font-size:16px;">⇄</div>
+        <div class="dll-node"><div class="dll-prev">←</div><div class="dll-data">7</div><div class="dll-next">→</div></div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">NULL</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMPARISON ===== -->
+  <div class="section" id="tab-compare">
+    <h2>Linked List vs Array — 완전 비교</h2>
+
+    <div class="card">
+      <h3>시간복잡도 비교</h3>
+      <table>
+        <tr><th>연산</th><th>Array</th><th>Linked List</th></tr>
+        <tr>
+          <td>Traverse &amp; Search</td>
+          <td>O(n)</td>
+          <td>O(n)</td>
+        </tr>
+        <tr>
+          <td>Insertion (임의 위치)</td>
+          <td><strong style="color:var(--text-danger)">O(n)</strong> — shift 필요</td>
+          <td><strong style="color:var(--text-success)">O(1)</strong> — 포인터만 변경</td>
+        </tr>
+        <tr>
+          <td>Insertion (끝)</td>
+          <td>O(1)</td>
+          <td>O(1)</td>
+        </tr>
+        <tr>
+          <td>Deletion (임의 위치)</td>
+          <td><strong style="color:var(--text-danger)">O(n)</strong> — shift 필요</td>
+          <td><strong style="color:var(--text-success)">O(1)</strong> — 포인터만 변경</td>
+        </tr>
+        <tr>
+          <td>Random Access</td>
+          <td><strong style="color:var(--text-success)">O(1)</strong> — 인덱스 직접 접근</td>
+          <td><strong style="color:var(--text-danger)">불가</strong> — 순차 탐색만</td>
+        </tr>
+      </table>
+      <div class="insight-box">삽입/삭제 O(1)은 <strong>삽입/삭제 위치를 이미 알 때</strong>의 복잡도. 위치를 먼저 탐색해야 한다면 O(n) + O(1) = O(n).</div>
+    </div>
+
+    <div class="card">
+      <h3>장단점 비교</h3>
+      <div class="grid-2">
+        <div>
+          <p style="font-size:13px; font-weight:600; margin-bottom:.4rem;">📦 Array</p>
+          <p style="font-size:13px; color:var(--text-success);">✅ 단순하고 다루기 쉬움<br>✅ Random Access O(1)<br>✅ 연속 메모리 → 캐시 효율 좋음</p>
+          <p style="font-size:13px; color:var(--text-danger); margin-top:.35rem;">❌ 크기 고정 — 예측 불가 입력 처리 어려움<br>❌ 삽입/삭제 비용 큼 (shift)</p>
+        </div>
+        <div>
+          <p style="font-size:13px; font-weight:600; margin-bottom:.4rem;">🔗 Linked List</p>
+          <p style="font-size:13px; color:var(--text-success);">✅ 동적 크기 — 런타임에 조절<br>✅ 삽입/삭제 효율적 (O(1))</p>
+          <p style="font-size:13px; color:var(--text-danger); margin-top:.35rem;">❌ 포인터 저장 → 추가 메모리 사용<br>❌ Random Access 불가<br>❌ 비연속 메모리 → 캐시 성능 나쁨<br>❌ 정렬되어도 이진 탐색 불가</p>
+        </div>
+      </div>
+      <div class="key-box">
+        <strong>선택 기준:</strong><br>
+        크기 고정 + 빠른 접근 필요 → <strong>Array</strong><br>
+        크기 가변 + 잦은 삽입/삭제 → <strong>Linked List</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>캐시 성능 문제 (Poor Cache Performance)</h3>
+      <p>CPU는 메모리를 블록(캐시 라인) 단위로 가져온다. 배열은 연속된 메모리이므로 arr[0]을 읽을 때 arr[1], arr[2]…도 함께 캐시에 올라온다 → <strong>캐시 히트율 높음</strong>.</p>
+      <p>연결 리스트는 노드가 메모리 여기저기에 흩어져 있어, 각 노드에 접근할 때마다 캐시 미스가 발생할 수 있다.</p>
+      <div class="warn-box">연결 리스트는 정렬되어 있어도 이진 탐색 불가 — 중간 노드로 바로 점프할 수 없기 때문. <strong>Skip List</strong>가 이 문제를 해결!</div>
+    </div>
+  </div>
+
+  <!-- ===== POLYNOMIAL ===== -->
+  <div class="section" id="tab-apps">
+    <h2>응용 — 다항식 덧셈 (Polynomial Addition)</h2>
+
+    <div class="card">
+      <h3>개념</h3>
+      <p>두 다항식에서 <strong>같은 지수(exponent)</strong>를 가진 항끼리 계수(coefficient)를 더한다.</p>
+      <div style="text-align:center; padding:1rem; background:var(--bg-secondary); border-radius:var(--radius-md); margin:.75rem 0; font-size:14px; font-family:var(--font-mono);">
+        (5x<sup>100</sup> + 7x<sup>10</sup> + x<sup>2</sup> + 5) + (8x<sup>55</sup> − 4x<sup>10</sup> + x<sup>5</sup> + x<sup>2</sup> − 3)
+        <div style="margin-top:8px; color:var(--text-info); font-weight:500;">= 5x<sup>100</sup> + 8x<sup>55</sup> + <strong>3</strong>x<sup>10</sup> + x<sup>5</sup> + <strong>2</strong>x<sup>2</sup> + <strong>2</strong></div>
+      </div>
+      <p style="font-size:13px;">x<sup>10</sup> 항: 7 + (−4) = <strong>3</strong> &nbsp;|&nbsp; x<sup>2</sup> 항: 1 + 1 = <strong>2</strong> &nbsp;|&nbsp; 상수: 5 + (−3) = <strong>2</strong></p>
+    </div>
+
+    <div class="card">
+      <h3>Array vs Linked List 구현 비교</h3>
+      <div class="grid-2">
+        <div>
+          <p style="font-size:13px; font-weight:600; margin-bottom:.4rem;">📦 Array 구현</p>
+          <div class="code-block">typedef struct {
+  // Poly[expon]=coefficient
+  int coeffList[MAX_DEGREE+1];
+  int pow;
+} Polynomial;
+
+// 5x^100 + 7x^10 + x^2 + 5
+// Poly[100]=5, Poly[10]=7
+// Poly[2]=1,   Poly[0]=5
+// 나머지 97개 칸은 0...</div>
+          <div class="warn-box" style="margin-top:.4rem; font-size:12px;">최고 차수 100 → 배열 크기 101 필요. 항이 4개뿐이어도 97칸 낭비!</div>
+        </div>
+        <div>
+          <p style="font-size:13px; font-weight:600; margin-bottom:.4rem;">🔗 Linked List 구현</p>
+          <div class="code-block">typedef struct Node {
+  int coeff; // 계수
+  int pow;   // 지수
+  struct Node* next;
+} Polynomial;
+
+// 실제 항만 노드로!
+// Head → [5|100]
+//      → [7|10]
+//      → [1|2]
+//      → [5|0] → NULL</div>
+          <div class="insight-box" style="margin-top:.4rem; font-size:12px;">항이 적으면 메모리 절약. 희소 다항식(sparse polynomial)에 적합!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>polyadd() — 덧셈 알고리즘</h3>
+      <p>두 다항식 리스트를 동시에 순회(Two-pointer)하며 지수를 비교. 3가지 경우를 처리한다.</p>
+      <table>
+        <tr><th>경우</th><th>조건</th><th>처리</th></tr>
+        <tr><td>Case 1</td><td>poly1 지수 &gt; poly2 지수</td><td>poly1 항을 결과에 추가, poly1만 advance</td></tr>
+        <tr><td>Case 2</td><td>poly1 지수 &lt; poly2 지수</td><td>poly2 항을 결과에 추가, poly2만 advance</td></tr>
+        <tr><td>Case 3</td><td>지수 동일</td><td>계수 합산 후 결과에 추가, 둘 다 advance</td></tr>
+      </table>
+      <div class="code-block">void polyadd(Node* poly1, Node* poly2, Node* result) {
+  while (poly1->next && poly2->next) {
+    if (poly1->pow > poly2->pow) {         // Case 1
+      result->pow = poly1->pow;
+      result->coeff = poly1->coeff;
+      poly1 = poly1->next;
+    } else if (poly1->pow < poly2->pow) {  // Case 2
+      result->pow = poly2->pow;
+      result->coeff = poly2->coeff;
+      poly2 = poly2->next;
+    } else {                                // Case 3: 지수 같음
+      result->pow = poly1->pow;
+      result->coeff = poly1->coeff + poly2->coeff; // 계수 합산!
+      poly1 = poly1->next;
+      poly2 = poly2->next;
+    }
+    // 다음 결과 노드 동적 생성
+    result->next = (Node*)malloc(sizeof(Node));
+    result = result->next;
+    result->next = NULL;
+  }
+  // 한쪽 리스트가 남은 경우 → while(poly1->next) 또는 while(poly2->next)로 나머지 추가
+}</div>
+      <div class="key-box">시간복잡도: <strong>O(m + n)</strong> (m, n = 각 다항식의 항 수). Case 3에서 둘 다 advance하지 않으면 같은 지수 항을 중복 처리하는 버그 발생!</div>
+    </div>
+  </div>
+
+  <!-- ===== SKIP LIST ===== -->
+  <div class="section" id="tab-skip">
+    <h2>Skip List</h2>
+
+    <div class="card">
+      <h3>탄생 배경 — 연결 리스트의 탐색 문제 해결</h3>
+      <p>정렬된 배열은 이진 탐색으로 O(log n). 하지만 연결 리스트는 정렬되어 있어도 임의 위치 접근이 불가 → O(n) 탐색.</p>
+      <p><strong>Skip List</strong>는 여러 레벨의 연결 리스트를 쌓아, 상위 레벨에서 큰 블록을 건너뛰며 탐색한다. 마치 급행 지하철처럼.</p>
+
+      <!-- Visualization -->
+      <div class="skip-list-vis">
+        <div style="font-size:11px; color:var(--text-tertiary); margin-bottom:5px; font-family:var(--font-mono);">일반 Linked List (탐색: O(n))</div>
+        <div class="skip-level">
+          <div class="skip-label">Lv 0</div>
+          <div class="skip-node inf">-∞</div><div class="skip-line"></div>
+          <div class="skip-node">2</div><div class="skip-line"></div>
+          <div class="skip-node">3</div><div class="skip-line"></div>
+          <div class="skip-node">5</div><div class="skip-line"></div>
+          <div class="skip-node">10</div><div class="skip-line"></div>
+          <div class="skip-node">12</div><div class="skip-line"></div>
+          <div class="skip-node">17</div><div class="skip-line"></div>
+          <div class="skip-node tgt">22</div><div class="skip-line"></div>
+          <div class="skip-node">25</div><div class="skip-line"></div>
+          <div class="skip-node inf">+∞</div>
+        </div>
+
+        <div style="font-size:11px; color:var(--text-tertiary); margin: 12px 0 5px; font-family:var(--font-mono);">Skip List (탐색: O(log n)) — Search(22)</div>
+        <div class="skip-level">
+          <div class="skip-label">Lv 3</div>
+          <div class="skip-node inf">-∞</div><div class="skip-line" style="min-width:120px;"></div>
+          <div class="skip-node">17</div><div class="skip-line" style="min-width:120px;"></div>
+          <div class="skip-node inf">+∞</div>
+        </div>
+        <div class="skip-level">
+          <div class="skip-label">Lv 2</div>
+          <div class="skip-node inf">-∞</div><div class="skip-line" style="min-width:60px;"></div>
+          <div class="skip-node">5</div><div class="skip-line" style="min-width:60px;"></div>
+          <div class="skip-node">17</div><div class="skip-line" style="min-width:60px;"></div>
+          <div class="skip-node">25</div><div class="skip-line" style="min-width:60px;"></div>
+          <div class="skip-node inf">+∞</div>
+        </div>
+        <div class="skip-level">
+          <div class="skip-label">Lv 1</div>
+          <div class="skip-node inf">-∞</div><div class="skip-line"></div>
+          <div class="skip-node">2</div><div class="skip-line"></div>
+          <div class="skip-node">5</div><div class="skip-line"></div>
+          <div class="skip-node">10</div><div class="skip-line"></div>
+          <div class="skip-node">17</div><div class="skip-line"></div>
+          <div class="skip-node tgt">22</div><div class="skip-line"></div>
+          <div class="skip-node">25</div><div class="skip-line"></div>
+          <div class="skip-node inf">+∞</div>
+        </div>
+      </div>
+      <div class="insight-box">비유: Lv3 = KTX(큰 구간 이동), Lv2 = 무궁화호, Lv1 = 완행 (세밀하게). 목적지에 가까워질수록 아래 레벨로 내려온다.</div>
+    </div>
+
+    <div class="card">
+      <h3>Perfect Skip List 구조</h3>
+      <p>각 상위 레벨은 바로 아래 레벨의 <strong>절반(½)</strong> 노드만 포함.</p>
+      <table>
+        <tr><th>레벨</th><th>포함 노드 수</th><th>특징</th></tr>
+        <tr><td>Level 0 (맨 아래)</td><td>n개</td><td>모든 노드 — 정렬된 연결 리스트</td></tr>
+        <tr><td>Level 1</td><td>n/2 개</td><td>짝수 인덱스 노드만</td></tr>
+        <tr><td>Level 2</td><td>n/4 개</td><td>4의 배수 인덱스만</td></tr>
+        <tr><td>Level k</td><td>n/2<sup>k</sup> 개</td><td>…</td></tr>
+      </table>
+      <div class="key-box">n개 노드 → 약 <strong>log₂n 레벨</strong>. 각 레벨에서 최대 2번 비교 이동 → 전체 탐색: <strong>O(log n)</strong></div>
+    </div>
+
+    <div class="card">
+      <h3>탐색 규칙 — 3가지</h3>
+      <p>최상위 레벨 맨 왼쪽(-∞)에서 시작. 현재 노드의 key를 목표 k와 비교.</p>
+
+      <table>
+        <tr><th>조건</th><th>의미</th><th>행동</th></tr>
+        <tr><td><code>k == key</code></td><td>현재 노드가 목표</td><td>✅ 탐색 완료!</td></tr>
+        <tr><td><code>k &lt; key</code></td><td>현재 노드 &gt; 목표 (오른쪽으로 가면 더 커짐)</td><td>⬇️ 한 레벨 아래로 내려감</td></tr>
+        <tr><td><code>k ≥ key</code></td><td>현재 노드 ≤ 목표 (더 오른쪽에 있을 수 있음)</td><td>➡️ 오른쪽으로 이동</td></tr>
+      </table>
+
+      <p style="font-size:13px; font-weight:500; margin-top:.75rem; margin-bottom:.25rem;">예: Search(71) 과정</p>
+      <div class="code-block">Lv3: -∞ 시작 → 71 ≥ -∞? → 오른쪽 → 31 도착
+Lv3: 71 ≥ 31? Yes → 오른쪽 → Inf 도착
+Lv3: 71 &lt; Inf → 아래로 ↓ (Lv2로)
+Lv2: 31에서 → 71 ≥ 31? Yes → 오른쪽 → 91
+Lv2: 71 &lt; 91 → 아래로 ↓ (Lv1로)
+Lv1: 31에서 → 오른쪽으로 이동하며 탐색...
+Lv0: 71 발견! ✅</div>
+      <div class="insight-box">각 레벨에서 범위를 절반으로 좁히는 방식 → 이진 탐색과 유사한 O(log n) 성능!</div>
+    </div>
+
+    <div class="card">
+      <h3>성능 최종 비교</h3>
+      <table>
+        <tr><th>연산</th><th>Array</th><th>Linked List</th><th>Perfect Skip List</th></tr>
+        <tr>
+          <td>Traverse &amp; Search</td>
+          <td>O(n) / O(1)*</td>
+          <td>O(n)</td>
+          <td><strong style="color:var(--text-success)">O(log n)</strong></td>
+        </tr>
+        <tr>
+          <td>Insertion</td>
+          <td>O(n)</td>
+          <td>O(1)</td>
+          <td>O(1)</td>
+        </tr>
+        <tr>
+          <td>Deletion</td>
+          <td>O(n)</td>
+          <td>O(1)</td>
+          <td>O(1)</td>
+        </tr>
+        <tr>
+          <td>Random Access</td>
+          <td>✅ O(1)</td>
+          <td>❌</td>
+          <td>❌</td>
+        </tr>
+      </table>
+      <p style="font-size:11px; color:var(--text-tertiary);">* Array: Search O(n) 순차 탐색, 정렬 시 이진 탐색 O(log n), Random Access O(1)</p>
+      <div class="key-box">Skip List = Linked List의 삽입/삭제 O(1) 장점 + 탐색을 <strong>O(n) → O(log n)</strong>으로 개선. 단, 추가 포인터를 위한 메모리 필요 (각 노드가 여러 레벨의 next 포인터를 가짐).</div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div class="section" id="tab-quiz">
+    <h2>연습 문제 (Practice Quiz)</h2>
+
+    <div id="score-card">
+      <div id="score-text">0 / 10</div>
+      <div id="score-msg"></div>
+      <button class="reset-btn" onclick="resetQuiz()">다시 풀기</button>
+    </div>
+
+    <div class="q-container" id="q1">
+      <div class="q-num">Q1 of 10</div>
+      <div class="q-text">연결 리스트에서 특정 값을 탐색하는 시간복잡도는?</div>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">A. O(1) — 인덱스로 직접 접근</button>
+      <button class="quiz-btn" onclick="answer('q1',this,true)">B. O(n) — Head부터 순차 탐색</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">C. O(log n) — 이진 탐색 가능</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">D. O(n²) — 이중 반복 필요</button>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="q-container" id="q2">
+      <div class="q-num">Q2 of 10</div>
+      <div class="q-text">연결 리스트 중간 노드 삭제 시 포인터 연결 전에 반드시 해야 하는 것은?</div>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">A. 삭제할 노드의 next를 NULL로 설정</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">B. head를 새 노드로 변경</button>
+      <button class="quiz-btn" onclick="answer('q2',this,true)">C. prev→next = cur→next 연결 후 free(temp)</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">D. 삭제 노드부터 먼저 free()</button>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="q-container" id="q3">
+      <div class="q-num">Q3 of 10</div>
+      <div class="q-text">전체 연결 리스트를 삭제할 때 각 노드에서 올바른 순서는?</div>
+      <button class="quiz-btn" onclick="answer('q3',this,true)">A. next 주소 저장 → free(현재) → 다음으로 이동</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">B. free(현재) → next 주소 저장 → 다음으로 이동</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">C. head = NULL로 설정하면 자동 해제</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">D. 마지막 노드부터 역순으로 free</button>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="q-container" id="q4">
+      <div class="q-num">Q4 of 10</div>
+      <div class="q-text">이중 연결 리스트(DLL)에서 중간 노드 삭제 시 단순 LL과 다르게 추가로 해야 하는 것은?</div>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">A. 이전 노드의 next를 다음 노드로 연결</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">B. 삭제 노드의 메모리 free</button>
+      <button class="quiz-btn" onclick="answer('q4',this,true)">C. 다음 노드의 prev 포인터도 이전 노드로 업데이트</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">D. head 포인터를 새 노드로 변경</button>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <div class="q-container" id="q5">
+      <div class="q-num">Q5 of 10</div>
+      <div class="q-text">DLL에서 맨 앞에 노드를 삽입할 때 단순 LL보다 추가로 해야 하는 것은?</div>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">A. 새 노드의 next를 기존 head로 설정</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">B. head 포인터를 새 노드로 변경</button>
+      <button class="quiz-btn" onclick="answer('q5',this,true)">C. 기존 head 노드의 prev를 새 노드로 업데이트</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">D. 새 노드의 prev를 tail로 설정</button>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="q-container" id="q6">
+      <div class="q-num">Q6 of 10</div>
+      <div class="q-text">다항식을 배열로 구현할 때 문제점은?</div>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">A. 같은 지수의 항끼리 더하기 어렵다</button>
+      <button class="quiz-btn" onclick="answer('q6',this,true)">B. 최고 차수가 크고 항이 적으면 대부분의 배열 공간이 낭비된다</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">C. 계수를 저장할 수 없다</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">D. 탐색 시간이 O(n²)이다</button>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <div class="q-container" id="q7">
+      <div class="q-num">Q7 of 10</div>
+      <div class="q-text">polyadd()에서 두 다항식의 지수가 같을 때 올바른 처리는?</div>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">A. 지수가 큰 쪽 항만 결과에 추가</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">B. poly1만 advance, poly2는 그대로</button>
+      <button class="quiz-btn" onclick="answer('q7',this,true)">C. 계수를 합산해 결과에 추가하고 둘 다 advance</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">D. 두 항 모두 개별적으로 결과에 추가</button>
+      <div class="quiz-feedback" id="q7-fb"></div>
+    </div>
+
+    <div class="q-container" id="q8">
+      <div class="q-num">Q8 of 10</div>
+      <div class="q-text">Skip List에서 탐색 시 현재 노드의 key가 목표값보다 클 때 (k &lt; key) 행동은?</div>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">A. 오른쪽으로 이동</button>
+      <button class="quiz-btn" onclick="answer('q8',this,true)">B. 한 레벨 아래로 내려감</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">C. 탐색 실패 반환</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">D. 처음부터 다시 탐색</button>
+      <div class="quiz-feedback" id="q8-fb"></div>
+    </div>
+
+    <div class="q-container" id="q9">
+      <div class="q-num">Q9 of 10</div>
+      <div class="q-text">Perfect Skip List에서 각 상위 레벨은 바로 아래 레벨의 몇 개 노드를 포함하는가?</div>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">A. 동일한 수</button>
+      <button class="quiz-btn" onclick="answer('q9',this,true)">B. 절반(½)</button>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">C. 1/3</button>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">D. 2/3</button>
+      <div class="quiz-feedback" id="q9-fb"></div>
+    </div>
+
+    <div class="q-container" id="q10">
+      <div class="q-num">Q10 of 10</div>
+      <div class="q-text">연결 리스트가 배열보다 캐시 성능이 나쁜 근본 이유는?</div>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">A. 노드 크기가 너무 크기 때문</button>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">B. 탐색 알고리즘이 비효율적이기 때문</button>
+      <button class="quiz-btn" onclick="answer('q10',this,true)">C. 노드가 메모리에 비연속적으로 위치해 공간 지역성(spatial locality)이 없기 때문</button>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">D. 포인터 크기가 데이터보다 크기 때문</button>
+      <div class="quiz-feedback" id="q10-fb"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const feedbacks = {
+  q1:  "✓ 연결 리스트는 인덱스 접근 불가 → Head부터 next를 따라 순차 탐색 → O(n). 배열의 O(1) Random Access와 정반대!",
+  q2:  "✓ 포인터 연결 순서: prev→next = cur→next로 우회 연결 먼저. 그 다음 free(temp). 먼저 free하면 cur→next 주소를 잃는다!",
+  q3:  "✓ next_node = cur_node->next로 먼저 저장! free(cur_node) 후에는 그 메모리를 통해 ->next에 접근할 수 없다.",
+  q4:  "✓ 단순 LL: prev→next = cur→next 만 하면 됨. DLL: 추가로 cur→next→prev = prev도 업데이트해야 양방향 일관성 유지!",
+  q5:  "✓ 단순 LL 맨 앞 삽입: new→next = head, head = new (2단계). DLL: 기존 head의 prev = new_node도 추가로 업데이트!",
+  q6:  "✓ 5x^100 + 7x^10처럼 최고 차수 100이지만 항이 2개뿐 → 배열 101칸 중 99칸이 0. 연결 리스트는 2개 노드만 사용!",
+  q7:  "✓ Case 3 (지수 동일): result->coeff = poly1->coeff + poly2->coeff. 둘 다 advance하지 않으면 같은 지수 항을 또 처리하는 버그!",
+  q8:  "✓ k < key: 현재 노드가 목표보다 크다 → 같은 레벨에서 더 오른쪽으로 가면 더 커지므로 아래 레벨로 내려가 세밀하게 탐색!",
+  q9:  "✓ Perfect Skip List: 각 레벨은 바로 아래의 ½. n개 → n/2 → n/4 → … → 약 log₂n 레벨 → 탐색 O(log n)!",
+  q10: "✓ 배열: 연속 메모리 → CPU 캐시 라인에 인접 요소도 함께 로드 (spatial locality). 연결 리스트: 노드가 메모리 곳곳에 흩어져 매번 캐시 미스!"
+};
+
+let score = 0, answered = 0;
+const total = 10;
+
+function answer(qid, btn, isCorrect) {
+  const c = document.getElementById(qid);
+  if (c.dataset.done) return;
+  c.dataset.done = '1';
+  c.querySelectorAll('.quiz-btn').forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('onclick').includes('true')) b.classList.add('correct');
+  });
+  if (!isCorrect) btn.classList.add('wrong');
+  else score++;
+  answered++;
+  const fb = document.getElementById(qid + '-fb');
+  fb.style.display = 'block';
+  fb.style.background = isCorrect ? 'var(--bg-success)' : 'var(--bg-danger)';
+  fb.style.color = isCorrect ? 'var(--text-success)' : 'var(--text-danger)';
+  fb.style.padding = '8px 12px';
+  fb.style.borderRadius = 'var(--radius-md)';
+  fb.textContent = feedbacks[qid];
+  if (answered === total) setTimeout(showScore, 500);
+}
+
+function showScore() {
+  const card = document.getElementById('score-card');
+  card.style.display = 'block';
+  document.getElementById('score-text').textContent = score + ' / ' + total;
+  const msgs = ['더 열심히 해보자! 💪', '조금 더 공부하면 완벽해!', '잘했어! 거의 다 왔어! 👍', '완벽해! 시험 준비 완료! 🎉'];
+  document.getElementById('score-msg').textContent = msgs[score <= 4 ? 0 : score <= 6 ? 1 : score <= 8 ? 2 : 3];
+  card.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  score = 0; answered = 0;
+  document.getElementById('score-card').style.display = 'none';
+  document.querySelectorAll('.q-container').forEach(c => {
+    delete c.dataset.done;
+    c.querySelectorAll('.quiz-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    const fb = c.querySelector('.quiz-feedback');
+    if (fb) fb.style.display = 'none';
+  });
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
