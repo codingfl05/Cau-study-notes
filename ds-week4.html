@@ -1,1295 +1,1281 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Structures – Week 4: Stack, Queue, Linked List</title>
+<title>Data Structures — Week 4: Stack, Queue, Linked List</title>
 <style>
-:root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f4f0;
-  --bg-tertiary: #eeedea;
-  --bg-info: #eaf2fc;
-  --bg-success: #eaf3de;
-  --bg-warning: #fdf3e0;
-  --bg-danger: #fdf0f0;
-  --text-primary: #1a1a18;
-  --text-secondary: #5c5c56;
-  --text-tertiary: #8c8c84;
-  --text-info: #185fa5;
-  --text-success: #3b6d11;
-  --text-warning: #854f0b;
-  --text-danger: #a32d2d;
-  --border-tertiary: rgba(0,0,0,0.08);
-  --border-secondary: rgba(0,0,0,0.14);
-  --border-info: #b5d4f4;
-  --border-success: #c0dd97;
-  --border-warning: #fac775;
-  --border-danger: #f7c1c1;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --font-sans: system-ui, -apple-system, sans-serif;
-  --font-mono: 'SFMono-Regular', 'Consolas', monospace;
-}
-@media (prefers-color-scheme: dark) {
   :root {
-    --bg-primary: #1e1e1c;
-    --bg-secondary: #262624;
-    --bg-tertiary: #2e2e2c;
-    --bg-info: #0c2a4a;
-    --bg-success: #0a2a12;
-    --bg-warning: #2a1a04;
-    --bg-danger: #2a0808;
-    --text-primary: #e8e7e0;
-    --text-secondary: #a0a098;
-    --text-tertiary: #68685e;
-    --text-info: #5ba0e8;
-    --text-success: #5aaa6a;
-    --text-warning: #d08830;
-    --text-danger: #e06060;
-    --border-tertiary: rgba(255,255,255,0.08);
-    --border-secondary: rgba(255,255,255,0.14);
-    --border-info: #1a4a7a;
-    --border-success: #1a4a22;
-    --border-warning: #5a3a0a;
-    --border-danger: #5a1818;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --bg-warning: #fdf3e0;
+    --bg-danger: #fdf0f0;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-warning: #854f0b;
+    --text-danger: #a32d2d;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-primary: rgba(0,0,0,0.22);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --border-danger: #f7c1c1;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', monospace;
   }
-}
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
+      --bg-danger: #2a0808;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --text-warning: #d08830;
+      --text-danger: #e06060;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-primary: rgba(255,255,255,0.22);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
+      --border-danger: #5a1818;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.7;
+  }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Header */
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .site-header a {
+    text-decoration: none;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .site-header a:hover { color: var(--text-primary); }
+  .sep { color: var(--text-tertiary); font-size: 13px; }
+  .header-title { font-size: 13px; color: var(--text-primary); font-weight: 500; }
 
-body {
-  font-family: var(--font-sans);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  line-height: 1.65;
-  min-height: 100vh;
-}
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 
-/* ── HEADER ── */
-.site-header {
-  position: sticky; top: 0; z-index: 100;
-  background: var(--bg-primary);
-  border-bottom: 0.5px solid var(--border-secondary);
-  padding: 0.6rem 1.5rem;
-  display: flex; align-items: center; gap: 1rem;
-}
-.home-link {
-  color: var(--text-info);
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 500;
-  display: flex; align-items: center; gap: 0.3rem;
-  white-space: nowrap;
-}
-.home-link:hover { text-decoration: underline; }
-.header-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-.header-badge {
-  margin-left: auto;
-  background: var(--bg-info);
-  color: var(--text-info);
-  border: 0.5px solid var(--border-info);
-  border-radius: 99px;
-  padding: 0.15rem 0.65rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
+  /* Page title */
+  .page-title { margin-bottom: 1.5rem; }
+  .page-title .eyebrow { font-size: 12px; color: var(--text-tertiary); font-weight: 400; margin-bottom: .35rem; letter-spacing: .04em; }
+  .page-title h1 { font-size: 22px; font-weight: 500; line-height: 1.3; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .35rem; }
 
-/* ── TABS ── */
-.tab-bar {
-  background: var(--bg-primary);
-  border-bottom: 0.5px solid var(--border-secondary);
-  padding: 0.5rem 1.5rem 0;
-  display: flex; gap: 0.3rem;
-  overflow-x: auto;
-}
-.tab-btn {
-  background: none; border: none; cursor: pointer;
-  padding: 0.45rem 0.9rem;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  font-size: 0.82rem; font-weight: 500;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
-}
-.tab-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-.tab-btn.active {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-weight: 700;
-  border: 0.5px solid var(--border-secondary);
-  border-bottom-color: var(--bg-secondary);
-}
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .tab {
+    font-size: 13px; padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: transparent;
+    font-family: var(--font-sans);
+    transition: all .12s;
+    font-weight: 400;
+  }
+  .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .tab.active {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+    font-weight: 500;
+  }
 
-/* ── MAIN CONTENT ── */
-.content { max-width: 860px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
+  /* Sections */
+  .section { display: none; }
+  .section.active { display: block; }
 
-/* ── CARDS ── */
-.card {
-  background: var(--bg-primary);
-  border: 0.5px solid var(--border-secondary);
-  border-radius: var(--radius-lg);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
-}
-.card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 0.6rem;
-  color: var(--text-primary);
-}
-.section-heading {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin: 1.4rem 0 0.7rem;
-  color: var(--text-primary);
-}
-.section-heading:first-child { margin-top: 0; }
+  /* Cards */
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  h2 {
+    font-size: 18px; font-weight: 500;
+    margin-bottom: 1rem;
+    padding-bottom: .6rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  h3 { font-size: 15px; font-weight: 500; margin-bottom: .5rem; }
+  p { font-size: 14px; margin-bottom: .6rem; }
 
-/* ── CALLOUT BOXES ── */
-.key-box, .warn-box, .insight-box {
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  border-left: 3px solid;
-}
-.key-box   { background: var(--bg-info);    border-color: var(--border-info);    color: var(--text-info); }
-.warn-box  { background: var(--bg-danger);  border-color: var(--border-danger);  color: var(--text-danger); }
-.insight-box { background: var(--bg-success); border-color: var(--border-success); color: var(--text-success); }
-.callout-label {
-  font-size: 0.72rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.06em;
-  margin-bottom: 0.25rem;
-  opacity: 0.7;
-}
+  /* Callout boxes */
+  .key-box {
+    border-left: 3px solid var(--border-info);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-info);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-info);
+  }
+  .warn-box {
+    border-left: 3px solid var(--border-danger);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-danger);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-danger);
+  }
+  .insight-box {
+    border-left: 3px solid var(--border-success);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-success);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-success);
+  }
 
-/* ── CODE BLOCKS ── */
-pre, code {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-}
-pre {
-  background: var(--bg-secondary);
-  border: 0.5px solid var(--border-secondary);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1rem;
-  overflow-x: auto;
-  margin-bottom: 1rem;
-  line-height: 1.55;
-}
-code { background: var(--bg-tertiary); padding: 0.1em 0.35em; border-radius: 4px; }
-pre code { background: none; padding: 0; }
+  /* Code */
+  code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary); padding: 2px 5px;
+    border-radius: 4px; color: var(--text-primary);
+  }
+  .code-block {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem; margin: .75rem 0;
+    line-height: 1.6; overflow-x: auto; white-space: pre;
+    color: var(--text-primary);
+  }
 
-/* ── TABLES ── */
-table {
-  width: 100%; border-collapse: collapse;
-  font-size: 0.85rem; margin-bottom: 1rem;
-}
-th {
-  text-transform: uppercase; letter-spacing: 0.05em;
-  font-size: 0.72rem; font-weight: 700;
-  color: var(--text-secondary);
-  border-bottom: 0.5px solid var(--border-secondary);
-  padding: 0.5rem 0.75rem;
-  text-align: left;
-  background: var(--bg-secondary);
-}
-td {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 0.5px solid var(--border-tertiary);
-  vertical-align: top;
-}
-tr:last-child td { border-bottom: none; }
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: .75rem 0; }
+  th {
+    text-align: left; padding: 7px 10px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-weight: 500; font-size: 12px;
+    border-bottom: 0.5px solid var(--border-secondary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  td { padding: 7px 10px; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
 
-/* ── BADGES ── */
-.badge {
-  display: inline-block;
-  padding: 0.15rem 0.6rem;
-  border-radius: 99px;
-  font-size: 0.72rem; font-weight: 600;
-  margin-right: 0.3rem; margin-bottom: 0.2rem;
-}
-.badge-info    { background: var(--bg-info);    color: var(--text-info);    border: 0.5px solid var(--border-info); }
-.badge-success { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
-.badge-warn    { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
-.badge-danger  { background: var(--bg-danger);  color: var(--text-danger);  border: 0.5px solid var(--border-danger); }
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
 
-/* ── SVG DIAGRAMS ── */
-.diagram-wrap {
-  background: var(--bg-primary);
-  border: 0.5px solid var(--border-secondary);
-  border-radius: var(--radius-lg);
-  padding: 1rem;
-  margin-bottom: 1rem;
-  overflow-x: auto;
-  text-align: center;
-}
-.diagram-wrap svg { max-width: 100%; }
+  /* Badge */
+  .badge {
+    display: inline-block; font-size: 12px;
+    padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .badge-blue { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); }
+  .badge-green { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
+  .badge-amber { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
 
-/* ── QUIZ ── */
-.quiz-q { margin-bottom: 1.25rem; }
-.quiz-q p { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
-.quiz-options { display: flex; flex-direction: column; gap: 0.35rem; }
-.quiz-opt {
-  background: var(--bg-secondary);
-  border: 0.5px solid var(--border-secondary);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 0.9rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  text-align: left;
-  transition: background 0.12s, border-color 0.12s;
-  color: var(--text-primary);
-}
-.quiz-opt:hover:not([disabled]) { background: var(--bg-tertiary); border-color: var(--border-info); }
-.quiz-opt.correct  { background: var(--bg-success) !important; border-color: var(--border-success) !important; color: var(--text-success) !important; font-weight: 600; }
-.quiz-opt.wrong    { background: var(--bg-danger)  !important; border-color: var(--border-danger)  !important; color: var(--text-danger)  !important; }
-.quiz-feedback { font-size: 0.8rem; margin-top: 0.35rem; }
-.quiz-score-card {
-  background: var(--bg-success);
-  border: 0.5px solid var(--border-success);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
-  text-align: center;
-  margin-top: 1rem;
-  display: none;
-}
-.quiz-score-card .score-big { font-size: 2.5rem; font-weight: 800; color: var(--text-success); }
-.quiz-score-card p { color: var(--text-success); margin-top: 0.3rem; }
-.retry-btn {
-  margin-top: 0.75rem;
-  background: var(--text-success); color: #fff;
-  border: none; border-radius: var(--radius-md);
-  padding: 0.5rem 1.2rem; cursor: pointer;
-  font-size: 0.85rem; font-weight: 600;
-}
+  /* Stack visualization */
+  .stack-vis { display: flex; gap: 12px; align-items: flex-end; margin: 1rem 0; flex-wrap: wrap; }
+  .stack-col { text-align: center; }
+  .stack-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; font-family: var(--font-mono); }
+  .stack-frames {
+    display: flex; flex-direction: column-reverse; gap: 2px;
+    width: 70px; min-height: 120px;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: 4px; justify-content: flex-start;
+    background: var(--bg-secondary);
+  }
+  .stack-frame {
+    border: 0.5px solid var(--border-info);
+    background: var(--bg-info); color: var(--text-info);
+    font-size: 13px; font-family: var(--font-mono);
+    text-align: center; padding: 6px 0;
+    border-radius: var(--radius-md);
+  }
+  .stack-frame.top-frame {
+    border-color: var(--border-warning);
+    background: var(--bg-warning); color: var(--text-warning);
+  }
+  .stack-action { font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); margin-top: 5px; }
 
-p { margin-bottom: 0.6rem; color: var(--text-secondary); font-size: 0.9rem; }
-ul, ol { padding-left: 1.4rem; color: var(--text-secondary); font-size: 0.9rem; }
-li { margin-bottom: 0.3rem; }
-strong { color: var(--text-primary); }
+  /* Queue visualization */
+  .queue-vis {
+    display: flex; align-items: center; gap: 0;
+    margin: 1rem 0; font-family: var(--font-mono); font-size: 13px;
+    overflow-x: auto;
+  }
+  .queue-label {
+    font-size: 11px; color: var(--text-tertiary);
+    font-family: var(--font-mono); margin-right: 8px; white-space: nowrap;
+  }
+  .queue-cell {
+    border: 0.5px solid var(--border-secondary);
+    padding: 8px 14px; text-align: center;
+    background: var(--bg-primary); white-space: nowrap;
+  }
+  .queue-cell:first-of-type { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+  .queue-cell:last-of-type  { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .queue-cell + .queue-cell { border-left: none; }
+  .queue-cell.hl-green { background: var(--bg-success); color: var(--text-success); border-color: var(--border-success); }
+  .queue-cell.hl-blue  { background: var(--bg-info); color: var(--text-info); border-color: var(--border-info); }
+  .queue-arrow { font-size: 18px; color: var(--text-tertiary); padding: 0 4px; }
+
+  /* Linked list visualization */
+  .ll-vis {
+    display: flex; align-items: center; gap: 0;
+    margin: 1rem 0; flex-wrap: wrap; row-gap: 8px;
+  }
+  .ll-node {
+    display: flex; border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md); overflow: hidden;
+    font-family: var(--font-mono); font-size: 12px;
+  }
+  .ll-data {
+    padding: 7px 12px; background: var(--bg-info);
+    color: var(--text-info); border-right: 0.5px solid var(--border-info);
+    font-weight: 600;
+  }
+  .ll-next {
+    padding: 7px 10px; background: var(--bg-primary);
+    color: var(--text-tertiary); font-size: 11px;
+  }
+  .ll-arrow {
+    font-size: 16px; color: var(--text-tertiary);
+    padding: 0 4px; align-self: center;
+  }
+  .ll-null {
+    padding: 7px 10px; background: var(--bg-tertiary);
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    color: var(--text-tertiary); font-family: var(--font-mono); font-size: 12px;
+  }
+  .ll-head-label {
+    font-size: 11px; color: var(--text-tertiary);
+    font-family: var(--font-mono); margin-right: 6px;
+    align-self: center;
+  }
+  .ll-node.hl { border-color: var(--border-warning); }
+  .ll-node.hl .ll-data { background: var(--bg-warning); color: var(--text-warning); border-color: var(--border-warning); }
+
+  /* Circular queue SVG */
+  .cq-wrap { text-align: center; margin: 1rem 0; }
+
+  /* Quiz */
+  .q-container {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .q-num { font-size: 12px; color: var(--text-tertiary); margin-bottom: .3rem; }
+  .q-text { font-size: 14px; font-weight: 500; margin-bottom: .75rem; }
+  .quiz-btn {
+    display: block; width: 100%;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: 9px 14px; cursor: pointer;
+    font-size: 13px; color: var(--text-primary);
+    text-align: left; margin: 4px 0;
+    transition: all .12s;
+    font-family: var(--font-sans);
+  }
+  .quiz-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+  .quiz-btn.correct { border-color: var(--border-success); background: var(--bg-success); color: var(--text-success); }
+  .quiz-btn.wrong   { border-color: var(--border-danger);  background: var(--bg-danger);  color: var(--text-danger);  }
+  .quiz-feedback {
+    font-size: 13px; margin-top: 8px;
+    padding: 8px 12px; border-radius: var(--radius-md);
+    display: none;
+  }
+  #score-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; text-align: center;
+    margin-bottom: 1.5rem; display: none;
+  }
+  #score-text { font-size: 24px; font-weight: 500; margin-bottom: .4rem; }
+  #score-msg  { font-size: 13px; color: var(--text-secondary); }
+  .reset-btn {
+    margin-top: .75rem;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: 20px; padding: 5px 16px;
+    cursor: pointer; font-size: 13px;
+    color: var(--text-secondary); font-family: var(--font-sans);
+    transition: all .12s;
+  }
+  .reset-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+
+  /* Step diagram */
+  .steps-row { display: flex; gap: 8px; flex-wrap: wrap; margin: .75rem 0; }
+  .step-box {
+    flex: 1; min-width: 100px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: .5rem .75rem;
+    font-size: 12px;
+    text-align: center;
+  }
+  .step-box strong { display: block; color: var(--text-info); font-size: 11px; margin-bottom: 2px; }
 </style>
 </head>
 <body>
 
 <header class="site-header">
-  <a class="home-link" href="index.html">← Home</a>
-  <span class="header-title">Data Structures · Week 4</span>
-  <span class="header-badge">Stack · Queue · Linked List</span>
+  <a href="index.html">← Home</a>
+  <span class="sep">/</span>
+  <a href="#">Data Structures</a>
+  <span class="sep">/</span>
+  <span class="header-title">Week 4 — Stack, Queue, Linked List</span>
 </header>
 
-<div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab('stack')">📚 Stack</button>
-  <button class="tab-btn" onclick="switchTab('queue')">🚌 Queue</button>
-  <button class="tab-btn" onclick="switchTab('linked')">🔗 Linked List</button>
-  <button class="tab-btn" onclick="switchTab('quiz')">✏️ Quiz</button>
-</div>
-
-<!-- ═══════════════════════════ STACK TAB ═══════════════════════════ -->
-<div class="content">
-<div class="tab-panel active" id="tab-stack">
-
-  <h2 class="section-heading">What is a Stack?</h2>
-
-  <div class="key-box">
-    <div class="callout-label">Core Concept</div>
-    A <strong>Stack</strong> is an ordered list where all insertions and deletions happen at <strong>one end</strong>, called the <strong>top</strong>. It follows <strong>LIFO</strong> — Last-In First-Out, just like a stack of plates: you always pick up the top one.
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">Data Structures · Week 4</div>
+    <h1>Stack, Queue &amp; Linked List</h1>
+    <div class="sub">스택, 큐, 연결 리스트 완벽 정리 노트</div>
   </div>
 
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <!-- Stack before push -->
-      <text x="60" y="20" font-size="12" fill="var(--text-secondary)" font-weight="700">Before Push(C)</text>
-      <rect x="30" y="30" width="80" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="30" y="60" width="80" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="30" y="90" width="80" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="70" y="50" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text-primary)">B</text>
-      <text x="70" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text-primary)">A</text>
-      <text x="18" y="48" text-anchor="middle" font-size="10" fill="var(--text-info)">Top</text>
-      <text x="70" y="140" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">Stack</text>
-
-      <!-- Arrow push -->
-      <text x="148" y="58" font-size="18" fill="var(--text-info)">→</text>
-      <text x="148" y="20" font-size="11" fill="var(--text-info)" font-weight="700">Push(C)</text>
-      <text x="148" y="35" font-size="10" fill="var(--text-tertiary)">insert at top</text>
-
-      <!-- Stack after push -->
-      <rect x="190" y="30" width="80" height="30" rx="4" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="1"/>
-      <rect x="190" y="60" width="80" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="190" y="90" width="80" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="230" y="50" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text-info)">C ← new</text>
-      <text x="230" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text-primary)">B</text>
-      <text x="230" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text-primary)">A</text>
-      <text x="176" y="48" text-anchor="middle" font-size="10" fill="var(--text-info)">Top</text>
-
-      <!-- Arrow pop -->
-      <text x="310" y="58" font-size="18" fill="var(--text-danger)">→</text>
-      <text x="308" y="20" font-size="11" fill="var(--text-danger)" font-weight="700">Pop()</text>
-      <text x="308" y="35" font-size="10" fill="var(--text-tertiary)">remove from top</text>
-
-      <!-- Stack after pop -->
-      <rect x="350" y="60" width="80" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="350" y="90" width="80" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="390" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text-primary)">B</text>
-      <text x="390" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text-primary)">A</text>
-      <text x="338" y="78" text-anchor="middle" font-size="10" fill="var(--text-info)">Top</text>
-      <text x="390" y="140" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">C removed ✓</text>
-    </svg>
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('stack',this)">📚 Stack</button>
+    <button class="tab" onclick="showTab('queue',this)">🚶 Queue</button>
+    <button class="tab" onclick="showTab('linkedlist',this)">🔗 Linked List</button>
+    <button class="tab" onclick="showTab('compare',this)">⚖️ 비교</button>
+    <button class="tab" onclick="showTab('quiz',this)">🧪 Quiz</button>
   </div>
 
-  <div class="insight-box">
-    <div class="callout-label">Real-life analogy</div>
-    Think of a pile of pancakes 🥞. You always add a new pancake on top, and always eat the top one first. You can't grab one from the middle without moving all the ones above it!
-  </div>
+  <!-- ===== STACK ===== -->
+  <div class="section active" id="tab-stack">
+    <h2>Stack (스택)</h2>
 
-  <h2 class="section-heading">Stack ADT (Abstract Data Type)</h2>
-  <div class="card">
-    <div class="card-title">Stack Operations</div>
-    <table>
-      <thead><tr><th>Operation</th><th>Description</th><th>Edge Case</th></tr></thead>
-      <tbody>
-        <tr><td><code>Create(capacity)</code></td><td>Create empty stack of given size</td><td>—</td></tr>
-        <tr><td><code>Push(stack, item)</code></td><td>Insert item at the top</td><td>Error if <strong>isFull</strong></td></tr>
-        <tr><td><code>Pop(stack)</code></td><td>Remove & return top item</td><td>Error if <strong>isEmpty</strong></td></tr>
-        <tr><td><code>Peek(stack)</code></td><td>Return top item <em>without removing</em></td><td>Error if <strong>isEmpty</strong></td></tr>
-        <tr><td><code>isFull(stack)</code></td><td>Returns true if top == capacity-1</td><td>—</td></tr>
-        <tr><td><code>isEmpty(stack)</code></td><td>Returns true if top == -1</td><td>—</td></tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="card">
+      <h3>Definition (정의)</h3>
+      <span class="badge badge-blue">LIFO — Last-In First-Out</span>
+      <p style="margin-top:.75rem;">삽입(push)과 삭제(pop)가 <strong>한쪽 끝(top)</strong>에서만 일어나는 순서 있는 리스트.</p>
+      <div class="key-box">생각하기 쉬운 예: 접시 쌓기 🍽️ — 제일 마지막에 올린 접시를 제일 먼저 꺼낸다!</div>
+      <div class="stack-vis">
+        <div class="stack-col">
+          <div class="stack-label">empty</div>
+          <div class="stack-frames"></div>
+          <div class="stack-action">top = -1</div>
+        </div>
+        <div class="stack-col">
+          <div class="stack-label">push(A)</div>
+          <div class="stack-frames">
+            <div class="stack-frame top-frame">A ← top</div>
+          </div>
+          <div class="stack-action">top = 0</div>
+        </div>
+        <div class="stack-col">
+          <div class="stack-label">push(B)</div>
+          <div class="stack-frames">
+            <div class="stack-frame top-frame">B ← top</div>
+            <div class="stack-frame">A</div>
+          </div>
+          <div class="stack-action">top = 1</div>
+        </div>
+        <div class="stack-col">
+          <div class="stack-label">push(C)</div>
+          <div class="stack-frames">
+            <div class="stack-frame top-frame">C ← top</div>
+            <div class="stack-frame">B</div>
+            <div class="stack-frame">A</div>
+          </div>
+          <div class="stack-action">top = 2</div>
+        </div>
+        <div class="stack-col">
+          <div class="stack-label">pop() → C</div>
+          <div class="stack-frames">
+            <div class="stack-frame top-frame">B ← top</div>
+            <div class="stack-frame">A</div>
+          </div>
+          <div class="stack-action">top = 1</div>
+        </div>
+      </div>
+    </div>
 
-  <div class="warn-box">
-    <div class="callout-label">⚠️ Common Pitfalls</div>
-    <strong>Stack Overflow</strong>: Pushing to a full stack → always check <code>isFull()</code> before Push.<br>
-    <strong>Stack Underflow</strong>: Popping from an empty stack → always check <code>isEmpty()</code> before Pop.<br>
-    An empty stack has <code>top = -1</code>; a full stack has <code>top = capacity - 1</code>.
-  </div>
+    <div class="card">
+      <h3>Stack ADT</h3>
+      <table>
+        <tr><th>연산</th><th>설명</th><th>조건</th></tr>
+        <tr><td><code>createStack(capacity)</code></td><td>빈 스택 생성</td><td>—</td></tr>
+        <tr><td><code>push(stack, item)</code></td><td>top에 item 삽입</td><td>isFull → 에러</td></tr>
+        <tr><td><code>pop(stack)</code></td><td>top 제거 &amp; 반환</td><td>isEmpty → 에러</td></tr>
+        <tr><td><code>peek(stack)</code></td><td>top 확인 (제거 안 함)</td><td>isEmpty → 에러</td></tr>
+        <tr><td><code>isFull(stack)</code></td><td>꽉 찼는지 확인</td><td>top == capacity-1</td></tr>
+        <tr><td><code>isEmpty(stack)</code></td><td>비었는지 확인</td><td>top == -1</td></tr>
+      </table>
+    </div>
 
-  <h2 class="section-heading">Array Implementation</h2>
-  <div class="card">
-    <p>The stack struct stores three things: the <strong>top index</strong>, the <strong>capacity</strong>, and a pointer to the <strong>array</strong>.</p>
-  </div>
-
-<pre>// Stack type definition
-typedef struct {
+    <div class="card">
+      <h3>Array Implementation (배열로 구현)</h3>
+      <div class="code-block">typedef struct {
     int top;
     int capacity;
-    int *array;  // can be char, float, double, etc.
+    int *array;   // char, int, float, double...
 } Stack;
 
 Stack *createStack(int capacity) {
-    Stack *stack = (Stack*)malloc(sizeof(Stack));
-    stack->top = -1;          // empty: top starts at -1
+    Stack *stack = (Stack*) malloc(sizeof(Stack));
+    if (!stack) return NULL;
+    stack->top = -1;          // 빈 스택: top = -1
     stack->capacity = capacity;
-    stack->array = (int*)malloc(capacity * sizeof(int));
+    stack->array = (int*) malloc(capacity * sizeof(int));
+    if (!stack->array) return NULL;
     return stack;
 }
 
-int isFull(Stack *stack)  { return stack->top == stack->capacity - 1; }
-int isEmpty(Stack *stack) { return stack->top == -1; }
-int peek(Stack *stack)    { return stack->array[stack->top]; }
+int isFull(Stack *s)  { return s->top == s->capacity - 1; }
+int isEmpty(Stack *s) { return s->top == -1; }
+int peek(Stack *s)    { return s->array[s->top]; }
 
-void push(Stack *stack, int item) {
-    if (!isFull(stack))
-        stack->array[++stack->top] = item;   // pre-increment top, then insert
+void push(Stack *s, int item) {
+    if (!isFull(s))
+        s->array[++s->top] = item;  // 먼저 top 증가!
     else printf("Stack is full!\n");
 }
 
-int pop(Stack *stack) {
-    if (!isEmpty(stack))
-        return stack->array[stack->top--];   // return top, then post-decrement
+int pop(Stack *s) {
+    if (!isEmpty(s))
+        return s->array[s->top--];  // 반환 후 top 감소!
     printf("Stack is Empty!\n");
     return 0;
-}</pre>
+}</div>
+      <div class="key-box">push: <code>++top</code> 먼저 증가 &nbsp;·&nbsp; pop: <code>top--</code> 반환 후 감소 &nbsp;·&nbsp; top = -1이 빈 스택!</div>
+    </div>
 
-  <div class="insight-box">
-    <div class="callout-label">💡 Key insight: pre vs post increment</div>
-    <strong>Push</strong> uses <code>++stack->top</code> (increment first, then assign) so the first element goes to index 0, not -1.<br>
-    <strong>Pop</strong> uses <code>stack->top--</code> (return first, then decrement) so you get the current top before moving down.
-  </div>
+    <div class="card">
+      <h3>응용 1 — Palindrome 체크 (회문 검사)</h3>
+      <p>회문: 앞뒤로 읽어도 같은 단어. 예: mom, level, radar, ABCDCBA</p>
 
-  <h2 class="section-heading">Stack Example: Palindromes</h2>
-  <div class="card">
-    <div class="card-title">What is a Palindrome?</div>
-    <p>A word/phrase that reads the same forwards and backwards. Examples: <strong>mom</strong>, <strong>level</strong>, <strong>civic</strong>, <strong>radar</strong>.</p>
-    <p><span class="badge badge-success">Palindrome</span> ABCDCBA ↔ ABCDCBA (same reversed)</p>
-    <p><span class="badge badge-danger">Not Palindrome</span> ABDA ↛ ADBA (different reversed)</p>
-  </div>
+      <!-- SVG palindrome diagram -->
+      <svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:580px;margin:.5rem 0;display:block">
+        <defs>
+          <style>
+            .ptext { font-family: monospace; font-size: 14px; fill: var(--text-primary); }
+            .plabel { font-family: monospace; font-size: 10px; fill: var(--text-tertiary); }
+          </style>
+        </defs>
+        <!-- Array cells -->
+        <g>
+          <rect x="10" y="20" width="40" height="36" rx="6" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.8"/>
+          <text x="30" y="43" text-anchor="middle" class="ptext" fill="var(--text-info)">A</text>
+          <rect x="52" y="20" width="40" height="36" rx="0" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.8"/>
+          <text x="72" y="43" text-anchor="middle" class="ptext">B</text>
+          <rect x="94" y="20" width="40" height="36" rx="0" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.8"/>
+          <text x="114" y="43" text-anchor="middle" class="ptext">C</text>
+          <rect x="136" y="20" width="40" height="36" rx="0" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.8"/>
+          <text x="156" y="43" text-anchor="middle" class="ptext">D</text>
+          <rect x="178" y="20" width="40" height="36" rx="0" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.8"/>
+          <text x="198" y="43" text-anchor="middle" class="ptext">C</text>
+          <rect x="220" y="20" width="40" height="36" rx="0" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.8"/>
+          <text x="240" y="43" text-anchor="middle" class="ptext">B</text>
+          <rect x="262" y="20" width="40" height="36" rx="6" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.8"/>
+          <text x="282" y="43" text-anchor="middle" class="ptext" fill="var(--text-info)">A</text>
+        </g>
+        <text x="20" y="15" class="plabel">push(first half)</text>
+        <text x="230" y="15" class="plabel">compare(pop)</text>
+        <!-- Arrow -->
+        <text x="320" y="43" text-anchor="middle" class="ptext" fill="var(--text-tertiary)">→</text>
+        <!-- Stack depiction -->
+        <g>
+          <rect x="350" y="10" width="36" height="56" rx="6" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.8"/>
+          <rect x="354" y="14" width="28" height="14" rx="4" fill="var(--bg-warning)" stroke="var(--border-warning)" stroke-width="0.5"/>
+          <text x="368" y="24" text-anchor="middle" style="font-family:monospace;font-size:11px;fill:var(--text-warning)">A</text>
+          <rect x="354" y="30" width="28" height="14" rx="4" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="368" y="40" text-anchor="middle" style="font-family:monospace;font-size:11px;fill:var(--text-info)">B</text>
+          <rect x="354" y="46" width="28" height="14" rx="4" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="368" y="57" text-anchor="middle" style="font-family:monospace;font-size:11px;fill:var(--text-info)">C</text>
+          <text x="368" y="76" text-anchor="middle" class="plabel">Stack</text>
+        </g>
+        <!-- Result -->
+        <text x="420" y="43" text-anchor="middle" class="ptext" fill="var(--text-tertiary)">→</text>
+        <rect x="445" y="22" width="140" height="32" rx="6" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.8"/>
+        <text x="515" y="42" text-anchor="middle" style="font-family:monospace;font-size:12px;fill:var(--text-success)">✓ Palindrome!</text>
+      </svg>
 
-  <div class="card">
-    <div class="card-title">Algorithm using Stack</div>
-    <ol>
-      <li><strong>Push</strong> the first <code>length/2</code> characters onto the stack</li>
-      <li>If the string length is <strong>odd</strong>, skip the middle character (<code>i++</code>)</li>
-      <li>For the remaining characters, <strong>Pop</strong> from stack and compare with current character</li>
-      <li>If any mismatch → <strong>NOT a palindrome</strong>. If all match → <strong>IS a palindrome</strong></li>
-    </ol>
-  </div>
-
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <text x="250" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">Checking "ABCCBA" with a Stack</text>
-      <!-- Word boxes -->
-      <text x="20" y="45" font-size="11" fill="var(--text-secondary)">Word:</text>
-      <rect x="55" y="30" width="30" height="26" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
-      <rect x="85" y="30" width="30" height="26" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
-      <rect x="115" y="30" width="30" height="26" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
-      <rect x="145" y="30" width="30" height="26" rx="3" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
-      <rect x="175" y="30" width="30" height="26" rx="3" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
-      <rect x="205" y="30" width="30" height="26" rx="3" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
-      <text x="70" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-info)">A</text>
-      <text x="100" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-info)">B</text>
-      <text x="130" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-info)">C</text>
-      <text x="160" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-success)">C</text>
-      <text x="190" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-success)">B</text>
-      <text x="220" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-success)">A</text>
-      <text x="100" y="70" text-anchor="middle" font-size="10" fill="var(--text-info)">← Push first 3</text>
-      <text x="190" y="70" text-anchor="middle" font-size="10" fill="var(--text-success)">← Compare with popped</text>
-
-      <!-- Stack -->
-      <text x="310" y="30" font-size="11" fill="var(--text-secondary)">Stack after Phase 1:</text>
-      <rect x="310" y="35" width="50" height="24" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="310" y="59" width="50" height="24" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="310" y="83" width="50" height="24" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="335" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">C</text>
-      <text x="335" y="76" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">B</text>
-      <text x="335" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">A</text>
-      <text x="295" y="52" text-anchor="end" font-size="10" fill="var(--text-info)">Top→</text>
-      <!-- Result -->
-      <rect x="390" y="60" width="100" height="36" rx="6" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
-      <text x="440" y="82" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-success)">✓ Palindrome!</text>
-    </svg>
-  </div>
-
-<pre>int isPalindrome(Stack *stack, char word[], int length) {
-    // Phase 1: push first half
-    for (int i = 0; i < length / 2; i++)
+      <p><strong>알고리즘:</strong><br>
+      ① 앞 절반(length/2)을 스택에 push<br>
+      ② 홀수 길이면 가운데 문자 skip<br>
+      ③ 나머지 절반과 pop 결과 비교 → 다르면 Not Palindrome</p>
+      <div class="code-block">int isPalindrome(Stack *stack, char word[], int length) {
+    // 1. Push first half into stack
+    for (int i = 0; i &lt; length / 2; i++)
         push(stack, word[i]);
 
     int i = length / 2;
-    if (length % 2 != 0) i++;  // skip middle char if odd length
+    if (length % 2 != 0) i++;   // 홀수: 중간 문자 skip
 
-    // Phase 2: compare with popped chars
-    while (i < length) {
-        if (pop(stack) != word[i])
-            return 0;  // mismatch → not a palindrome
+    // 2. Pop and compare with second half
+    while (i &lt; length) {
+        if (pop(stack) != word[i]) return 0;  // Not palindrome
         i++;
     }
-    return 1;  // all matched → palindrome!
-}</pre>
+    return 1;  // Palindrome!
+}</div>
+    </div>
 
-  <h2 class="section-heading">Stack Example: Bracket Check</h2>
-  <div class="card">
-    <p>Given an expression like <code>[&#123;(  )&#125;][]()</code>, check if all brackets are balanced.</p>
-    <p><strong>Algorithm:</strong> Scan left to right. If you see an <em>opening</em> bracket → <strong>Push</strong>. If you see a <em>closing</em> bracket → <strong>Pop</strong> and verify it matches. After scanning, if the stack is <strong>empty</strong> → balanced!</p>
+    <div class="card">
+      <h3>응용 2 — Bracket Check (괄호 균형 검사)</h3>
+      <p>수식의 괄호가 올바르게 짝지어져 있는지 검사. 예: <code>[&#123;(  )&#125;][]()</code></p>
+      <table>
+        <tr><th>조건</th><th>동작</th></tr>
+        <tr><td>여는 괄호 <code>( &#123; [</code></td><td>스택에 <strong>push</strong></td></tr>
+        <tr><td>닫는 괄호 <code>) &#125; ]</code></td><td>스택에서 <strong>pop</strong>, 짝 확인</td></tr>
+        <tr><td>순회 완료 후</td><td>스택 비어있으면 → <strong>Balanced! ✅</strong></td></tr>
+        <tr><td>순회 완료 후</td><td>스택 남아있으면 → <strong>Not Balanced! ❌</strong></td></tr>
+      </table>
+
+      <!-- Bracket step diagram -->
+      <div class="steps-row">
+        <div class="step-box"><strong>Step 1</strong>[ → push<br>Stack: [</div>
+        <div class="step-box"><strong>Step 2</strong>&#123; → push<br>Stack: [ &#123;</div>
+        <div class="step-box"><strong>Step 3</strong>( → push<br>Stack: [ &#123; (</div>
+        <div class="step-box"><strong>Step 4</strong>) → pop (<br>Stack: [ &#123;</div>
+        <div class="step-box"><strong>Step 5</strong>&#125; → pop &#123;<br>Stack: [</div>
+        <div class="step-box"><strong>Step 6</strong>] → pop [<br>Stack: ∅ ✅</div>
+      </div>
+      <div class="insight-box">순회 완료 후 스택이 empty이면 → Balanced ✅ &nbsp;|&nbsp; 스택이 남아있거나 짝이 안 맞으면 → Not Balanced ❌</div>
+    </div>
+
+    <div class="card">
+      <h3>응용 3 — Postfix Expression (후위 표기식)</h3>
+      <table>
+        <tr><th>표기법</th><th>설명</th><th>예</th></tr>
+        <tr><td>Infix (중위)</td><td>operand-op-operand (사람용)</td><td>A + B</td></tr>
+        <tr><td>Prefix (전위, Polish)</td><td>op-operand-operand</td><td>+ A B</td></tr>
+        <tr><td>Postfix (후위, Compiler)</td><td>operand-operand-op (컴퓨터용)</td><td>A B +</td></tr>
+      </table>
+      <div class="key-box"><strong>Postfix 장점:</strong> 컴퓨터 파싱 쉬움 · 연산자 우선순위 불필요 · 괄호 불필요 · 스택으로 효율적 계산</div>
+
+      <h3 style="margin-top:1rem;">Postfix 계산 알고리즘</h3>
+      <p style="font-size:13px;">① 왼쪽부터 스캔 &nbsp;② 피연산자 → push &nbsp;③ 연산자 → 2개 pop 후 연산 &nbsp;④ 결과 push</p>
+      <div class="code-block">// 예: 5 3 2 * + 8 -
+// push 5,3,2   → stack: [5, 3, 2]
+// *  → pop 2,3 → 3*2=6  → stack: [5, 6]
+// +  → pop 6,5 → 5+6=11 → stack: [11]
+// push 8       → stack: [11, 8]
+// -  → pop 8,11→ 11-8=3 → stack: [3]
+// Result = 3</div>
+
+      <h3 style="margin-top:1rem;">Infix → Postfix 변환 규칙</h3>
+      <p style="font-size:13px;">• 피연산자 → 출력<br>• 연산자: 스택 비면 push / top보다 우선순위 높으면 push / 같거나 낮으면 pop<br>• <code>(</code> → push &nbsp;/ &nbsp;<code>)</code> → <code>(</code> 만날 때까지 pop 후 출력</p>
+      <table>
+        <tr><th>Infix</th><th>Postfix</th></tr>
+        <tr><td>3 + (4 * 6)</td><td>3 4 6 * +</td></tr>
+        <tr><td>(3 + 4) * 6</td><td>3 4 + 6 *</td></tr>
+        <tr><td>a + b * c + d</td><td>a b c * + d +</td></tr>
+        <tr><td>(a + b) * c + d</td><td>a b + c * d +</td></tr>
+        <tr><td>(a + b) * (c + d)</td><td>a b + c d + *</td></tr>
+        <tr><td>((a+b) - c*(d/e)) + f</td><td>a b + c d e / * - f +</td></tr>
+      </table>
+    </div>
   </div>
 
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-mono),monospace">
-      <text x="250" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-primary)" font-family="system-ui,sans-serif">Bracket Check: [ { ( ) } ] [ ]</text>
-      <!-- Steps -->
-      <g>
-        <!-- Step boxes for expression -->
-        <text x="10" y="35" font-size="10" fill="var(--text-secondary)" font-family="system-ui">Expr:</text>
-        <text x="45" y="35" font-size="13" font-weight="700" fill="var(--text-info)">[</text>
-        <text x="65" y="35" font-size="13" font-weight="700" fill="var(--text-info)">{</text>
-        <text x="85" y="35" font-size="13" font-weight="700" fill="var(--text-info)">(</text>
-        <text x="105" y="35" font-size="13" font-weight="700" fill="var(--text-danger)">)</text>
-        <text x="125" y="35" font-size="13" font-weight="700" fill="var(--text-danger)">}</text>
-        <text x="145" y="35" font-size="13" font-weight="700" fill="var(--text-danger)">]</text>
-        <text x="165" y="35" font-size="13" font-weight="700" fill="var(--text-info)">[</text>
-        <text x="185" y="35" font-size="13" font-weight="700" fill="var(--text-danger)">]</text>
+  <!-- ===== QUEUE ===== -->
+  <div class="section" id="tab-queue">
+    <h2>Queue (큐)</h2>
 
-        <!-- Stack states -->
-        <text x="10" y="55" font-size="9" fill="var(--text-secondary)" font-family="system-ui">Stack:</text>
-        <text x="45" y="55" font-size="10" fill="var(--text-tertiary)">[</text>
-        <text x="65" y="55" font-size="10" fill="var(--text-tertiary)">[{</text>
-        <text x="85" y="55" font-size="10" fill="var(--text-tertiary)">[{(</text>
-        <text x="105" y="55" font-size="10" fill="var(--text-tertiary)">[{</text>
-        <text x="125" y="55" font-size="10" fill="var(--text-tertiary)">[</text>
-        <text x="145" y="55" font-size="10" fill="var(--text-tertiary)">∅</text>
-        <text x="165" y="55" font-size="10" fill="var(--text-tertiary)">[</text>
-        <text x="185" y="55" font-size="10" fill="var(--text-tertiary)">∅</text>
+    <div class="card">
+      <h3>Definition (정의)</h3>
+      <span class="badge badge-green">FIFO — First-In First-Out</span>
+      <p style="margin-top:.75rem;">삽입은 한쪽 끝(tail/rear)에서, 삭제는 반대쪽 끝(head/front)에서 일어나는 리스트.</p>
+      <div class="key-box">생각하기 쉬운 예: 줄 서기 🧑‍🤝‍🧑 — 제일 먼저 온 사람이 제일 먼저 나간다!</div>
 
-        <!-- Actions -->
-        <text x="45" y="70" font-size="8" fill="var(--text-info)">push</text>
-        <text x="65" y="70" font-size="8" fill="var(--text-info)">push</text>
-        <text x="85" y="70" font-size="8" fill="var(--text-info)">push</text>
-        <text x="102" y="70" font-size="8" fill="var(--text-danger)">pop✓</text>
-        <text x="122" y="70" font-size="8" fill="var(--text-danger)">pop✓</text>
-        <text x="142" y="70" font-size="8" fill="var(--text-danger)">pop✓</text>
-        <text x="165" y="70" font-size="8" fill="var(--text-info)">push</text>
-        <text x="182" y="70" font-size="8" fill="var(--text-danger)">pop✓</text>
-      </g>
-      <!-- Result -->
-      <rect x="240" y="25" width="240" height="60" rx="8" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
-      <text x="360" y="47" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-success)" font-family="system-ui">Result: Stack is EMPTY</text>
-      <text x="360" y="67" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-success)" font-family="system-ui">✅ Expression is Balanced!</text>
-      <text x="360" y="95" text-anchor="middle" font-size="10" fill="var(--text-secondary)" font-family="system-ui">If stack is NOT empty at the end → Unbalanced!</text>
-    </svg>
-  </div>
+      <!-- Queue visualization -->
+      <div style="margin:1rem 0;">
+        <div style="font-size:11px;color:var(--text-tertiary);font-family:monospace;margin-bottom:4px;">Enqueue (9) → tail / Dequeue ← front (2)</div>
+        <div class="queue-vis">
+          <div class="queue-label">Dequeue ←</div>
+          <div class="queue-cell hl-green">3</div>
+          <div class="queue-cell">4</div>
+          <div class="queue-cell">5</div>
+          <div class="queue-cell">6</div>
+          <div class="queue-cell">7</div>
+          <div class="queue-cell hl-blue">8</div>
+          <div class="queue-label">← Enqueue</div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:4px;font-size:11px;color:var(--text-tertiary);font-family:monospace;">
+          <span>↑ Front/Head</span>
+          <span style="margin-left:auto;">Back/Tail/Rear ↑</span>
+        </div>
+      </div>
+    </div>
 
-  <h2 class="section-heading">Stack Example: Postfix Expression</h2>
+    <div class="card">
+      <h3>Queue ADT</h3>
+      <table>
+        <tr><th>연산</th><th>설명</th><th>조건</th></tr>
+        <tr><td><code>createQueue(capacity)</code></td><td>빈 큐 생성</td><td>—</td></tr>
+        <tr><td><code>enqueue(queue, item)</code></td><td>tail에 item 삽입</td><td>isFull → 에러</td></tr>
+        <tr><td><code>dequeue(queue)</code></td><td>front 제거 &amp; 반환</td><td>isEmpty → 에러</td></tr>
+        <tr><td><code>front(queue)</code></td><td>front 확인 (제거 안 함)</td><td>isEmpty → 에러</td></tr>
+        <tr><td><code>rear(queue)</code></td><td>rear 확인 (제거 안 함)</td><td>isEmpty → 에러</td></tr>
+        <tr><td><code>isFull(queue)</code></td><td>꽉 찼는지 확인</td><td>rear == capacity-1</td></tr>
+        <tr><td><code>isEmpty(queue)</code></td><td>비었는지 확인</td><td>front == rear</td></tr>
+      </table>
+    </div>
 
-  <div class="card">
-    <div class="card-title">Three Notation Types</div>
-    <table>
-      <thead><tr><th>Notation</th><th>Pattern</th><th>Example</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Infix</strong> (human)</td><td>operand <em>op</em> operand</td><td><code>A + B</code></td></tr>
-        <tr><td><strong>Prefix</strong> (Polish)</td><td><em>op</em> operand operand</td><td><code>+ A B</code></td></tr>
-        <tr><td><strong>Postfix</strong> (compiler)</td><td>operand operand <em>op</em></td><td><code>A B +</code></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="key-box">
-    <div class="callout-label">Why Postfix?</div>
-    <strong>Simple to parse</strong> · <strong>No need for brackets</strong> · <strong>Not affected by operator precedence</strong> · <strong>Efficiently evaluated using a Stack</strong><br>
-    Example: Infix <code>a - b * d</code> is ambiguous without knowing precedence, but Postfix <code>a b d * -</code> is unambiguous!
-  </div>
-
-  <div class="card">
-    <div class="card-title">Evaluating Postfix: 5 3 2 * + 8 -</div>
-    <p>Algorithm: scan left-to-right → if operand: push → if operator: pop 2, compute, push result</p>
-  </div>
-
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <text x="250" y="15" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-primary)">5 3 2 * + 8 -   →   Answer: 3</text>
-
-      <!-- Step 1: push 5,3,2 -->
-      <text x="40" y="38" text-anchor="middle" font-size="10" fill="var(--text-secondary)">Push 5,3,2</text>
-      <rect x="10" y="42" width="60" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="10" y="64" width="60" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="10" y="86" width="60" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="40" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">2</text>
-      <text x="40" y="79" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">3</text>
-      <text x="40" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">5</text>
-
-      <text x="80" y="70" font-size="18" fill="var(--text-info)">→</text>
-
-      <!-- Step 2: pop 2,3 → 3*2=6, push 6 -->
-      <text x="130" y="38" text-anchor="middle" font-size="10" fill="var(--text-secondary)">* → pop 3,2</text>
-      <text x="130" y="50" text-anchor="middle" font-size="9" fill="var(--text-success)">3×2=6, push 6</text>
-      <rect x="100" y="64" width="60" height="22" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
-      <rect x="100" y="86" width="60" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="130" y="79" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-info)">6</text>
-      <text x="130" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">5</text>
-
-      <text x="170" y="80" font-size="18" fill="var(--text-info)">→</text>
-
-      <!-- Step 3: + → pop 6,5 → 11 -->
-      <text x="220" y="38" text-anchor="middle" font-size="10" fill="var(--text-secondary)">+ → pop 6,5</text>
-      <text x="220" y="50" text-anchor="middle" font-size="9" fill="var(--text-success)">5+6=11, push 11</text>
-      <rect x="190" y="86" width="60" height="22" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
-      <text x="220" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-info)">11</text>
-
-      <text x="260" y="100" font-size="18" fill="var(--text-info)">→</text>
-
-      <!-- Step 4: push 8 -->
-      <text x="310" y="38" text-anchor="middle" font-size="10" fill="var(--text-secondary)">Push 8</text>
-      <rect x="280" y="64" width="60" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="280" y="86" width="60" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="310" y="79" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">8</text>
-      <text x="310" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">11</text>
-
-      <text x="350" y="90" font-size="18" fill="var(--text-info)">→</text>
-
-      <!-- Step 5: - → 11-8=3 -->
-      <text x="420" y="38" text-anchor="middle" font-size="10" fill="var(--text-secondary)">- → pop 8,11</text>
-      <text x="420" y="50" text-anchor="middle" font-size="9" fill="var(--text-success)">11-8=3, push 3</text>
-      <rect x="390" y="86" width="60" height="22" rx="3" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
-      <text x="420" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-success)">3 ✓</text>
-    </svg>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Converting Infix → Postfix</div>
-    <p>Rule: scan left to right.</p>
-    <ul>
-      <li>If <strong>operand</strong>: output it directly</li>
-      <li>If <strong>operator</strong>: push if stack empty or higher precedence; else pop first</li>
-      <li>If <strong>'('</strong>: push to stack</li>
-      <li>If <strong>')'</strong>: pop until matching '(' is found</li>
-    </ul>
-    <br>
-    <table>
-      <thead><tr><th>Infix</th><th>Postfix</th></tr></thead>
-      <tbody>
-        <tr><td><code>3 + (4 * 6)</code></td><td><code>3 4 6 * +</code></td></tr>
-        <tr><td><code>(3 + 4) * 6</code></td><td><code>3 4 + 6 *</code></td></tr>
-        <tr><td><code>a + b * c + d</code></td><td><code>a b c * + d +</code></td></tr>
-        <tr><td><code>(a + b) * (c + d)</code></td><td><code>a b + c d + *</code></td></tr>
-        <tr><td><code>((a + b) - c * (d / e)) + f</code></td><td><code>a b + c d e / * - f +</code></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-</div><!-- end tab-stack -->
-
-
-<!-- ═══════════════════════════ QUEUE TAB ═══════════════════════════ -->
-<div class="tab-panel" id="tab-queue">
-
-  <h2 class="section-heading">What is a Queue?</h2>
-
-  <div class="key-box">
-    <div class="callout-label">Core Concept</div>
-    A <strong>Queue</strong> is a list where insertion happens at one end (<strong>tail/rear</strong>) and deletion at the other end (<strong>head/front</strong>). It follows <strong>FIFO</strong> — First-In First-Out, just like a real queue of people waiting in line!
-  </div>
-
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 500 110" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <text x="250" y="15" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-primary)">Queue — FIFO (First-In First-Out)</text>
-      <!-- Dequeue arrow -->
-      <text x="30" y="55" text-anchor="middle" font-size="11" fill="var(--text-danger)" font-weight="700">Dequeue</text>
-      <text x="30" y="68" text-anchor="middle" font-size="9" fill="var(--text-secondary)">(from front)</text>
-      <polygon points="72,50 60,44 60,56" fill="var(--text-danger)"/>
-      <!-- Queue cells -->
-      <rect x="72" y="38" width="50" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="122" y="38" width="50" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="172" y="38" width="50" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="222" y="38" width="50" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="272" y="38" width="50" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="322" y="38" width="50" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="97" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">3</text>
-      <text x="147" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">4</text>
-      <text x="197" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">5</text>
-      <text x="247" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">6</text>
-      <text x="297" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">7</text>
-      <text x="347" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">8</text>
-      <text x="97" y="78" text-anchor="middle" font-size="9" fill="var(--text-info)">Front/Head</text>
-      <text x="347" y="78" text-anchor="middle" font-size="9" fill="var(--text-success)">Rear/Tail</text>
-      <!-- Enqueue arrow -->
-      <polygon points="382,50 394,44 394,56" fill="var(--text-success)"/>
-      <text x="420" y="55" text-anchor="middle" font-size="11" fill="var(--text-success)" font-weight="700">Enqueue</text>
-      <text x="420" y="68" text-anchor="middle" font-size="9" fill="var(--text-secondary)">(at rear)</text>
-    </svg>
-  </div>
-
-  <div class="insight-box">
-    <div class="callout-label">Real-life analogy</div>
-    Think of a ticket line at a movie theater 🎬. People join at the back and are served from the front. The first person who joined is the first to get their ticket!
-  </div>
-
-  <h2 class="section-heading">Queue ADT</h2>
-  <div class="card">
-    <table>
-      <thead><tr><th>Operation</th><th>Description</th><th>Edge Case</th></tr></thead>
-      <tbody>
-        <tr><td><code>Create(capacity)</code></td><td>Create empty queue</td><td>—</td></tr>
-        <tr><td><code>Enqueue(queue, item)</code></td><td>Insert at tail (rear)</td><td>Error if <strong>isFull</strong></td></tr>
-        <tr><td><code>Dequeue(queue)</code></td><td>Remove & return from head</td><td>Error if <strong>isEmpty</strong></td></tr>
-        <tr><td><code>front(queue)</code></td><td>Peek at head without removing</td><td>Error if <strong>isEmpty</strong></td></tr>
-        <tr><td><code>rear(queue)</code></td><td>Peek at tail without removing</td><td>Error if <strong>isEmpty</strong></td></tr>
-        <tr><td><code>isFull / isEmpty</code></td><td>Boundary checks</td><td>—</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h2 class="section-heading">Array Implementation</h2>
-
-<pre>typedef struct {
+    <div class="card">
+      <h3>Array Implementation (배열로 구현)</h3>
+      <div class="code-block">typedef struct {
     int front, rear;
     int capacity;
     int *array;
 } Queue;
 
 Queue *createQueue(int capacity) {
-    Queue *q = (Queue*)malloc(sizeof(Queue));
-    q->front = 0;
-    q->rear  = -1;       // empty queue: rear starts at -1
-    q->capacity = capacity;
-    q->array = (int*)malloc(capacity * sizeof(int));
-    return q;
+    Queue *queue = (Queue*) malloc(sizeof(Queue));
+    if (!queue) return NULL;
+    queue->front = 0;
+    queue->rear = -1;         // 초기 상태: rear=-1, front=0
+    queue->capacity = capacity;
+    queue->array = (int*) malloc(capacity * sizeof(int));
+    if (!queue->array) return NULL;
+    return queue;
 }
 
 int isFull(Queue *q)  { return q->rear == q->capacity - 1; }
-int isEmpty(Queue *q) { return q->front == q->rear; } // Wait! see linear queue issue!
+int isEmpty(Queue *q) { return q->front == q->rear; }  // front tracks head
 
 void enqueue(Queue *q, int item) {
     if (!isFull(q))
-        q->array[++q->rear] = item;  // rear advances right
+        q->array[++q->rear] = item;   // rear 먼저 증가!
     else printf("Queue is Full!\n");
 }
 
 int dequeue(Queue *q) {
     if (!isEmpty(q))
-        return q->array[q->front++];  // front advances right
+        return q->array[q->front++];  // front 반환 후 증가!
     printf("Queue is Empty!\n");
     return -1;
-}</pre>
+}</div>
+      <div class="key-box">enqueue: <code>++rear</code> 먼저 증가 &nbsp;·&nbsp; dequeue: <code>front++</code> 반환 후 증가 &nbsp;·&nbsp; front==rear가 빈 큐!</div>
+    </div>
 
-  <h2 class="section-heading">Problem: Linear Queue Limitation</h2>
+    <div class="card">
+      <h3>⚠️ Linear Queue의 한계</h3>
+      <p>아래 상황을 생각해보자. capacity=5인 큐에서 여러 번 enqueue/dequeue 후 rear가 배열 끝에 도달했다. front 앞에 공간이 남아있어도 큐가 "full"로 판단된다!</p>
+      <table>
+        <tr><th>front</th><th>rear</th><th>Q[0]</th><th>Q[1]</th><th>Q[2]</th><th>Q[3]</th><th>Q[4]</th><th>상태</th></tr>
+        <tr><td>0</td><td>-1</td><td></td><td></td><td></td><td></td><td></td><td>Empty</td></tr>
+        <tr><td>0</td><td>0</td><td>1</td><td></td><td></td><td></td><td></td><td>1 추가</td></tr>
+        <tr><td>1</td><td>1</td><td></td><td>2</td><td></td><td></td><td></td><td>1 제거, 2 추가</td></tr>
+        <tr><td>2</td><td>4</td><td></td><td></td><td>3</td><td>4</td><td>5</td><td>front 앞이 비어있지만...</td></tr>
+      </table>
+      <div class="warn-box">rear == capacity-1 이면 full 판정! 앞에 빈 공간이 있어도 추가 불가 → <strong>해결책: Circular Queue!</strong></div>
+    </div>
 
-  <div class="warn-box">
-    <div class="callout-label">⚠️ The "Ghost Space" Problem</div>
-    In a linear queue with capacity 5, after several Enqueue/Dequeue operations, <code>front</code> advances right. Even if the left slots are empty, <code>rear == capacity-1</code> triggers "Queue is Full!" — wasting memory! This is called <strong>ghost space</strong>.
-  </div>
+    <div class="card">
+      <h3>Circular Queue (원형 큐)</h3>
+      <p>배열을 원형으로 사용하여 앞에 생긴 빈 공간을 재활용. <code>% capacity</code> 연산으로 인덱스를 순환시킨다.</p>
 
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 460 90" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-primary)">Linear Queue Ghost Space Problem</text>
-      <!-- Slots -->
-      <rect x="20" y="22" width="60" height="30" rx="4" fill="var(--bg-danger)" stroke="var(--border-danger)" stroke-width="0.5"/>
-      <rect x="80" y="22" width="60" height="30" rx="4" fill="var(--bg-danger)" stroke="var(--border-danger)" stroke-width="0.5"/>
-      <rect x="140" y="22" width="60" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="200" y="22" width="60" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <rect x="260" y="22" width="60" height="30" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="50" y="42" text-anchor="middle" font-size="11" fill="var(--text-danger)">removed</text>
-      <text x="110" y="42" text-anchor="middle" font-size="11" fill="var(--text-danger)">removed</text>
-      <text x="170" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">3</text>
-      <text x="230" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">4</text>
-      <text x="290" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">5</text>
-      <text x="170" y="65" text-anchor="middle" font-size="9" fill="var(--text-info)">front=2</text>
-      <text x="290" y="65" text-anchor="middle" font-size="9" fill="var(--text-success)">rear=4</text>
-      <!-- Warning -->
-      <rect x="340" y="15" width="115" height="50" rx="6" fill="var(--bg-danger)" stroke="var(--border-danger)" stroke-width="0.5"/>
-      <text x="397" y="34" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-danger)">rear == cap-1</text>
-      <text x="397" y="50" text-anchor="middle" font-size="11" fill="var(--text-danger)">"Queue Full!"</text>
-      <text x="397" y="62" text-anchor="middle" font-size="9" fill="var(--text-danger)">but 2 slots wasted!</text>
-    </svg>
-  </div>
+      <!-- Circular Queue SVG -->
+      <div class="cq-wrap">
+        <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg" style="width:220px;height:220px;">
+          <defs>
+            <style>.cqt{font-family:monospace;font-size:11px;fill:var(--text-primary)}.cql{font-family:monospace;font-size:9px;fill:var(--text-tertiary)}</style>
+          </defs>
+          <!-- Circle segments - 8 slots -->
+          <g transform="translate(140,140)">
+            <!-- Slot 0 -->
+            <path d="M0,0 L55,0 A55,55 0 0,1 38.9,38.9 Z" fill="var(--bg-info)" stroke="var(--bg-primary)" stroke-width="2"/>
+            <text x="52" y="-12" class="cql">0·Front</text>
+            <!-- Slot 1 -->
+            <path d="M0,0 L38.9,38.9 A55,55 0 0,1 0,55 Z" fill="var(--bg-info)" stroke="var(--bg-primary)" stroke-width="2"/>
+            <!-- Slot 2 -->
+            <path d="M0,0 L0,55 A55,55 0 0,1 -38.9,38.9 Z" fill="var(--bg-info)" stroke="var(--bg-primary)" stroke-width="2"/>
+            <!-- Slot 3 -->
+            <path d="M0,0 L-38.9,38.9 A55,55 0 0,1 -55,0 Z" fill="var(--bg-warning)" stroke="var(--bg-primary)" stroke-width="2"/>
+            <text x="-68" y="4" class="cql">3·Rear</text>
+            <!-- Slot 4 -->
+            <path d="M0,0 L-55,0 A55,55 0 0,1 -38.9,-38.9 Z" fill="var(--bg-tertiary)" stroke="var(--bg-primary)" stroke-width="2"/>
+            <!-- Slot 5 -->
+            <path d="M0,0 L-38.9,-38.9 A55,55 0 0,1 0,-55 Z" fill="var(--bg-tertiary)" stroke="var(--bg-primary)" stroke-width="2"/>
+            <!-- Slot 6 -->
+            <path d="M0,0 L0,-55 A55,55 0 0,1 38.9,-38.9 Z" fill="var(--bg-tertiary)" stroke="var(--bg-primary)" stroke-width="2"/>
+            <!-- Slot 7 -->
+            <path d="M0,0 L38.9,-38.9 A55,55 0 0,1 55,0 Z" fill="var(--bg-tertiary)" stroke="var(--bg-primary)" stroke-width="2"/>
+            <!-- Center white circle -->
+            <circle cx="0" cy="0" r="30" fill="var(--bg-primary)" stroke="var(--border-tertiary)" stroke-width="0.5"/>
+            <text x="0" y="4" text-anchor="middle" style="font-family:monospace;font-size:9px;fill:var(--text-secondary)">Circular</text>
+            <!-- Slot labels -->
+            <text x="38" y="-20" class="cqt" fill="var(--text-info)">10</text>
+            <text x="26" y="22"  class="cqt" fill="var(--text-info)">20</text>
+            <text x="-10" y="46" class="cqt" fill="var(--text-info)">30</text>
+            <text x="-46" y="20" class="cqt" fill="var(--text-warning)">40</text>
+          </g>
+          <!-- Legend -->
+          <rect x="10" y="250" width="12" height="12" rx="2" fill="var(--bg-info)"/>
+          <text x="26" y="260" class="cql">Data (filled)</text>
+          <rect x="110" y="250" width="12" height="12" rx="2" fill="var(--bg-tertiary)"/>
+          <text x="126" y="260" class="cql">Empty slot</text>
+          <rect x="200" y="250" width="12" height="12" rx="2" fill="var(--bg-warning)"/>
+          <text x="216" y="260" class="cql">Rear</text>
+        </svg>
+      </div>
 
-  <h2 class="section-heading">Solution: Circular Queue</h2>
-
-  <div class="key-box">
-    <div class="callout-label">Circular Queue</div>
-    Arrange elements in a <strong>circle</strong>. Instead of advancing linearly, use <strong>modulo arithmetic</strong>: <code>rear = (rear + 1) % capacity</code>. This lets the rear "wrap around" to reuse freed front slots. A <code>size</code> variable tracks how many elements are currently stored.
-  </div>
-
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <!-- Circle -->
-      <circle cx="150" cy="110" r="75" fill="none" stroke="var(--border-secondary)" stroke-width="1.5"/>
-      <!-- 8 slots around the circle -->
-      <g>
-        <!-- Slot at 12 o'clock (top) = index 0 - Front -->
-        <rect x="128" y="22" width="44" height="22" rx="4" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
-        <text x="150" y="37" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-info)">Front 0</text>
-        <!-- 1 -->
-        <rect x="195" y="38" width="44" height="22" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-        <text x="217" y="52" text-anchor="middle" font-size="11" fill="var(--text-primary)">10</text>
-        <!-- 2 -->
-        <rect x="225" y="88" width="44" height="22" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-        <text x="247" y="103" text-anchor="middle" font-size="11" fill="var(--text-primary)">20</text>
-        <!-- 3 -->
-        <rect x="200" y="140" width="44" height="22" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-        <text x="222" y="155" text-anchor="middle" font-size="11" fill="var(--text-primary)">30</text>
-        <!-- 4 - Rear -->
-        <rect x="128" y="163" width="44" height="22" rx="4" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
-        <text x="150" y="178" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-success)">Rear 40</text>
-        <!-- 5 empty -->
-        <rect x="56" y="140" width="44" height="22" rx="4" fill="var(--bg-tertiary)" stroke="var(--border-tertiary)" stroke-width="0.5"/>
-        <text x="78" y="155" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">—</text>
-        <!-- 6 empty -->
-        <rect x="30" y="88" width="44" height="22" rx="4" fill="var(--bg-tertiary)" stroke="var(--border-tertiary)" stroke-width="0.5"/>
-        <text x="52" y="103" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">—</text>
-        <!-- 7 empty -->
-        <rect x="58" y="38" width="44" height="22" rx="4" fill="var(--bg-tertiary)" stroke="var(--border-tertiary)" stroke-width="0.5"/>
-        <text x="80" y="52" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">—</text>
-      </g>
-    </svg>
-  </div>
-
-<pre>// Circular Queue: key changes vs linear
+      <div class="code-block">// 핵심: % capacity 로 인덱스 순환
 void enqueue(Queue *q, int item) {
     if (!isFull(q)) {
-        q->rear = (q->rear + 1) % q->capacity;  // wrap around!
+        q->rear = (q->rear + 1) % q->capacity;  // 순환!
         q->array[q->rear] = item;
         q->size += 1;
-    }
+    } else printf("Queue is Full!\n");
 }
 
 int dequeue(Queue *q) {
     if (!isEmpty(q)) {
         int element = q->array[q->front];
-        q->front = (q->front + 1) % q->capacity; // wrap around!
+        q->front = (q->front + 1) % q->capacity;  // 순환!
         q->size -= 1;
         return element;
     }
+    printf("Queue is Empty!\n");
     return -1;
 }
 
+// Circular Queue는 size 필드로 empty/full 판단!
 int isFull(Queue *q)  { return q->size == q->capacity; }
-int isEmpty(Queue *q) { return q->size == 0; }</pre>
-
-  <div class="insight-box">
-    <div class="callout-label">💡 The key difference</div>
-    Linear queue uses <code>front == rear</code> to detect empty (but this conflicts with "one element left"). Circular queue solves this cleanly by tracking <code>size</code>: <code>isFull = size==capacity</code>, <code>isEmpty = size==0</code>.
+int isEmpty(Queue *q) { return q->size == 0; }</div>
+      <div class="insight-box">핵심 공식: <code>(index + 1) % capacity</code> → 배열 끝에 도달하면 자동으로 앞으로 돌아옴!</div>
+    </div>
   </div>
 
-</div><!-- end tab-queue -->
+  <!-- ===== LINKED LIST ===== -->
+  <div class="section" id="tab-linkedlist">
+    <h2>Linked List (연결 리스트)</h2>
 
+    <div class="card">
+      <h3>Definition (정의)</h3>
+      <p>연속적으로 연결된 노드(node)들의 집합. 각 노드는 <strong>데이터(element)</strong>와 <strong>다음 노드를 가리키는 포인터(next)</strong>로 구성된다. 배열과 달리 메모리 상 인접할 필요가 없다.</p>
 
-<!-- ═══════════════════════════ LINKED LIST TAB ═══════════════════════════ -->
-<div class="tab-panel" id="tab-linked">
+      <div class="ll-vis">
+        <div class="ll-head-label">Head</div>
+        <div class="ll-node">
+          <div class="ll-data">15</div>
+          <div class="ll-next">→</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">8</div>
+          <div class="ll-next">→</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">23</div>
+          <div class="ll-next">→</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">14</div>
+          <div class="ll-next">→</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">3</div>
+          <div class="ll-next">→</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">NULL</div>
+      </div>
 
-  <h2 class="section-heading">What is a Linked List?</h2>
+      <div class="grid-2" style="margin-top:.75rem;">
+        <div class="key-box" style="margin:0;">
+          <strong>Why Linked List?</strong><br>
+          ✅ Dynamic size (런타임 할당)<br>
+          ✅ 쉬운 삽입/삭제<br>
+          ✅ 필요할 때만 메모리 사용
+        </div>
+        <div class="warn-box" style="margin:0;">
+          <strong>단점</strong><br>
+          ❌ Random access 불가 (O(n))<br>
+          ❌ 포인터 저장 추가 메모리<br>
+          ❌ 역방향 탐색 불가 (단방향)
+        </div>
+      </div>
+    </div>
 
-  <div class="key-box">
-    <div class="callout-label">Core Concept</div>
-    A <strong>Linked List</strong> is a collection of nodes where each node contains an <strong>element</strong> (data) and a <strong>pointer</strong> to the next node. Unlike arrays, nodes are <strong>NOT necessarily adjacent in memory</strong> — they can be scattered anywhere, connected only by pointers.
-  </div>
+    <div class="card">
+      <h3>Node 구조 &amp; 기본 연산</h3>
+      <div class="code-block">typedef struct Node {
+    int element;           // 데이터
+    struct Node *next;     // 다음 노드 포인터
+} Node;</div>
+      <table>
+        <tr><th>연산</th><th>시간복잡도</th><th>설명</th></tr>
+        <tr><td>Traversal (순회)</td><td>O(n)</td><td>포인터 따라 NULL까지 이동</td></tr>
+        <tr><td>Search (검색)</td><td>O(n)</td><td>순서대로 비교</td></tr>
+        <tr><td>Insert at beginning</td><td>O(1)</td><td>head 앞에 추가</td></tr>
+        <tr><td>Insert at end</td><td>O(n)</td><td>끝까지 traverse 후 추가</td></tr>
+        <tr><td>Insert at middle</td><td>O(n)</td><td>위치 찾은 후 추가</td></tr>
+        <tr><td>Delete any node</td><td>O(n)</td><td>위치 찾은 후 포인터 수정</td></tr>
+      </table>
+    </div>
 
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 500 80" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <text x="40" y="15" font-size="10" fill="var(--text-info)" font-weight="700">Head</text>
-      <line x1="40" y1="18" x2="40" y2="30" stroke="var(--text-info)" stroke-width="1.5" marker-end="url(#arr)"/>
-      <defs>
-        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill="var(--text-info)"/>
-        </marker>
-        <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill="var(--text-secondary)"/>
-        </marker>
-      </defs>
-      <!-- Node A -->
-      <rect x="10" y="30" width="55" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <line x1="40" y1="30" x2="40" y2="58" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="26" y="49" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">A</text>
-      <text x="53" y="49" text-anchor="middle" font-size="13" fill="var(--text-secondary)">→</text>
-      <text x="26" y="70" text-anchor="middle" font-size="8" fill="var(--text-secondary)">data</text>
-      <text x="53" y="70" text-anchor="middle" font-size="8" fill="var(--text-secondary)">next</text>
-      <!-- Node B -->
-      <rect x="90" y="30" width="55" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <line x1="120" y1="30" x2="120" y2="58" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="106" y="49" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">B</text>
-      <text x="133" y="49" text-anchor="middle" font-size="13" fill="var(--text-secondary)">→</text>
-      <!-- Node C -->
-      <rect x="170" y="30" width="55" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <line x1="200" y1="30" x2="200" y2="58" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="186" y="49" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">C</text>
-      <text x="213" y="49" text-anchor="middle" font-size="13" fill="var(--text-secondary)">→</text>
-      <!-- Node D -->
-      <rect x="250" y="30" width="55" height="28" rx="4" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <line x1="280" y1="30" x2="280" y2="58" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="266" y="49" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">D</text>
-      <text x="293" y="49" text-anchor="middle" font-size="13" fill="var(--text-secondary)">→</text>
-      <!-- NULL -->
-      <text x="320" y="49" font-size="11" font-weight="700" fill="var(--text-tertiary)">NULL</text>
-    </svg>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Why Use a Linked List?</div>
-    <table>
-      <thead><tr><th>Advantage</th><th>Explanation</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Dynamic size</strong></td><td>Allocate/deallocate memory at runtime — no fixed size like arrays</td></tr>
-        <tr><td><strong>Easy insertion/deletion</strong></td><td>Just redirect pointers — no shifting elements like in arrays</td></tr>
-        <tr><td><strong>Efficient memory</strong></td><td>Only allocate memory when you actually need it</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="warn-box">
-    <div class="callout-label">⚠️ Trade-offs</div>
-    No random access (can't do <code>list[3]</code> — must traverse). Extra memory for pointers. Cache-unfriendly because nodes are scattered in memory.
-  </div>
-
-  <h2 class="section-heading">Basic Operations</h2>
-
-  <div class="card">
-    <p>Three fundamental operations: <span class="badge badge-info">Traversal</span> <span class="badge badge-warn">Search</span> <span class="badge badge-success">Insert / Delete</span></p>
-  </div>
-
-  <h3 style="font-size:1rem;font-weight:700;margin:1rem 0 0.5rem;color:var(--text-primary)">1. Traversal</h3>
-  <p style="color:var(--text-secondary);font-size:0.9rem">Follow the pointer of each node until you reach NULL. Process each node's element along the way.</p>
-<pre>void traverse(Node *head) {
+    <div class="card">
+      <h3>Traversal &amp; Search (순회 &amp; 검색)</h3>
+      <div class="code-block">// Traversal: 모든 노드 방문
+void traverse(Node *head) {
     Node *cur_node = head;
     while (cur_node != NULL) {
         printf("%d ", cur_node->element);
-        cur_node = cur_node->next;  // follow the pointer
+        cur_node = cur_node->next;   // 다음 노드로 이동
     }
-}</pre>
+}
 
-  <h3 style="font-size:1rem;font-weight:700;margin:1rem 0 0.5rem;color:var(--text-primary)">2. Search</h3>
-<pre>// Iterative search
+// Search (Iterative): key 값 찾기
 bool search_iterative(Node *head, int key) {
     Node *cur_node = head;
     while (cur_node != NULL) {
         if (cur_node->element == key) return true;
         cur_node = cur_node->next;
     }
-    return false;
+    return false;   // key not found
 }
 
-// Recursive search
+// Search (Recursive): 재귀로 탐색
 bool search_recursive(Node *head, int key) {
-    if (head == NULL) return false;           // base case: not found
-    if (head->element == key) return true;    // found!
-    return search_recursive(head->next, key); // check rest of list
-}</pre>
+    if (head == NULL) return false;            // Base case
+    if (head->element == key) return true;     // Found!
+    return search_recursive(head->next, key);  // Recurse
+}</div>
+      <div class="key-box">종료 조건: <code>cur_node != NULL</code> — NULL을 만나면 리스트 끝!</div>
+    </div>
 
-  <h3 style="font-size:1rem;font-weight:700;margin:1rem 0 0.5rem;color:var(--text-primary)">3. Insertion</h3>
+    <div class="card">
+      <h3>Insertion (삽입) — 3가지 위치</h3>
 
-  <div class="card">
-    <p>Three positions to insert: <span class="badge badge-info">Beginning</span> <span class="badge badge-success">End</span> <span class="badge badge-warn">Middle</span></p>
-  </div>
-
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 500 140" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <text x="250" y="15" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-primary)">Insertion at Beginning: insertAtHead(35)</text>
-      <!-- Before -->
-      <text x="15" y="35" font-size="10" fill="var(--text-secondary)">Before:</text>
-      <text x="60" y="35" font-size="10" fill="var(--text-info)">Head</text>
-      <text x="60" y="45" font-size="10" fill="var(--text-info)">↓</text>
-      <rect x="40" y="48" width="40" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="60" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">15</text>
-      <text x="82" y="62" font-size="10" fill="var(--text-secondary)">→</text>
-      <rect x="92" y="48" width="40" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="112" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">8</text>
-      <text x="134" y="62" font-size="10" fill="var(--text-secondary)">→ …</text>
-
-      <!-- New node -->
-      <rect x="200" y="48" width="50" height="22" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="1"/>
-      <text x="225" y="63" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-info)">35 (new)</text>
-      <text x="225" y="35" text-anchor="middle" font-size="9" fill="var(--text-info)">① Create node</text>
-      <text x="225" y="78" text-anchor="middle" font-size="9" fill="var(--text-info)">② next → old head</text>
-
-      <!-- After -->
-      <text x="15" y="110" font-size="10" fill="var(--text-secondary)">After:</text>
-      <text x="60" y="110" font-size="10" fill="var(--text-info)">Head</text>
-      <text x="60" y="120" font-size="10" fill="var(--text-info)">↓</text>
-      <rect x="40" y="118" width="50" height="22" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="1"/>
-      <text x="65" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-info)">35</text>
-      <text x="93" y="132" font-size="10" fill="var(--text-secondary)">→</text>
-      <rect x="100" y="118" width="40" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="120" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">15</text>
-      <text x="142" y="132" font-size="10" fill="var(--text-secondary)">→</text>
-      <rect x="152" y="118" width="40" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="172" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">8</text>
-      <text x="194" y="132" font-size="10" fill="var(--text-secondary)">→ …</text>
-      <text x="250" y="128" font-size="9" fill="var(--text-success)">③ Head = new node ✓</text>
-    </svg>
-  </div>
-
-<pre>// Insert at beginning (O(1))
-void insertAtHead(Node **head_ref, int new_data) {
-    Node* new_node = (Node*)malloc(sizeof(Node));
+      <!-- Insert at beginning -->
+      <h3 style="margin-top:.75rem;color:var(--text-info);">① 처음에 삽입 (at the beginning)</h3>
+      <div class="steps-row">
+        <div class="step-box"><strong>(1)</strong>새 노드 생성<br>new_node(35)</div>
+        <div class="step-box"><strong>(2)</strong>new_node→next<br>= *head_ref</div>
+        <div class="step-box"><strong>(3)</strong>*head_ref<br>= new_node</div>
+      </div>
+      <div class="ll-vis" style="margin-bottom:.5rem;">
+        <div class="ll-head-label">Head</div>
+        <div class="ll-node hl">
+          <div class="ll-data">35</div>
+          <div class="ll-next">→</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">15</div>
+          <div class="ll-next">→</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">8</div>
+          <div class="ll-next">→</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">NULL</div>
+      </div>
+      <div class="code-block">void insertAtHead(Node **head_ref, int new_data) {
+    Node *new_node = (Node*) malloc(sizeof(Node));
     new_node->element = new_data;
-    new_node->next = (*head_ref);   // ② point to old head
-    (*head_ref) = new_node;         // ③ update head to new node
-}
+    new_node->next = (*head_ref);    // 2. 기존 head를 가리킴
+    (*head_ref) = new_node;          // 3. 새 노드가 head
+}</div>
 
-// Insert at end (O(n) — must traverse)
-void insertAtEnd(Node *head, int new_data) {
-    Node* new_node = (Node*)malloc(sizeof(Node));
+      <!-- Insert at end -->
+      <h3 style="margin-top:1.25rem;color:var(--text-info);">② 끝에 삽입 (at the end)</h3>
+      <div class="steps-row">
+        <div class="step-box"><strong>(1)</strong>새 노드 생성<br>next = NULL</div>
+        <div class="step-box"><strong>(2)</strong>끝까지 traverse</div>
+        <div class="step-box"><strong>(3)</strong>last→next<br>= new_node</div>
+      </div>
+      <div class="code-block">void insertAtEnd(Node *head, int new_data) {
+    Node *new_node = (Node*) malloc(sizeof(Node));
     new_node->element = new_data;
-    new_node->next = NULL;
-
+    new_node->next = NULL;           // 마지막 노드: next=NULL
     Node *last = head;
-    while (last->next != NULL)      // ② traverse to last
+    while (last->next != NULL)       // 끝까지 이동
         last = last->next;
-    last->next = new_node;          // ③ link last node to new
-}
+    last->next = new_node;           // 마지막 노드가 새 노드 가리킴
+}</div>
 
-// Insert after a specific key position (O(n))
-void insertAfterPosition(Node *head, int new_data, int key) {
-    Node* new_node = (Node*)malloc(sizeof(Node));
+      <!-- Insert at middle -->
+      <h3 style="margin-top:1.25rem;color:var(--text-info);">③ 중간에 삽입 (at the middle)</h3>
+      <div class="steps-row">
+        <div class="step-box"><strong>(1)</strong>새 노드 생성</div>
+        <div class="step-box"><strong>(2)</strong>위치 노드 탐색</div>
+        <div class="step-box"><strong>(3)</strong>new→next<br>= pos→next</div>
+        <div class="step-box"><strong>(4)</strong>pos→next<br>= new_node</div>
+      </div>
+      <div class="code-block">void insertAfterPosition(Node *head, int new_data, int key) {
+    Node *new_node = (Node*) malloc(sizeof(Node));
     new_node->element = new_data;
-
     Node *position = head;
-    while (position->element != key) // ② find position
+    while (position->element != key)   // key 노드 찾기
         position = position->next;
+    new_node->next = position->next;   // 3. 새 노드의 next = 다음 노드
+    position->next = new_node;         // 4. 이전 노드의 next = 새 노드
+}</div>
+      <div class="warn-box">반드시 (3)을 (4)보다 먼저! 순서 바뀌면 다음 노드 연결 끊김!</div>
+    </div>
 
-    new_node->next = position->next; // ③ new node points to what's after
-    position->next = new_node;       // ④ position points to new node
-}</pre>
+    <div class="card">
+      <h3>Deletion (삭제) — 3가지 경우</h3>
 
-  <h3 style="font-size:1rem;font-weight:700;margin:1rem 0 0.5rem;color:var(--text-primary)">4. Deletion</h3>
-  <div class="card">
-    <p>Three cases: <span class="badge badge-danger">Delete head</span> <span class="badge badge-danger">Delete tail</span> <span class="badge badge-danger">Delete intermediate</span></p>
-  </div>
+      <h3 style="color:var(--text-danger);margin-top:.5rem;">① 첫 번째 노드 삭제</h3>
+      <div class="steps-row">
+        <div class="step-box"><strong>(1)</strong>temp = *head_ref</div>
+        <div class="step-box"><strong>(2)</strong>*head_ref = head→next</div>
+        <div class="step-box"><strong>(3)</strong>free(temp)</div>
+      </div>
 
-<pre>void deleteNode(Node **head_ref, int key) {
+      <h3 style="color:var(--text-danger);margin-top:1rem;">② 마지막 노드 삭제</h3>
+      <div class="steps-row">
+        <div class="step-box"><strong>(1)</strong>끝까지 traverse<br>(prev, cur)</div>
+        <div class="step-box"><strong>(2)</strong>temp = cur_node</div>
+        <div class="step-box"><strong>(3)</strong>prev→next = NULL</div>
+        <div class="step-box"><strong>(4)</strong>free(temp)</div>
+      </div>
+
+      <h3 style="color:var(--text-danger);margin-top:1rem;">③ 중간 노드 삭제</h3>
+      <div class="steps-row">
+        <div class="step-box"><strong>(1)</strong>위치 탐색<br>(prev, cur)</div>
+        <div class="step-box"><strong>(2)</strong>temp = cur_node</div>
+        <div class="step-box"><strong>(3)</strong>prev→next = cur→next</div>
+        <div class="step-box"><strong>(4)</strong>free(temp)</div>
+      </div>
+
+      <div class="code-block">void deleteNode(Node **head_ref, int key) {
     if (*head_ref == NULL) { printf("List is Empty.\n"); return; }
 
-    // Case 1: Delete the head node
+    // Case 1: 첫 번째 노드 삭제
     if ((*head_ref)->element == key) {
         Node *temp = *head_ref;
-        *head_ref = (*head_ref)->next;  // move head to next
-        free(temp);                      // free old head
+        *head_ref = (*head_ref)->next;
+        free(temp);
         return;
     }
 
-    // Case 2 & 3: Delete middle or last node
+    // Case 2 & 3: 중간 또는 마지막 노드 삭제
     Node *prev_node = *head_ref;
-    Node *cur_node  = (*head_ref)->next;
-
-    while (cur_node != NULL && cur_node->element != key) {
+    Node *cur_node = (*head_ref)->next;
+    while (cur_node->next != NULL &amp;&amp; cur_node->element != key) {
         prev_node = cur_node;
-        cur_node  = cur_node->next;
+        cur_node = cur_node->next;
     }
-
-    if (cur_node == NULL) { printf("Key not found.\n"); return; }
-
-    // Bypass the node to be deleted
-    prev_node->next = cur_node->next;
-    free(cur_node);  // same code handles both middle and tail!
+    if (cur_node->element != key) {
+        printf("Deletion failed: No key in the list.\n");
+        return;
+    }
+    Node *temp = cur_node;
+    prev_node->next = cur_node->next;   // 포인터 우회
+    free(temp);                          // 메모리 해제!
 }
 
-// Delete entire list
+// 전체 리스트 삭제
 void deleteList(Node **head_ref) {
     Node *cur_node = *head_ref;
-    Node *next_node;
     while (cur_node != NULL) {
-        next_node = cur_node->next;  // save next before freeing
-        free(cur_node);
-        cur_node = next_node;
+        Node *next_node = cur_node->next;  // 1. 다음 주소 저장
+        free(cur_node);                    // 2. 현재 노드 해제
+        cur_node = next_node;              // 3. 다음으로 이동
     }
     *head_ref = NULL;
-}</pre>
-
-  <div class="insight-box">
-    <div class="callout-label">💡 Why double pointer (Node **)?</div>
-    When we delete the head, we need to update the <code>head</code> variable itself in main(). A single pointer <code>*head</code> only lets us change what head points to, but <code>**head_ref</code> lets us change the actual <code>head</code> pointer. Think of it like passing an address of an address.
+}</div>
+      <div class="warn-box">삭제 시 반드시 <code>free()</code>로 메모리 해제! 안 하면 <strong>Memory Leak!</strong></div>
+    </div>
   </div>
 
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 460 90" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
-      <text x="230" y="14" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text-primary)">Deletion of Intermediate Node (23)</text>
-      <!-- Before -->
-      <text x="15" y="34" font-size="10" fill="var(--text-secondary)">Before:</text>
-      <rect x="45" y="23" width="35" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="62" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">15</text>
-      <text x="81" y="37" font-size="10" fill="var(--text-secondary)">→</text>
-      <rect x="90" y="23" width="35" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="107" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">8</text>
-      <text x="126" y="37" font-size="10" fill="var(--text-secondary)">→</text>
-      <rect x="135" y="23" width="35" height="22" rx="3" fill="var(--bg-danger)" stroke="var(--border-danger)" stroke-width="1"/>
-      <text x="152" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-danger)">23</text>
-      <text x="171" y="37" font-size="10" fill="var(--text-secondary)">→</text>
-      <rect x="180" y="23" width="35" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="197" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">14</text>
-      <text x="216" y="37" font-size="10" fill="var(--text-secondary)">→ NULL</text>
+  <!-- ===== COMPARE ===== -->
+  <div class="section" id="tab-compare">
+    <h2>자료구조 비교 (Comparison)</h2>
 
-      <!-- After -->
-      <text x="15" y="75" font-size="10" fill="var(--text-secondary)">After:</text>
-      <rect x="45" y="63" width="35" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="62" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">15</text>
-      <text x="81" y="77" font-size="10" fill="var(--text-secondary)">→</text>
-      <rect x="90" y="63" width="35" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="107" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">8</text>
-      <!-- Skip arrow over 23 -->
-      <path d="M126,74 Q152,55 180,74" stroke="var(--text-success)" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
-      <text x="152" y="52" text-anchor="middle" font-size="9" fill="var(--text-success)">prev→next = cur→next</text>
-      <rect x="180" y="63" width="35" height="22" rx="3" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
-      <text x="197" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-primary)">14</text>
-      <text x="216" y="77" font-size="10" fill="var(--text-secondary)">→ NULL</text>
-      <text x="300" y="75" font-size="10" fill="var(--text-danger)">free(23) ✓</text>
-    </svg>
+    <div class="card">
+      <h3>Stack vs Queue vs Linked List</h3>
+      <table>
+        <tr><th>특성</th><th>Stack</th><th>Queue</th><th>Linked List</th></tr>
+        <tr><td>순서 원칙</td><td>LIFO</td><td>FIFO</td><td>자유 (직접 관리)</td></tr>
+        <tr><td>삽입 위치</td><td>top만</td><td>tail만</td><td>어디서나</td></tr>
+        <tr><td>삭제 위치</td><td>top만</td><td>front만</td><td>어디서나</td></tr>
+        <tr><td>Access</td><td>top만 접근</td><td>front/rear 접근</td><td>sequential O(n)</td></tr>
+        <tr><td>Random Access</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        <tr><td>크기 변경</td><td>고정 (배열 기반)</td><td>고정 (배열 기반)</td><td>동적 ✅</td></tr>
+        <tr><td>메모리</td><td>연속</td><td>연속</td><td>비연속</td></tr>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Stack 사용 예</h3>
+        <p style="font-size:13px;">
+          • 브라우저 뒤로가기 버튼<br>
+          • 재귀 함수 호출 스택<br>
+          • 괄호 균형 검사<br>
+          • Postfix 수식 계산<br>
+          • 회문(Palindrome) 검사<br>
+          • 실행 취소 (Ctrl+Z)
+        </p>
+      </div>
+      <div class="card">
+        <h3>Queue 사용 예</h3>
+        <p style="font-size:13px;">
+          • 프린터 출력 대기열<br>
+          • OS 프로세스 스케줄링<br>
+          • BFS (너비 우선 탐색)<br>
+          • 키보드 버퍼<br>
+          • 은행 대기 번호<br>
+          • 네트워크 패킷 처리
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Array vs Linked List — 언제 뭘 쓸까?</h3>
+      <table>
+        <tr><th>기준</th><th>Array</th><th>Linked List</th></tr>
+        <tr><td>크기 고정 여부</td><td>컴파일 시 결정</td><td>런타임에 동적 변경</td></tr>
+        <tr><td>Random Access</td><td>✅ O(1)</td><td>❌ O(n)</td></tr>
+        <tr><td>삽입/삭제 (중간)</td><td>❌ O(n) — shift 필요</td><td>✅ O(1) (위치 알면)</td></tr>
+        <tr><td>메모리</td><td>연속 — 캐시 효율 좋음</td><td>비연속 — 포인터 오버헤드</td></tr>
+        <tr><td>메모리 낭비</td><td>미사용 공간 낭비 가능</td><td>필요한 만큼만 사용</td></tr>
+      </table>
+      <div class="insight-box">
+        <strong>선택 기준:</strong><br>
+        • 크기 고정 + 빠른 접근 필요 → <strong>Array</strong><br>
+        • 크기 가변 + 잦은 삽입/삭제 → <strong>Linked List</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Linear Queue vs Circular Queue</h3>
+      <table>
+        <tr><th>기준</th><th>Linear Queue</th><th>Circular Queue</th></tr>
+        <tr><td>isEmpty 조건</td><td>front == rear</td><td>size == 0</td></tr>
+        <tr><td>isFull 조건</td><td>rear == capacity-1</td><td>size == capacity</td></tr>
+        <tr><td>enqueue 인덱스</td><td><code>++rear</code></td><td><code>(rear+1) % capacity</code></td></tr>
+        <tr><td>dequeue 인덱스</td><td><code>front++</code></td><td><code>(front+1) % capacity</code></td></tr>
+        <tr><td>공간 재활용</td><td>❌</td><td>✅</td></tr>
+      </table>
+    </div>
   </div>
 
-</div><!-- end tab-linked -->
+  <!-- ===== QUIZ ===== -->
+  <div class="section" id="tab-quiz">
+    <h2>연습 문제 (Practice Quiz)</h2>
 
+    <div id="score-card">
+      <div id="score-text">0 / 10</div>
+      <div id="score-msg"></div>
+      <button class="reset-btn" onclick="resetQuiz()">다시 풀기</button>
+    </div>
 
-<!-- ═══════════════════════════ QUIZ TAB ═══════════════════════════ -->
-<div class="tab-panel" id="tab-quiz">
-  <div class="key-box">
-    <div class="callout-label">Quiz Instructions</div>
-    8 questions covering key exam concepts. Click an option to see feedback immediately!
+    <div class="q-container" id="q1">
+      <div class="q-num">Q1 of 10</div>
+      <div class="q-text">스택의 isEmpty() 조건은? (배열 구현 기준)</div>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">A. top == capacity</button>
+      <button class="quiz-btn" onclick="answer('q1',this,true)">B. top == -1</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">C. top == 0</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">D. top == capacity - 1</button>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="q-container" id="q2">
+      <div class="q-num">Q2 of 10</div>
+      <div class="q-text">push() 연산에서 올바른 top 처리 순서는?</div>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">A. array[top] = item; top++;</button>
+      <button class="quiz-btn" onclick="answer('q2',this,true)">B. array[++top] = item;</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">C. array[top--] = item;</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">D. top++; array[top-1] = item;</button>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="q-container" id="q3">
+      <div class="q-num">Q3 of 10</div>
+      <div class="q-text">큐(Queue)의 특성으로 올바른 것은?</div>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">A. LIFO — 나중에 들어온 것이 먼저 나간다</button>
+      <button class="quiz-btn" onclick="answer('q3',this,true)">B. FIFO — 먼저 들어온 것이 먼저 나간다</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">C. 삽입과 삭제 모두 같은 끝에서 일어난다</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">D. 임의의 위치에 삽입/삭제 가능하다</button>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="q-container" id="q4">
+      <div class="q-num">Q4 of 10</div>
+      <div class="q-text">Circular Queue에서 enqueue 시 rear 인덱스 갱신 방법은?</div>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">A. rear = rear + 1</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">B. rear = rear - 1</button>
+      <button class="quiz-btn" onclick="answer('q4',this,true)">C. rear = (rear + 1) % capacity</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">D. rear = (rear - 1) % capacity</button>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <div class="q-container" id="q5">
+      <div class="q-num">Q5 of 10</div>
+      <div class="q-text">연결 리스트(Linked List)에서 맨 앞에 노드를 삽입할 때 시간복잡도는?</div>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">A. O(n)</button>
+      <button class="quiz-btn" onclick="answer('q5',this,true)">B. O(1)</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">C. O(log n)</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">D. O(n²)</button>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="q-container" id="q6">
+      <div class="q-num">Q6 of 10</div>
+      <div class="q-text">연결 리스트 중간에 노드를 삽입할 때 반드시 먼저 해야 할 것은?</div>
+      <button class="quiz-btn" onclick="answer('q6',this,true)">A. 새 노드의 next를 position→next로 설정</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">B. position→next를 새 노드로 설정</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">C. free(position)</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">D. head를 새 노드로 변경</button>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <div class="q-container" id="q7">
+      <div class="q-num">Q7 of 10</div>
+      <div class="q-text">Postfix 식 "10 2 8 * + 3 -"의 계산 결과는?</div>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">A. 25</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">B. 21</button>
+      <button class="quiz-btn" onclick="answer('q7',this,true)">C. 23</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">D. 27</button>
+      <div class="quiz-feedback" id="q7-fb"></div>
+    </div>
+
+    <div class="q-container" id="q8">
+      <div class="q-num">Q8 of 10</div>
+      <div class="q-text">연결 리스트에서 노드를 삭제한 후 반드시 해야 하는 것은?</div>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">A. head = NULL</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">B. 삭제 노드의 next = NULL</button>
+      <button class="quiz-btn" onclick="answer('q8',this,true)">C. free(temp) — 메모리 해제</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">D. 아무것도 안 해도 된다</button>
+      <div class="quiz-feedback" id="q8-fb"></div>
+    </div>
+
+    <div class="q-container" id="q9">
+      <div class="q-num">Q9 of 10</div>
+      <div class="q-text">Linear Queue의 가장 큰 문제점은?</div>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">A. FIFO 원칙을 지키지 못한다</button>
+      <button class="quiz-btn" onclick="answer('q9',this,true)">B. dequeue 후 앞쪽 빈 공간을 재사용하지 못한다</button>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">C. enqueue 시간복잡도가 O(n)이다</button>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">D. 구현이 너무 복잡하다</button>
+      <div class="quiz-feedback" id="q9-fb"></div>
+    </div>
+
+    <div class="q-container" id="q10">
+      <div class="q-num">Q10 of 10</div>
+      <div class="q-text">연결 리스트와 배열을 비교할 때, 연결 리스트의 장점은?</div>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">A. Random Access가 O(1)로 빠르다</button>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">B. 메모리를 연속적으로 사용하여 캐시 효율이 좋다</button>
+      <button class="quiz-btn" onclick="answer('q10',this,true)">C. 크기가 동적으로 변하며 삽입/삭제가 효율적이다</button>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">D. 포인터 저장이 필요없어 메모리가 절약된다</button>
+      <div class="quiz-feedback" id="q10-fb"></div>
+    </div>
   </div>
-
-  <div id="quiz-container">
-
-    <div class="quiz-q" id="q1">
-      <p>Q1. What does LIFO stand for, and which data structure uses it?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q1')">Last-In First-Out — Queue</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q1')">Last-In First-Out — Stack</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q1')">Least-In First-Out — Stack</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q1')">Last-In First-Out — Linked List</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q1"></div>
-    </div>
-
-    <div class="quiz-q" id="q2">
-      <p>Q2. In an array-based Stack with capacity N, what is the value of <code>top</code> when the stack is <strong>empty</strong>?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q2')">0</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q2')">N</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q2')">-1</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q2')">N-1</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q2"></div>
-    </div>
-
-    <div class="quiz-q" id="q3">
-      <p>Q3. When checking a palindrome using a stack on the word "RACECAR" (length 7, odd), which characters do you push onto the stack?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q3')">All 7 characters</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q3')">First 3: R, A, C — then skip the middle E</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q3')">First 4: R, A, C, E</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q3')">Last 3: C, A, R</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q3"></div>
-    </div>
-
-    <div class="quiz-q" id="q4">
-      <p>Q4. When using a stack to check bracket matching, what do you do when you encounter a <strong>closing bracket</strong>?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q4')">Push it to the stack</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q4')">Pop from the stack and check if it matches</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q4')">Push it and then pop immediately</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q4')">Ignore it</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q4"></div>
-    </div>
-
-    <div class="quiz-q" id="q5">
-      <p>Q5. Evaluate the postfix expression: <code>5 3 2 * + 8 -</code>. What is the result?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q5')">-2</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q5')">3</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q5')">11</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q5')">8</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q5"></div>
-    </div>
-
-    <div class="quiz-q" id="q6">
-      <p>Q6. What is the main problem with a <strong>linear queue</strong> that a <strong>circular queue</strong> solves?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q6')">Linear queues cannot store integers</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q6')">Linear queues are always slower</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q6')">Freed front slots cannot be reused, causing "ghost space" waste</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q6')">Linear queues don't support Enqueue</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q6"></div>
-    </div>
-
-    <div class="quiz-q" id="q7">
-      <p>Q7. In a circular queue implementation, what formula is used to advance the <code>rear</code> pointer?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q7')"><code>rear = rear + 1</code></button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q7')"><code>rear = (rear + 1) % capacity</code></button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q7')"><code>rear = rear - 1</code></button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q7')"><code>rear = (rear * 2) % capacity</code></button>
-      </div>
-      <div class="quiz-feedback" id="fb-q7"></div>
-    </div>
-
-    <div class="quiz-q" id="q8">
-      <p>Q8. When inserting a new node at the <strong>beginning</strong> of a linked list, which step must come FIRST?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q8')">Set head = new node</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q8')">Set new node's next = current head, THEN update head</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q8')">Traverse to the end of the list</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q8')">Free the old head node</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q8"></div>
-    </div>
-
-    <div class="quiz-q" id="q9">
-      <p>Q9. What is the time complexity of <strong>insertion at the beginning</strong> of a linked list?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q9')">O(n) — must traverse the whole list</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q9')">O(1) — just update the head pointer</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q9')">O(log n) — binary search style</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q9')">O(n²) — nested traversal</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q9"></div>
-    </div>
-
-    <div class="quiz-q" id="q10">
-      <p>Q10. Why does <code>deleteNode()</code> take a <strong>double pointer</strong> (<code>Node **head_ref</code>) instead of a single pointer?</p>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q10')">To save memory by storing less data</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q10')">Because linked lists always need double pointers</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'correct','q10')">So the function can modify the actual head pointer when deleting the head node</button>
-        <button class="quiz-opt" onclick="checkAnswer(this,'wrong','q10')">To support both circular and linear linked lists</button>
-      </div>
-      <div class="quiz-feedback" id="fb-q10"></div>
-    </div>
-
-  </div><!-- quiz-container -->
-
-  <div class="quiz-score-card" id="score-card">
-    <div class="score-big" id="score-display">0 / 10</div>
-    <p id="score-msg">Great job!</p>
-    <button class="retry-btn" onclick="resetQuiz()">🔄 Try Again</button>
-  </div>
-
-</div><!-- end tab-quiz -->
-
-</div><!-- end content -->
+</div>
 
 <script>
-// ── TAB SWITCHING ──
-function switchTab(name) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  event.currentTarget.classList.add('active');
-}
-
-// ── QUIZ LOGIC ──
-let answered = {};
-let totalQ = 10;
-
 const feedbacks = {
-  q1:  { correct: "✅ Correct! Stack = LIFO. Queue = FIFO (First-In First-Out).", wrong: "❌ Stack uses LIFO. Queue uses FIFO." },
-  q2:  { correct: "✅ Correct! An empty stack starts with top = -1. When you push the first element, ++top makes it 0.", wrong: "❌ Empty stack has top = -1. Full stack has top = capacity - 1." },
-  q3:  { correct: "✅ Correct! For odd-length words, push the first ⌊length/2⌋ chars, then skip the middle char, then compare the rest by popping.", wrong: "❌ For 'RACECAR' (7 chars), push first 3 (R,A,C), skip middle E, then compare C,A,R by popping." },
-  q4:  { correct: "✅ Correct! Opening bracket → push. Closing bracket → pop and verify it matches. If empty stack on pop → unbalanced!", wrong: "❌ Closing brackets trigger a POP. We check if the popped opening bracket matches." },
-  q5:  { correct: "✅ Correct! 3*2=6 → 5+6=11 → 11-8=3. Answer is 3!", wrong: "❌ Step by step: push 5,3,2 → see *: pop 3,2, push 3*2=6 → see +: pop 6,5, push 5+6=11 → push 8 → see -: pop 8,11, push 11-8=3." },
-  q6:  { correct: "✅ Correct! After dequeuing elements, front moves right. Even though those slots are empty, rear can't go past capacity-1. Circular queue wraps around with modulo.", wrong: "❌ The 'ghost space' problem: dequeued front slots can't be reused in a linear queue." },
-  q7:  { correct: "✅ Correct! Modulo arithmetic makes the pointer wrap around: after index capacity-1, it goes back to 0.", wrong: "❌ The key is modulo: (rear + 1) % capacity. This wraps rear back to 0 after the last slot." },
-  q8:  { correct: "✅ Correct! Order matters! If you set head = new_node first, you lose the reference to the old head and can't set new_node->next properly.", wrong: "❌ Always set new_node->next = *head_ref BEFORE updating head. If you update head first, you lose the old head's address!" },
-  q9:  { correct: "✅ Correct! Insertion at the beginning is O(1) — just update two pointers. Insertion at the END is O(n) because you must traverse.", wrong: "❌ Inserting at the beginning is O(1). Only the head pointer needs to be updated — no traversal needed." },
-  q10: { correct: "✅ Correct! With a single pointer, you can't change where 'head' points. A double pointer passes the ADDRESS of head, so we can redirect it.", wrong: "❌ When deleting the head node, the head variable itself must change. A double pointer (address of head) lets us do that." },
+  q1: "✓ top == -1 이 empty stack. isFull은 top == capacity-1",
+  q2: "✓ push: ++top으로 먼저 top을 증가시킨 후 그 위치에 저장!",
+  q3: "✓ Queue는 FIFO — 먼저 들어온 것이 먼저 나간다. 줄서기와 같은 원리!",
+  q4: "✓ (rear + 1) % capacity — 나머지 연산으로 배열 끝에서 앞으로 순환!",
+  q5: "✓ 맨 앞 삽입은 O(1) — head 포인터만 변경하면 되어 traverse 불필요!",
+  q6: "✓ 먼저 new_node→next = position→next 설정 후, position→next = new_node. 순서 바뀌면 다음 노드 잃음!",
+  q7: "✓ push 10,2,8 → *: 2×8=16 → +: 10+16=26 → push 3 → -: 26-3=23",
+  q8: "✓ 반드시 free(temp)로 메모리 해제! 안 하면 Memory Leak 발생!",
+  q9: "✓ dequeue 후 front가 증가하여 앞 공간이 비지만 rear가 끝에 다다르면 full 판정. → Circular Queue로 해결!",
+  q10: "✓ 연결 리스트: 동적 크기 + 삽입/삭제 O(1)(위치 알면). 배열은 Random Access O(1)이 장점!"
 };
 
-function checkAnswer(btn, result, qId) {
-  if (answered[qId]) return;
-  answered[qId] = result === 'correct' ? 1 : 0;
+let score = 0, answered = 0;
+const total = 10;
 
-  const opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
-  opts.forEach(o => {
-    o.disabled = true;
-    // find the correct answer and highlight it green
-    if (o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
+function answer(qid, btn, isCorrect) {
+  const c = document.getElementById(qid);
+  if (c.dataset.done) return;
+  c.dataset.done = '1';
+  c.querySelectorAll('.quiz-btn').forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('onclick').includes('true')) b.classList.add('correct');
   });
-  if (result === 'wrong') btn.classList.add('wrong');
+  if (!isCorrect) btn.classList.add('wrong');
+  else score++;
+  answered++;
 
-  const fb = document.getElementById('fb-' + qId);
-  fb.innerHTML = result === 'correct'
-    ? `<span style="color:var(--text-success)">${feedbacks[qId].correct}</span>`
-    : `<span style="color:var(--text-danger)">${feedbacks[qId].wrong}</span>`;
+  const fb = document.getElementById(qid + '-fb');
+  fb.style.display = 'block';
+  fb.style.background = isCorrect ? 'var(--bg-success)' : 'var(--bg-danger)';
+  fb.style.color = isCorrect ? 'var(--text-success)' : 'var(--text-danger)';
+  fb.style.padding = '8px 12px';
+  fb.style.borderRadius = 'var(--radius-md)';
+  fb.textContent = feedbacks[qid];
 
-  if (Object.keys(answered).length === totalQ) showScore();
+  if (answered === total) setTimeout(showScore, 500);
 }
 
 function showScore() {
-  const score = Object.values(answered).reduce((a,b) => a+b, 0);
   const card = document.getElementById('score-card');
   card.style.display = 'block';
-  document.getElementById('score-display').textContent = score + ' / ' + totalQ;
-  const msgs = ['Keep studying — review the notes again! 💪', 'Good start! Review the tricky parts. 📖', 'Solid! A bit more practice and you\'re set. 🎯', 'Great work! You know this material well! 🌟', 'Perfect score! You\'ve mastered Week 4! 🏆'];
-  const idx = Math.min(Math.floor(score / 2), 4);
-  document.getElementById('score-msg').textContent = msgs[idx];
+  document.getElementById('score-text').textContent = score + ' / ' + total;
+  const msgs = ['더 열심히 해보자! 💪', '조금 더 공부하면 완벽해!', '잘했어! 거의 다 왔어! 👍', '완벽해! 시험 준비 완료! 🎉'];
+  document.getElementById('score-msg').textContent = msgs[score <= 4 ? 0 : score <= 6 ? 1 : score <= 8 ? 2 : 3];
+  card.scrollIntoView({ behavior: 'smooth' });
 }
 
 function resetQuiz() {
-  answered = {};
-  document.querySelectorAll('.quiz-opt').forEach(o => {
-    o.disabled = false;
-    o.classList.remove('correct','wrong');
-  });
-  document.querySelectorAll('.quiz-feedback').forEach(f => f.innerHTML = '');
+  score = 0; answered = 0;
   document.getElementById('score-card').style.display = 'none';
+  document.querySelectorAll('.q-container').forEach(c => {
+    delete c.dataset.done;
+    c.querySelectorAll('.quiz-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    const fb = c.querySelector('.quiz-feedback');
+    if (fb) fb.style.display = 'none';
+  });
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 </script>
-
 </body>
 </html>

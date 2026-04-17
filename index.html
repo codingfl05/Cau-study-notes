@@ -1,139 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Study Notes</title>
 <style>
-:root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f4f0;
-  --bg-tertiary: #eeedea;
-  --bg-info: #eaf2fc;
-  --text-primary: #1a1a18;
-  --text-secondary: #5c5c56;
-  --text-info: #185fa5;
-  --border-secondary: rgba(0,0,0,0.14);
-  --border-info: #b5d4f4;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --font-sans: system-ui, -apple-system, sans-serif;
-}
-@media (prefers-color-scheme: dark) {
   :root {
-    --bg-primary: #1e1e1c;
-    --bg-secondary: #262624;
-    --bg-tertiary: #2e2e2c;
-    --bg-info: #0c2a4a;
-    --text-primary: #e8e7e0;
-    --text-secondary: #a0a098;
-    --text-info: #5ba0e8;
-    --border-secondary: rgba(255,255,255,0.14);
-    --border-info: #1a4a7a;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
   }
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: var(--font-sans);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  min-height: 100vh;
-}
-.site-header {
-  background: var(--bg-primary);
-  border-bottom: 0.5px solid var(--border-secondary);
-  padding: 1rem 1.5rem;
-}
-.site-header h1 { font-size: 1.3rem; font-weight: 800; }
-.site-header p  { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem; }
-.content { max-width: 860px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
-.subject-card {
-  background: var(--bg-primary);
-  border: 0.5px solid var(--border-secondary);
-  border-radius: var(--radius-lg);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
-}
-.subject-title {
-  font-size: 1rem; font-weight: 700;
-  margin-bottom: 0.6rem;
-}
-.week-links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.week-link {
-  display: inline-block;
-  background: var(--bg-info);
-  color: var(--text-info);
-  border: 0.5px solid var(--border-info);
-  border-radius: 99px;
-  padding: 0.2rem 0.75rem;
-  font-size: 0.78rem; font-weight: 600;
-  text-decoration: none;
-  transition: opacity 0.15s;
-}
-.week-link:hover { opacity: 0.75; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+  }
+  .site-header .brand {
+    font-size: 14px; font-weight: 500; color: var(--text-primary);
+    text-decoration: none;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .page-title { margin-bottom: 2rem; }
+  .page-title .eyebrow { font-size: 12px; color: var(--text-tertiary); margin-bottom: .35rem; letter-spacing: .04em; }
+  .page-title h1 { font-size: 24px; font-weight: 500; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .35rem; }
+
+  .subject-section { margin-bottom: 2rem; }
+  .subject-title {
+    font-size: 13px; font-weight: 500; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: .75rem;
+    padding-bottom: .5rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+
+  .week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+
+  .week-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all .14s;
+    display: block;
+  }
+  .week-card:hover {
+    border-color: var(--border-secondary);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+  }
+  .week-card .wk-num { font-size: 11px; color: var(--text-tertiary); margin-bottom: .25rem; }
+  .week-card .wk-title { font-size: 14px; font-weight: 500; margin-bottom: .25rem; }
+  .week-card .wk-sub { font-size: 12px; color: var(--text-secondary); }
+
+  .week-card.ds { border-left: 3px solid var(--border-info); }
+  .week-card.ds .wk-num { color: var(--text-info); }
 </style>
 </head>
 <body>
 
 <header class="site-header">
-  <h1>📚 Study Notes</h1>
-  <p>Click a week to open the notes for that week.</p>
+  <a href="index.html" class="brand">📓 Study Notes</a>
 </header>
 
-<div class="content">
-  <div class="grid">
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">Personal Study Notes</div>
+    <h1>강의 노트 모음</h1>
+    <div class="sub">주차별 학습 자료 정리</div>
+  </div>
 
-    <!-- Data Structures -->
-    <div class="subject-card">
-      <div class="subject-title">🗂 Data Structures</div>
-      <div class="week-links">
-        <a class="week-link" href="ds-week1.html">Week 1</a>
-        <a class="week-link" href="ds-week2.html">Week 2</a>
-        <a class="week-link" href="ds-week3.html">Week 3</a>
-        <a class="week-link" href="ds-week4.html">Week 4 ✨</a>
-      </div>
+  <div class="subject-section">
+    <div class="subject-title">📦 Data Structures</div>
+    <div class="week-grid">
+      <a href="ds-week3.html" class="week-card ds">
+        <div class="wk-num">Week 3</div>
+        <div class="wk-title">Array &amp; Stack</div>
+        <div class="wk-sub">배열과 스택 기초</div>
+      </a>
+      <a href="ds-week4.html" class="week-card ds">
+        <div class="wk-num">Week 4</div>
+        <div class="wk-title">Stack, Queue, Linked List</div>
+        <div class="wk-sub">스택 응용, 큐, 연결 리스트</div>
+      </a>
     </div>
-
-    <!-- Numerical Analysis -->
-    <div class="subject-card">
-      <div class="subject-title">📐 Numerical Analysis</div>
-      <div class="week-links">
-        <a class="week-link" href="na-week1.html">Week 1</a>
-        <a class="week-link" href="na-week2.html">Week 2</a>
-        <a class="week-link" href="na-week3.html">Week 3</a>
-      </div>
-    </div>
-
-    <!-- Probability -->
-    <div class="subject-card">
-      <div class="subject-title">🎲 Probability</div>
-      <div class="week-links">
-        <a class="week-link" href="prob-week1.html">Week 1</a>
-        <a class="week-link" href="prob-week2.html">Week 2</a>
-        <a class="week-link" href="prob-week3.html">Week 3</a>
-      </div>
-    </div>
-
-    <!-- Computer Graphics -->
-    <div class="subject-card">
-      <div class="subject-title">🎨 Computer Graphics</div>
-      <div class="week-links">
-        <a class="week-link" href="cg-week1.html">Week 1</a>
-        <a class="week-link" href="cg-week2.html">Week 2</a>
-      </div>
-    </div>
-
-    <!-- Korean History -->
-    <div class="subject-card">
-      <div class="subject-title">🏯 Korean History</div>
-      <div class="week-links">
-        <a class="week-link" href="hist-week1.html">Week 1</a>
-        <a class="week-link" href="hist-week2.html">Week 2</a>
-      </div>
-    </div>
-
   </div>
 </div>
 
