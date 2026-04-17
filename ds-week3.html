@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Structures — Week 3: Array & Stack</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --bg-warning: #fdf3e0;
+    --bg-danger: #fdf0f0;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-warning: #854f0b;
+    --text-danger: #a32d2d;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-primary: rgba(0,0,0,0.22);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --border-danger: #f7c1c1;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
+      --bg-danger: #2a0808;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --text-warning: #d08830;
+      --text-danger: #e06060;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-primary: rgba(255,255,255,0.22);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
+      --border-danger: #5a1818;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* Header */
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .site-header a {
+    text-decoration: none;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .site-header a:hover { color: var(--text-primary); }
+  .sep { color: var(--text-tertiary); font-size: 13px; }
+  .header-title { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* Page title */
+  .page-title { margin-bottom: 1.5rem; }
+  .page-title .eyebrow { font-size: 12px; color: var(--text-tertiary); font-weight: 400; margin-bottom: .35rem; letter-spacing: .04em; }
+  .page-title h1 { font-size: 22px; font-weight: 500; line-height: 1.3; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .35rem; }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .tab {
+    font-size: 13px; padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: transparent;
+    font-family: var(--font-sans);
+    transition: all .12s;
+    font-weight: 400;
+  }
+  .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .tab.active {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* Sections */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  h2 {
+    font-size: 18px; font-weight: 500;
+    margin-bottom: 1rem;
+    padding-bottom: .6rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  h3 { font-size: 15px; font-weight: 500; margin-bottom: .5rem; }
+  p { font-size: 14px; margin-bottom: .6rem; }
+
+  /* Callout boxes */
+  .key-box {
+    border-left: 3px solid var(--border-info);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-info);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-info);
+  }
+  .warn-box {
+    border-left: 3px solid var(--border-danger);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-danger);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-danger);
+  }
+  .insight-box {
+    border-left: 3px solid var(--border-success);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-success);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-success);
+  }
+
+  /* Code */
+  code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary); padding: 2px 5px;
+    border-radius: 4px; color: var(--text-primary);
+  }
+  .code-block {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem; margin: .75rem 0;
+    line-height: 1.6; overflow-x: auto; white-space: pre;
+    color: var(--text-primary);
+  }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: .75rem 0; }
+  th {
+    text-align: left; padding: 7px 10px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-weight: 500; font-size: 12px;
+    border-bottom: 0.5px solid var(--border-secondary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  td { padding: 7px 10px; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Badge */
+  .badge {
+    display: inline-block; font-size: 12px;
+    padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .badge-blue { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); }
+  .badge-green { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
+  .badge-amber { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
+
+  /* Array visualization */
+  .array-vis { display: flex; margin: .75rem 0; font-family: var(--font-mono); font-size: 13px; }
+  .arr-cell {
+    border: 0.5px solid var(--border-secondary);
+    padding: 8px 0; flex: 1;
+    text-align: center; background: var(--bg-primary);
+  }
+  .arr-cell:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+  .arr-cell:last-child { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .arr-cell + .arr-cell { border-left: none; }
+  .arr-cell.hl-blue { background: var(--bg-info); color: var(--text-info); border-color: var(--border-info); }
+  .arr-cell.hl-amber { background: var(--bg-warning); color: var(--text-warning); border-color: var(--border-warning); }
+  .arr-idx-row { display: flex; margin-bottom: .75rem; }
+  .arr-idx { flex: 1; text-align: center; font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); padding-top: 3px; }
+
+  /* Stack visualization */
+  .stack-vis { display: flex; gap: 12px; align-items: flex-end; margin: 1rem 0; flex-wrap: wrap; }
+  .stack-col { text-align: center; }
+  .stack-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; font-family: var(--font-mono); }
+  .stack-frames {
+    display: flex; flex-direction: column-reverse; gap: 2px;
+    width: 70px; min-height: 120px;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: 4px; justify-content: flex-start;
+    background: var(--bg-secondary);
+  }
+  .stack-frame {
+    border: 0.5px solid var(--border-info);
+    background: var(--bg-info); color: var(--text-info);
+    font-size: 13px; font-family: var(--font-mono);
+    text-align: center; padding: 6px 0;
+    border-radius: var(--radius-md);
+  }
+  .stack-frame.top-frame {
+    border-color: var(--border-warning);
+    background: var(--bg-warning); color: var(--text-warning);
+  }
+  .stack-action { font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); margin-top: 5px; }
+
+  /* Quiz */
+  .q-container {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .q-num { font-size: 12px; color: var(--text-tertiary); margin-bottom: .3rem; }
+  .q-text { font-size: 14px; font-weight: 500; margin-bottom: .75rem; }
+  .quiz-btn {
+    display: block; width: 100%;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: 9px 14px; cursor: pointer;
+    font-size: 13px; color: var(--text-primary);
+    text-align: left; margin: 4px 0;
+    transition: all .12s;
+    font-family: var(--font-sans);
+  }
+  .quiz-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+  .quiz-btn.correct { border-color: var(--border-success); background: var(--bg-success); color: var(--text-success); }
+  .quiz-btn.wrong   { border-color: var(--border-danger);  background: var(--bg-danger);  color: var(--text-danger);  }
+  .quiz-feedback {
+    font-size: 13px; margin-top: 8px;
+    padding: 8px 12px; border-radius: var(--radius-md);
+    display: none;
+  }
+  #score-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; text-align: center;
+    margin-bottom: 1.5rem; display: none;
+  }
+  #score-text { font-size: 24px; font-weight: 500; margin-bottom: .4rem; }
+  #score-msg  { font-size: 13px; color: var(--text-secondary); }
+  .reset-btn {
+    margin-top: .75rem;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: 20px; padding: 5px 16px;
+    cursor: pointer; font-size: 13px;
+    color: var(--text-secondary); font-family: var(--font-sans);
+    transition: all .12s;
+  }
+  .reset-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html">← Home</a>
+  <span class="sep">/</span>
+  <a href="#">Data Structures</a>
+  <span class="sep">/</span>
+  <span class="header-title">Week 3 — Array &amp; Stack</span>
+</header>
+
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">Data Structures · Week 3</div>
+    <h1>Array &amp; Stack</h1>
+    <div class="sub">배열과 스택 완벽 정리 노트</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('review',this)">📖 복습</button>
+    <button class="tab" onclick="showTab('array',this)">📦 Array</button>
+    <button class="tab" onclick="showTab('dynamic',this)">🔧 Dynamic Memory</button>
+    <button class="tab" onclick="showTab('stack',this)">📚 Stack</button>
+    <button class="tab" onclick="showTab('apps',this)">💡 Stack 응용</button>
+    <button class="tab" onclick="showTab('quiz',this)">🧪 Quiz</button>
+  </div>
+
+  <!-- ===== REVIEW ===== -->
+  <div class="section active" id="tab-review">
+    <h2>이전 내용 복습 (Previously…)</h2>
+
+    <div class="card">
+      <h3>Software Development Cycle</h3>
+      <table>
+        <tr><th>#</th><th>단계</th><th>내용</th></tr>
+        <tr><td>1</td><td>Planning</td><td>프로젝트 계획 수립</td></tr>
+        <tr><td>2</td><td>Requirement Analysis</td><td>프로그램 목표 정의, Input/Output 명세</td></tr>
+        <tr><td>3</td><td>Program Design</td><td>Algorithm 설계 + ADT 정의</td></tr>
+        <tr><td>4</td><td>Implementation</td><td>Coding &amp; Debugging</td></tr>
+        <tr><td>5</td><td>Testing &amp; Integration</td><td>다양한 입력으로 검증</td></tr>
+        <tr><td>6</td><td>Maintenance</td><td>유지보수</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Algorithm — 정의 (Definition)</h3>
+      <p>특정 작업을 수행하는 <strong>유한한(finite)</strong> 명령어 집합.</p>
+      <div class="key-box"><strong>5가지 요건:</strong> Input · Output · Definiteness(명확성) · Finiteness(유한성) · Effectiveness(효율성)</div>
+    </div>
+
+    <div class="card">
+      <h3>ADT (Abstract Data Type) — 왜 필요한가?</h3>
+      <p>구현 방식(Array, Linked List 등)이 달라도 <strong>같은 인터페이스</strong>로 사용 가능하게 한다.</p>
+      <div class="insight-box">핵심: 인터페이스(공개 함수)와 내부 데이터 구조를 분리. 사용자는 구현 방식 몰라도 됨!</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Stack</h3>
+        <span class="badge badge-blue">LIFO</span>
+        <p style="margin-top:8px; font-size:13px;">Last-In First-Out<br>연산: <code>push</code>, <code>pop</code><br>예: 브라우저 뒤로가기, 재귀 호출</p>
+      </div>
+      <div class="card">
+        <h3>Queue</h3>
+        <span class="badge badge-green">FIFO</span>
+        <p style="margin-top:8px; font-size:13px;">First-In First-Out<br>연산: <code>enqueue</code>, <code>dequeue</code><br>예: 줄서기, 프린터 큐</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Asymptotic Analysis (점근적 분석)</h3>
+      <p>입력 크기(n)에 따른 알고리즘 성능 평가. Big-O 표기법 사용.</p>
+      <div class="insight-box">장점: 알고리즘 간 효율 비교 · 큰 입력에서 성능 예측 · 수학적 분석 가능</div>
+    </div>
+  </div>
+
+  <!-- ===== ARRAY ===== -->
+  <div class="section" id="tab-array">
+    <h2>Array (배열)</h2>
+
+    <div class="card">
+      <h3>Definition (정의)</h3>
+      <p>연속된 메모리 공간에 저장된, 고정 크기의 동질(homogeneous) 요소 모음.</p>
+      <table>
+        <tr><th>특성</th><th>설명</th></tr>
+        <tr><td>Fixed-size</td><td>크기 고정 — 선언 시 결정, 변경 불가</td></tr>
+        <tr><td>Homogeneous</td><td>모든 요소가 같은 데이터 타입</td></tr>
+        <tr><td>Contiguous Memory</td><td>연속된 메모리 위치에 저장</td></tr>
+        <tr><td>Index/Key 접근</td><td>인덱스로 직접 접근 (Random Access)</td></tr>
+      </table>
+      <div class="key-box"><strong>주소 공식:</strong> Address[i] = Base Address + (index × size_of_element)</div>
+    </div>
+
+    <div class="card">
+      <h3>Indexing (인덱싱)</h3>
+      <p>C에서 배열 인덱스는 <strong>0부터</strong> 시작. 크기 n이면 마지막 인덱스 = <strong>n-1</strong></p>
+      <div class="array-vis">
+        <div class="arr-cell hl-blue">arr[0]</div>
+        <div class="arr-cell">arr[1]</div>
+        <div class="arr-cell">arr[2]</div>
+        <div class="arr-cell">arr[3]</div>
+        <div class="arr-cell">arr[4]</div>
+        <div class="arr-cell hl-blue">arr[n-1]</div>
+      </div>
+      <div class="arr-idx-row">
+        <div class="arr-idx">0</div>
+        <div class="arr-idx">1</div>
+        <div class="arr-idx">2</div>
+        <div class="arr-idx">3</div>
+        <div class="arr-idx">4</div>
+        <div class="arr-idx">n-1</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Declaration &amp; Initialization (선언 &amp; 초기화)</h3>
+      <div class="code-block">// 1. 선언만 (garbage values 포함 가능)
+int arr[5];
+
+// 2. 크기 명시 + 초기화
+int arr1[5] = {2, 4, 8, 12, 16};
+
+// 3. 크기 생략 + 초기화 (auto-sized)
+int arr2[] = {2, 4, 8, 12, 16};
+
+// 4. 반복문으로 초기화
+int arr3[5];
+for (int i = 0; i &lt; 5; i++) {
+    arr3[i] = arr2[i] * 2;  // {4, 8, 16, 24, 32}
+}</div>
+    </div>
+
+    <div class="card">
+      <h3>Access, Update &amp; Traversal (접근, 수정, 순회)</h3>
+      <div class="code-block">int arr[5] = {2, 4, 8, 12, 16};
+
+// Access — O(1) 직접 접근
+printf("arr[2]: %d\n", arr[2]);   // 8
+
+// Update (수정)
+arr[2] = 100;   // {2, 4, 100, 12, 16}
+
+// Traversal (순회)
+for (int i = 0; i &lt; 5; i++) {
+    printf("%d ", arr[i]);
+}</div>
+      <p style="font-size:12px; color:var(--text-tertiary); margin-top:.5rem;">arr[2] = 100 적용 후:</p>
+      <div class="array-vis">
+        <div class="arr-cell">2</div>
+        <div class="arr-cell">4</div>
+        <div class="arr-cell hl-amber">100</div>
+        <div class="arr-cell">12</div>
+        <div class="arr-cell">16</div>
+      </div>
+      <div class="arr-idx-row">
+        <div class="arr-idx">0</div>
+        <div class="arr-idx">1</div>
+        <div class="arr-idx">2</div>
+        <div class="arr-idx">3</div>
+        <div class="arr-idx">4</div>
+      </div>
+      <div class="key-box">Random Access = <strong>O(1)</strong>. 연속 메모리 + 주소 공식으로 바로 접근!</div>
+    </div>
+
+    <div class="card">
+      <h3>Multidimensional Array (다차원 배열)</h3>
+      <div class="code-block">// 2D Array: 2행 3열
+int arr2[2][3] = { {10,20,30}, {40,50,60} };
+
+// 3D Array: 2×2×2
+int arr3[2][2][2] = { {{10,20},{30,40}}, {{50,60},{70,80}} };
+
+// 2D 순회 출력
+for (int i = 0; i &lt; 2; i++) {
+    for (int j = 0; j &lt; 3; j++) {
+        printf("%d ", arr2[i][j]);
+    }
+    printf("\n");
+}</div>
+      <div class="insight-box">Space &amp; Time Complexity: <strong>O(Rows × Columns)</strong></div>
+    </div>
+
+    <div class="card">
+      <h3>Passing Array to Function (함수에 배열 전달)</h3>
+      <p>배열 이름은 자동으로 <strong>첫 번째 요소의 포인터</strong>가 된다. <code>arr == &amp;arr[0]</code></p>
+      <table>
+        <tr><th>방식</th><th>코드 예시</th><th>원본 변경</th></tr>
+        <tr><td>Pass by Value (primitive)</td><td><code>update_by_value(arr[3], 10)</code></td><td>❌ 복사본만 변경</td></tr>
+        <tr><td>Pass by Reference (배열)</td><td><code>update_by_reference(arr, 3, 20)</code></td><td>✅ 원본 변경됨</td></tr>
+      </table>
+      <div class="warn-box">C에서 int, float, char 등 <strong>primitive type은 항상 pass by value!</strong></div>
+    </div>
+
+    <div class="card">
+      <h3>Limitations of Array (배열의 한계)</h3>
+      <table>
+        <tr><th>한계</th><th>설명</th></tr>
+        <tr><td>Static (정적)</td><td>크기 고정 — 런타임에 변경 불가</td></tr>
+        <tr><td>Homogeneous (동질)</td><td>같은 타입만 — 복잡한 데이터 관리 불가</td></tr>
+        <tr><td>Insertion/Deletion</td><td>traverse + shift → <strong>O(n)</strong></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Structure in C (구조체 — 배열 한계 극복)</h3>
+      <p>서로 다른 타입을 하나로 묶어 관리. <code>typedef</code>로 간편하게 사용.</p>
+      <div class="code-block">typedef struct {
+    int year, month, day;
+} date_of_birth;
+
+typedef struct {
+    int student_id;
+    char *name;
+    double grade;
+    date_of_birth dob;   // structure within structure!
+} student;
+
+// 값 전달 — 원본 변경 불가
+void get_student_value(struct student s) { s.student_id = 20240000; }
+
+// 포인터 전달 — 원본 변경 가능 (s->field 로 접근)
+void get_student_reference(student *s) { s->student_id = 20240000; }</div>
+      <div class="insight-box">포인터 전달 시 <code>s-&gt;field</code>로 접근. 원본 수정 가능!</div>
+    </div>
+  </div>
+
+  <!-- ===== DYNAMIC MEMORY ===== -->
+  <div class="section" id="tab-dynamic">
+    <h2>Dynamic Memory Allocation (동적 메모리 할당)</h2>
+
+    <div class="card">
+      <h3>Static vs Dynamic</h3>
+      <table>
+        <tr><th>구분</th><th>Dynamic</th><th>Static</th></tr>
+        <tr><td>시점</td><td>Runtime (실행 시)</td><td>Compile time (컴파일 시)</td></tr>
+        <tr><td>메모리</td><td>Heap 공간</td><td>Stack 공간</td></tr>
+        <tr><td>유연성</td><td>효율적, 재사용 가능</td><td>비효율적, 재사용 불가</td></tr>
+        <tr><td>크기 변경</td><td>가능 (realloc)</td><td>불가능</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>malloc() — 초기화 없이 할당</h3>
+      <div class="code-block">// 5개 int = 20 bytes 연속 할당, 초기화 안 됨 (garbage values)
+int *ptr = (int*) malloc(5 * sizeof(int));
+if (ptr != NULL) {   // NULL 체크 필수!
+    // ... 사용 ...
+    free(ptr);       // 반드시 해제!
+}</div>
+      <div class="warn-box">malloc은 초기화 안 함 → garbage values 포함 가능. <code>ptr != NULL</code> 체크 필수!</div>
+    </div>
+
+    <div class="card">
+      <h3>calloc() — 0으로 초기화하며 할당</h3>
+      <div class="code-block">// 5개 블록, 각 sizeof(int) = 20 bytes, 모두 0으로 초기화
+int *ptr = (int*) calloc(5, sizeof(int));</div>
+      <div class="key-box">calloc vs malloc: calloc은 모든 블록을 <strong>0으로 초기화</strong>. 0 초기화가 필요할 때 사용!</div>
+    </div>
+
+    <div class="card">
+      <h3>realloc() — 크기 변경</h3>
+      <div class="code-block">// 기존 20 bytes → 40 bytes로 확장
+ptr = realloc(ptr, 10 * sizeof(int));
+// 실패 시 NULL 반환, 원본 블록은 그대로 유지됨</div>
+    </div>
+
+    <div class="card">
+      <h3>free() — 메모리 해제</h3>
+      <div class="code-block">free(ptr);   // 동적 할당 메모리 반드시 해제! (Memory Leak 방지)</div>
+      <div class="warn-box">동적으로 할당한 메모리는 반드시 <code>free()</code>로 해제. 안 하면 <strong>Memory Leak!</strong></div>
+    </div>
+
+    <div class="card">
+      <h3>Dynamic 2D Array</h3>
+      <div class="code-block">int row = 3, col = 4;
+
+// 행 포인터 배열 할당
+int **arr = (int**) malloc(row * sizeof(int*));
+
+// 각 행 할당
+for (int i = 0; i &lt; row; i++)
+    arr[i] = (int*) malloc(col * sizeof(int));
+
+// 사용 후 해제 (역순으로!)
+for (int i = 0; i &lt; row; i++) free(arr[i]);
+free(arr);
+// Space/Time Complexity: O(Rows × Columns)</div>
+    </div>
+  </div>
+
+  <!-- ===== STACK ===== -->
+  <div class="section" id="tab-stack">
+    <h2>Stack (스택)</h2>
+
+    <div class="card">
+      <h3>Definition (정의)</h3>
+      <span class="badge badge-blue">LIFO — Last-In First-Out</span>
+      <p style="margin-top:.75rem;">삽입(push)과 삭제(pop)가 <strong>한쪽 끝(top)</strong>에서만 일어나는 순서 있는 리스트.</p>
+      <div class="stack-vis">
+        <div class="stack-col">
+          <div class="stack-label">empty</div>
+          <div class="stack-frames"></div>
+          <div class="stack-action">top = -1</div>
+        </div>
+        <div class="stack-col">
+          <div class="stack-label">push(1)</div>
+          <div class="stack-frames">
+            <div class="stack-frame top-frame">1 ← top</div>
+          </div>
+          <div class="stack-action">top = 0</div>
+        </div>
+        <div class="stack-col">
+          <div class="stack-label">push(2)</div>
+          <div class="stack-frames">
+            <div class="stack-frame top-frame">2 ← top</div>
+            <div class="stack-frame">1</div>
+          </div>
+          <div class="stack-action">top = 1</div>
+        </div>
+        <div class="stack-col">
+          <div class="stack-label">push(3)</div>
+          <div class="stack-frames">
+            <div class="stack-frame top-frame">3 ← top</div>
+            <div class="stack-frame">2</div>
+            <div class="stack-frame">1</div>
+          </div>
+          <div class="stack-action">top = 2</div>
+        </div>
+        <div class="stack-col">
+          <div class="stack-label">pop() → 3</div>
+          <div class="stack-frames">
+            <div class="stack-frame top-frame">2 ← top</div>
+            <div class="stack-frame">1</div>
+          </div>
+          <div class="stack-action">top = 1</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Stack ADT</h3>
+      <table>
+        <tr><th>연산</th><th>설명</th><th>조건</th></tr>
+        <tr><td><code>createStack(capacity)</code></td><td>빈 스택 생성</td><td>—</td></tr>
+        <tr><td><code>push(stack, item)</code></td><td>top에 item 삽입</td><td>isFull → 에러</td></tr>
+        <tr><td><code>pop(stack)</code></td><td>top 제거 &amp; 반환</td><td>isEmpty → 에러</td></tr>
+        <tr><td><code>peek(stack)</code></td><td>top 확인 (제거 안 함)</td><td>isEmpty → 에러</td></tr>
+        <tr><td><code>isFull(stack)</code></td><td>꽉 찼는지 확인</td><td>top == capacity-1</td></tr>
+        <tr><td><code>isEmpty(stack)</code></td><td>비었는지 확인</td><td>top == -1</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Array Implementation (배열로 구현)</h3>
+      <div class="code-block">typedef struct {
+    int top;
+    int capacity;
+    int *array;   // char, int, float, double...
+} Stack;
+
+Stack *createStack(int capacity) {
+    Stack *stack = (Stack*) malloc(sizeof(Stack));
+    if (!stack) return NULL;
+    stack->top = -1;          // 빈 스택: top = -1
+    stack->capacity = capacity;
+    stack->array = (int*) malloc(capacity * sizeof(int));
+    if (!stack->array) return NULL;
+    return stack;
+}
+
+int isFull(Stack *s)  { return s->top == s->capacity - 1; }
+int isEmpty(Stack *s) { return s->top == -1; }
+int peek(Stack *s)    { return s->array[s->top]; }
+
+void push(Stack *s, int item) {
+    if (!isFull(s))
+        s->array[++s->top] = item;  // 먼저 top 증가!
+    else printf("Stack is full!\n");
+}
+
+int pop(Stack *s) {
+    if (!isEmpty(s))
+        return s->array[s->top--];  // 반환 후 top 감소!
+    printf("Stack is Empty!\n");
+    return 0;
+}</div>
+      <div class="key-box">push: <code>++top</code> 먼저 증가 · pop: <code>top--</code> 반환 후 감소 · top = -1 이 빈 스택!</div>
+    </div>
+  </div>
+
+  <!-- ===== APPLICATIONS ===== -->
+  <div class="section" id="tab-apps">
+    <h2>Stack 응용 (Applications)</h2>
+
+    <div class="card">
+      <h3>1. Palindrome 체크 (회문 검사)</h3>
+      <p>회문: 앞뒤로 읽어도 같은 단어. 예: mom, level, radar, ABCDCBA</p>
+      <p><strong>알고리즘:</strong><br>
+      ① 앞 절반(length/2) → 스택에 push<br>
+      ② 홀수 길이면 가운데 문자 skip<br>
+      ③ 나머지 절반 각 문자와 pop 결과 비교 → 다르면 Not Palindrome</p>
+      <div class="code-block">int isPalindrome(Stack *stack, char word[], int length) {
+    for (int i = 0; i &lt; length / 2; i++)
+        push(stack, word[i]);
+    int i = length / 2;
+    if (length % 2 != 0) i++;   // 홀수: 중간 문자 skip
+    while (i &lt; length) {
+        if (pop(stack) != word[i]) return 0;
+        i++;
+    }
+    return 1;
+}</div>
+    </div>
+
+    <div class="card">
+      <h3>2. Bracket Check (괄호 균형 검사)</h3>
+      <p>수식의 괄호가 올바르게 짝지어져 있는지 검사.</p>
+      <table>
+        <tr><th>조건</th><th>동작</th></tr>
+        <tr><td>여는 괄호 <code>( { [</code></td><td>스택에 <strong>push</strong></td></tr>
+        <tr><td>닫는 괄호 <code>) } ]</code></td><td>스택에서 <strong>pop</strong>, 짝 확인</td></tr>
+        <tr><td>순회 완료 후</td><td>스택 비어있으면 → <strong>Balanced! ✅</strong></td></tr>
+      </table>
+      <div class="insight-box">예: <code>[{()}][]()</code> → 순회 완료 후 스택 empty → Balanced ✅</div>
+    </div>
+
+    <div class="card">
+      <h3>3. Postfix Expression (후위 표기식)</h3>
+      <table>
+        <tr><th>표기법</th><th>설명</th><th>예</th></tr>
+        <tr><td>Infix (중위)</td><td>operand-op-operand (사람용)</td><td>A + B</td></tr>
+        <tr><td>Prefix (전위, Polish)</td><td>op-operand-operand</td><td>+ A B</td></tr>
+        <tr><td>Postfix (후위, Compiler)</td><td>operand-operand-op (컴퓨터용)</td><td>A B +</td></tr>
+      </table>
+      <div class="key-box"><strong>Postfix 장점:</strong> 컴퓨터가 파싱 쉬움 · 우선순위 불필요 · 괄호 불필요 · 스택으로 효율적 계산</div>
+
+      <h3 style="margin-top:1rem;">Postfix 계산 알고리즘</h3>
+      <p style="font-size:13px;">① 왼쪽부터 스캔 &nbsp;② 피연산자 → push &nbsp;③ 연산자 → 2개 pop 후 연산 &nbsp;④ 결과 push</p>
+      <div class="code-block">// 예: 5 3 2 * + 8 -
+// push 5,3,2   → stack: [5, 3, 2]
+// *  → pop 2,3 → 3*2=6  → stack: [5, 6]
+// +  → pop 6,5 → 5+6=11 → stack: [11]
+// push 8       → stack: [11, 8]
+// -  → pop 8,11→ 11-8=3 → stack: [3]
+// Result = 3</div>
+
+      <h3 style="margin-top:1rem;">Infix → Postfix 변환 규칙</h3>
+      <p style="font-size:13px;">• 피연산자 → 출력<br>• 연산자: 스택 비면 push / top보다 우선순위 높으면 push / 같거나 낮으면 pop<br>• <code>(</code> → push &nbsp;/ &nbsp;<code>)</code> → <code>(</code> 만날 때까지 pop</p>
+      <table>
+        <tr><th>Infix</th><th>Postfix</th></tr>
+        <tr><td>3 + (4 * 6)</td><td>3 4 6 * +</td></tr>
+        <tr><td>(3 + 4) * 6</td><td>3 4 + 6 *</td></tr>
+        <tr><td>a + b * c + d</td><td>a b c * + d +</td></tr>
+        <tr><td>(a + b) * c + d</td><td>a b + c * d +</td></tr>
+        <tr><td>(a + b) * (c + d)</td><td>a b + c d + *</td></tr>
+        <tr><td>((a+b) - c*(d/e)) + f</td><td>a b + c d e / * - f +</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div class="section" id="tab-quiz">
+    <h2>연습 문제 (Practice Quiz)</h2>
+
+    <div id="score-card">
+      <div id="score-text">0 / 8</div>
+      <div id="score-msg"></div>
+      <button class="reset-btn" onclick="resetQuiz()">다시 풀기</button>
+    </div>
+
+    <div class="q-container" id="q1">
+      <div class="q-num">Q1 of 8</div>
+      <div class="q-text">배열 arr[10]의 마지막 유효 인덱스는?</div>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">A. 10</button>
+      <button class="quiz-btn" onclick="answer('q1',this,true)">B. 9</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">C. 11</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">D. -1</button>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="q-container" id="q2">
+      <div class="q-num">Q2 of 8</div>
+      <div class="q-text">malloc()과 calloc()의 핵심 차이점은?</div>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">A. malloc은 heap, calloc은 stack 사용</button>
+      <button class="quiz-btn" onclick="answer('q2',this,true)">B. calloc은 0으로 초기화, malloc은 초기화 안 함</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">C. malloc은 크기를 늘릴 수 없음</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">D. calloc은 단일 블록만 할당 가능</button>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="q-container" id="q3">
+      <div class="q-num">Q3 of 8</div>
+      <div class="q-text">스택에서 isEmpty() 조건은?</div>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">A. top == capacity</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">B. top == 0</button>
+      <button class="quiz-btn" onclick="answer('q3',this,true)">C. top == -1</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">D. top == capacity - 1</button>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="q-container" id="q4">
+      <div class="q-num">Q4 of 8</div>
+      <div class="q-text">Infix "a + b * c + d"를 Postfix로 변환하면?</div>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">A. a b + c * d +</button>
+      <button class="quiz-btn" onclick="answer('q4',this,true)">B. a b c * + d +</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">C. a b c d + * +</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">D. a + b c * d +</button>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <div class="q-container" id="q5">
+      <div class="q-num">Q5 of 8</div>
+      <div class="q-text">배열에서 Random Access의 시간 복잡도는?</div>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">A. O(n)</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">B. O(log n)</button>
+      <button class="quiz-btn" onclick="answer('q5',this,true)">C. O(1)</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">D. O(n²)</button>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="q-container" id="q6">
+      <div class="q-num">Q6 of 8</div>
+      <div class="q-text">Postfix 식 "10 2 8 * + 3 -"의 결과는?</div>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">A. 25</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">B. 21</button>
+      <button class="quiz-btn" onclick="answer('q6',this,true)">C. 23</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">D. 27</button>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <div class="q-container" id="q7">
+      <div class="q-num">Q7 of 8</div>
+      <div class="q-text">배열을 함수에 전달할 때 배열 이름이 나타내는 것은?</div>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">A. 배열 전체의 복사본</button>
+      <button class="quiz-btn" onclick="answer('q7',this,true)">B. 첫 번째 요소의 포인터(주소)</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">C. 배열의 크기</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">D. 마지막 요소의 주소</button>
+      <div class="quiz-feedback" id="q7-fb"></div>
+    </div>
+
+    <div class="q-container" id="q8">
+      <div class="q-num">Q8 of 8</div>
+      <div class="q-text">배열의 삽입/삭제 연산의 시간 복잡도는?</div>
+      <button class="quiz-btn" onclick="answer('q8',this,true)">A. O(n)</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">B. O(1)</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">C. O(log n)</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">D. O(n²)</button>
+      <div class="quiz-feedback" id="q8-fb"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const feedbacks = {
+  q1: "✓ arr[10]은 인덱스 0~9. 마지막 인덱스 = n-1 = 9",
+  q2: "✓ calloc은 모든 메모리를 0으로 초기화. malloc은 garbage values 포함 가능",
+  q3: "✓ top == -1 이 empty stack 표시. isFull은 top == capacity-1",
+  q4: "✓ b*c 먼저 (우선순위 높음) → a b c * + d +",
+  q5: "✓ Base Address + index×size 공식으로 O(1) 직접 접근",
+  q6: "✓ push 10,2,8 → *: 2×8=16 → +: 10+16=26 → push 3 → -: 26-3=23",
+  q7: "✓ 배열 이름 = 첫 번째 요소의 포인터. arr == &arr[0]",
+  q8: "✓ traverse O(n) + shift O(n) = O(n). Random Access O(1)과 다름!"
+};
+
+let score = 0, answered = 0;
+const total = 8;
+
+function answer(qid, btn, isCorrect) {
+  const c = document.getElementById(qid);
+  if (c.dataset.done) return;
+  c.dataset.done = '1';
+  c.querySelectorAll('.quiz-btn').forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('onclick').includes('true')) b.classList.add('correct');
+  });
+  if (!isCorrect) btn.classList.add('wrong');
+  else score++;
+  answered++;
+
+  const fb = document.getElementById(qid + '-fb');
+  fb.style.display = 'block';
+  fb.style.background = isCorrect ? 'var(--bg-success)' : 'var(--bg-danger)';
+  fb.style.color = isCorrect ? 'var(--text-success)' : 'var(--text-danger)';
+  fb.style.padding = '8px 12px';
+  fb.style.borderRadius = 'var(--radius-md)';
+  fb.textContent = feedbacks[qid];
+
+  if (answered === total) setTimeout(showScore, 500);
+}
+
+function showScore() {
+  const card = document.getElementById('score-card');
+  card.style.display = 'block';
+  document.getElementById('score-text').textContent = score + ' / ' + total;
+  const msgs = ['더 열심히 해보자! 💪', '조금 더 공부하면 완벽해!', '잘했어! 거의 다 왔어! 👍', '완벽해! 시험 준비 완료! 🎉'];
+  document.getElementById('score-msg').textContent = msgs[score <= 3 ? 0 : score <= 5 ? 1 : score <= 7 ? 2 : 3];
+  card.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  score = 0; answered = 0;
+  document.getElementById('score-card').style.display = 'none';
+  document.querySelectorAll('.q-container').forEach(c => {
+    delete c.dataset.done;
+    c.querySelectorAll('.quiz-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    const fb = c.querySelector('.quiz-feedback');
+    if (fb) fb.style.display = 'none';
+  });
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
