@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probability — Midterm Review</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --bg-warning: #fdf3e0;
+    --bg-danger: #fdf0f0;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-warning: #854f0b;
+    --text-danger: #a32d2d;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-primary: rgba(0,0,0,0.22);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --border-danger: #f7c1c1;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
+      --bg-danger: #2a0808;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --text-warning: #d08830;
+      --text-danger: #e06060;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-primary: rgba(255,255,255,0.22);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
+      --border-danger: #5a1818;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* Header */
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .site-header a { text-decoration: none; font-size: 13px; color: var(--text-secondary); font-weight: 400; }
+  .site-header a:hover { color: var(--text-primary); }
+  .sep { color: var(--text-tertiary); font-size: 13px; }
+  .header-title { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .page-title { margin-bottom: 1.5rem; }
+  .page-title .eyebrow { font-size: 12px; color: var(--text-tertiary); font-weight: 400; margin-bottom: .35rem; letter-spacing: .04em; }
+  .page-title h1 { font-size: 22px; font-weight: 500; line-height: 1.3; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .35rem; }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .tab {
+    font-size: 13px; padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: transparent;
+    font-family: var(--font-sans);
+    transition: all .12s;
+    font-weight: 400;
+  }
+  .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .tab.active {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  h2 { font-size: 18px; font-weight: 500; margin-bottom: 1rem; padding-bottom: .6rem; border-bottom: 0.5px solid var(--border-tertiary); }
+  h3 { font-size: 15px; font-weight: 500; margin-bottom: .5rem; }
+  p { font-size: 14px; margin-bottom: .6rem; }
+
+  /* Callout boxes */
+  .key-box {
+    border-left: 3px solid var(--border-info);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-info);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-info);
+  }
+  .warn-box {
+    border-left: 3px solid var(--border-danger);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-danger);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-danger);
+  }
+  .insight-box {
+    border-left: 3px solid var(--border-success);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-success);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-success);
+  }
+
+  code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary); padding: 2px 5px;
+    border-radius: 4px; color: var(--text-primary);
+  }
+  .code-block {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem; margin: .75rem 0;
+    line-height: 1.6; overflow-x: auto; white-space: pre;
+    color: var(--text-primary);
+  }
+
+  /* Math display */
+  .math-block {
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: .75rem 1.25rem; margin: .75rem 0;
+    font-size: 15px; text-align: center;
+    color: var(--text-primary);
+    overflow-x: auto;
+  }
+  .math-inline {
+    font-family: 'Georgia', serif;
+    background: var(--bg-tertiary);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: .75rem 0; }
+  th {
+    text-align: left; padding: 7px 10px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-weight: 500; font-size: 12px;
+    border-bottom: 0.5px solid var(--border-secondary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  td { padding: 7px 10px; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .badge {
+    display: inline-block; font-size: 12px;
+    padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .badge-blue { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); }
+  .badge-green { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
+  .badge-orange { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
+  .badge-red { background: var(--bg-danger); color: var(--text-danger); border: 0.5px solid var(--border-danger); }
+
+  /* Step boxes for proofs/examples */
+  .step-box {
+    background: var(--bg-tertiary);
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: .6rem 1rem;
+    margin: .4rem 0;
+    font-size: 13px;
+  }
+  .step-box .step-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .05em;
+    color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 2px;
+  }
+
+  /* Quiz */
+  .q-container {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .q-num { font-size: 11px; color: var(--text-tertiary); margin-bottom: .4rem; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+  .q-text { font-size: 14px; font-weight: 500; margin-bottom: .75rem; line-height: 1.5; }
+  .quiz-btn {
+    display: block; width: 100%; text-align: left;
+    padding: 8px 12px; margin-bottom: 6px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    font-size: 13px; color: var(--text-primary);
+    cursor: pointer; font-family: var(--font-sans);
+    transition: all .1s;
+  }
+  .quiz-btn:hover:not(:disabled) { background: var(--bg-tertiary); border-color: var(--border-secondary); }
+  .quiz-btn.correct { background: var(--bg-success); color: var(--text-success); border-color: var(--border-success); }
+  .quiz-btn.wrong { background: var(--bg-danger); color: var(--text-danger); border-color: var(--border-danger); }
+  .quiz-btn:disabled { cursor: default; opacity: .85; }
+  .quiz-feedback { display: none; font-size: 13px; margin-top: .5rem; border-radius: var(--radius-md); padding: 8px 12px; }
+
+  #score-card {
+    display: none;
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;
+  }
+  #score-text { font-size: 36px; font-weight: 500; margin-bottom: .5rem; }
+  #score-msg { font-size: 14px; color: var(--text-secondary); margin-bottom: 1rem; }
+  .reset-btn {
+    padding: 8px 20px; border-radius: 20px;
+    background: var(--text-primary); color: var(--bg-primary);
+    border: none; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: var(--font-sans);
+  }
+
+  ul { padding-left: 1.2rem; font-size: 14px; }
+  ul li { margin-bottom: .3rem; }
+  ol { padding-left: 1.3rem; font-size: 14px; }
+  ol li { margin-bottom: .4rem; }
+
+  /* SVG diagram container */
+  .diagram-wrap { margin: .75rem 0; overflow-x: auto; }
+  svg text { font-family: var(--font-sans); }
+</style>
+<!-- KaTeX for math rendering -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html">← Home</a>
+  <span class="sep">/</span>
+  <span class="header-title">Probability — 중간고사 총정리</span>
+</header>
+
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">Probability & Statistics · Midterm Review</div>
+    <h1>확률과 통계 — 중간고사 핵심 정리</h1>
+    <div class="sub">집합 · 확률 공리 · 조건부 확률 · 독립 · 베이즈 · 확률 변수 · 분포</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('sets',this)">1. 집합</button>
+    <button class="tab" onclick="showTab('prob',this)">2. 확률 공리</button>
+    <button class="tab" onclick="showTab('cond',this)">3. 조건부·독립</button>
+    <button class="tab" onclick="showTab('bayes',this)">4. 베이즈 정리</button>
+    <button class="tab" onclick="showTab('rv',this)">5. 확률 변수</button>
+    <button class="tab" onclick="showTab('dist',this)">6. 5가지 분포</button>
+    <button class="tab" onclick="showTab('quiz',this)">Quiz 🎯</button>
+  </div>
+
+  <!-- ===== TAB 1: SETS ===== -->
+  <div class="section active" id="tab-sets">
+    <h2>1. 집합 (Sets)</h2>
+
+    <div class="card">
+      <h3>🧱 핵심 용어 한눈에</h3>
+      <p>집합은 확률의 언어다. 먼저 용어를 정확하게 잡아두자.</p>
+      <table>
+        <tr><th>기호</th><th>이름</th><th>뜻</th><th>예시</th></tr>
+        <tr><td>$x \in S$</td><td>원소 포함</td><td>$x$가 집합 $S$의 원소</td><td>$3 \in \{1,2,3\}$</td></tr>
+        <tr><td>$|S|$</td><td>집합의 크기</td><td>원소 개수</td><td>$|\{a,b,c\}|=3$</td></tr>
+        <tr><td>$\emptyset$</td><td>공집합</td><td>원소가 없는 집합</td><td>$\{x \mid x>5, x<3\}$</td></tr>
+        <tr><td>$\Omega$</td><td>전체집합</td><td>관심 있는 모든 원소의 집합</td><td>주사위: $\{1,2,3,4,5,6\}$</td></tr>
+        <tr><td>$T \subseteq S$</td><td>부분집합</td><td>$T$의 모든 원소가 $S$에도 있음</td><td>$\{1,2\} \subseteq \{1,2,3\}$</td></tr>
+        <tr><td>$2^S$</td><td>멱집합</td><td>$S$의 모든 부분집합의 집합</td><td>$|2^S| = 2^{|S|}$</td></tr>
+      </table>
+      <div class="insight-box">💡 <strong>멱집합 크기 암기법:</strong> 원소 $n$개 → 부분집합 $2^n$개. 예: $S=\{a,b\}$이면 부분집합은 $\emptyset, \{a\}, \{b\}, \{a,b\}$ 총 $2^2 = 4$개.</div>
+    </div>
+
+    <div class="card">
+      <h3>🔧 집합 연산 (Set Operations)</h3>
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:680px">
+          <defs>
+            <clipPath id="clipA1"><circle cx="140" cy="80" r="55"/></clipPath>
+            <clipPath id="clipB1"><circle cx="195" cy="80" r="55"/></clipPath>
+            <clipPath id="clipA2"><circle cx="390" cy="80" r="55"/></clipPath>
+            <clipPath id="clipB2"><circle cx="445" cy="80" r="55"/></clipPath>
+          </defs>
+          <!-- Union diagram -->
+          <rect x="70" y="20" width="200" height="120" rx="8" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+          <circle cx="140" cy="80" r="55" fill="#eaf2fc" stroke="#b5d4f4" stroke-width="1"/>
+          <circle cx="195" cy="80" r="55" fill="#eaf2fc" stroke="#b5d4f4" stroke-width="1"/>
+          <text x="167" y="150" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.6">합집합 S ∪ T</text>
+          <text x="130" y="78" text-anchor="middle" font-size="12" fill="#185fa5" font-weight="500">S</text>
+          <text x="204" y="78" text-anchor="middle" font-size="12" fill="#185fa5" font-weight="500">T</text>
+
+          <!-- Intersection diagram -->
+          <rect x="320" y="20" width="200" height="120" rx="8" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+          <circle cx="390" cy="80" r="55" fill="none" stroke="#b5d4f4" stroke-width="1"/>
+          <circle cx="445" cy="80" r="55" fill="none" stroke="#b5d4f4" stroke-width="1"/>
+          <circle cx="445" cy="80" r="55" clip-path="url(#clipA2)" fill="#eaf2fc"/>
+          <text x="418" y="150" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.6">교집합 S ∩ T</text>
+          <text x="378" y="78" text-anchor="middle" font-size="12" fill="#185fa5" font-weight="500">S</text>
+          <text x="458" y="78" text-anchor="middle" font-size="12" fill="#185fa5" font-weight="500">T</text>
+          <text x="418" y="82" text-anchor="middle" font-size="10" fill="#185fa5" opacity="0.8">∩</text>
+        </svg>
+      </div>
+
+      <table>
+        <tr><th>연산</th><th>기호</th><th>정의</th></tr>
+        <tr><td>여집합 (Complement)</td><td>$S^c$</td><td>$\Omega$에는 있지만 $S$에는 없는 원소들</td></tr>
+        <tr><td>합집합 (Union)</td><td>$S \cup T$</td><td>$S$ 또는 $T$에 속하는 원소들</td></tr>
+        <tr><td>교집합 (Intersection)</td><td>$S \cap T$</td><td>$S$ 와 $T$ 모두에 속하는 원소들</td></tr>
+        <tr><td>서로소 (Disjoint)</td><td>$S \cap T = \emptyset$</td><td>공통 원소 없음</td></tr>
+      </table>
+
+      <div class="insight-box">💡 <strong>분할(Partition):</strong> $S_1, \dots, S_N$이 서로소이면서 합집합이 $\Omega$가 되면 "분할"이라 한다. 나중에 전확률 정리에서 핵심 개념으로 등장!</div>
+    </div>
+
+    <div class="card">
+      <h3>📐 집합 대수 법칙 (Algebra of Sets)</h3>
+      <div class="grid-2">
+        <div>
+          <h3 style="font-size:13px; color:var(--text-secondary); margin-bottom:.5rem;">교환·결합·분배</h3>
+          <p style="font-size:13px;"><strong>교환:</strong> $S \cap T = T \cap S$</p>
+          <p style="font-size:13px;"><strong>결합:</strong> $S \cap (T \cap U) = (S \cap T) \cap U$</p>
+          <p style="font-size:13px;"><strong>분배:</strong> $S \cap (T \cup U) = (S \cap T) \cup (S \cap U)$</p>
+        </div>
+        <div>
+          <h3 style="font-size:13px; color:var(--text-secondary); margin-bottom:.5rem;">드 모르간의 법칙</h3>
+          <div class="math-block" style="font-size:13px;">$(A \cup B)^c = A^c \cap B^c$</div>
+          <div class="math-block" style="font-size:13px;">$(A \cap B)^c = A^c \cup B^c$</div>
+        </div>
+      </div>
+      <div class="key-box">
+        <strong>드 모르간 직관적 이해:</strong><br>
+        "A 또는 B가 아닌 것" = "A가 아닌 것 AND B가 아닌 것"<br>
+        예: "사과도 바나나도 아닌 것" = "사과가 아닌 것 ∩ 바나나가 아닌 것" ✓
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 2: PROBABILITY AXIOMS ===== -->
+  <div class="section" id="tab-prob">
+    <h2>2. 확률 공리 & 확률 모델 (Probability Axioms)</h2>
+
+    <div class="card">
+      <h3>🎲 확률 모델의 구성 요소</h3>
+      <table>
+        <tr><th>용어</th><th>영어</th><th>의미</th><th>예 (주사위)</th></tr>
+        <tr><td>실험</td><td>Experiment</td><td>결과가 딱 하나 나오는 과정</td><td>주사위 한 번 굴리기</td></tr>
+        <tr><td>표본 공간</td><td>Sample Space $\Omega$</td><td>가능한 모든 결과의 집합</td><td>$\{1,2,3,4,5,6\}$</td></tr>
+        <tr><td>사건</td><td>Event</td><td>$\Omega$의 부분집합</td><td>"짝수" = $\{2,4,6\}$</td></tr>
+        <tr><td>단원 사건</td><td>Atomic Event</td><td>결과 하나만 포함하는 사건</td><td>$\{3\}$</td></tr>
+        <tr><td>확률 법칙</td><td>Probability Law</td><td>사건에 0~1 숫자를 배정하는 함수</td><td>$P(\{3\}) = 1/6$</td></tr>
+      </table>
+      <div class="insight-box">💡 모든 사건은 단원 사건들의 합집합으로 표현 가능: $\{2,4,6\} = \{2\} \cup \{4\} \cup \{6\}$</div>
+    </div>
+
+    <div class="card">
+      <h3>🏛️ 확률의 3공리 (The 3 Axioms) — 반드시 암기!</h3>
+      <div class="warn-box"><strong>⚠️ 시험 단골:</strong> 공리 이름과 내용을 정확히 쓸 수 있어야 한다.</div>
+
+      <div class="step-box">
+        <div class="step-label">Axiom 1 — Nonnegativity (비음성)</div>
+        모든 사건 $A$에 대해 &nbsp; $P(A) \ge 0$
+      </div>
+      <div class="step-box">
+        <div class="step-label">Axiom 2 — Normalization (정규화)</div>
+        전체 표본 공간의 확률 &nbsp; $P(\Omega) = 1$
+      </div>
+      <div class="step-box">
+        <div class="step-label">Axiom 3 — Additivity (가법성)</div>
+        $A \cap B = \emptyset$ (서로소)이면 &nbsp; $P(A \cup B) = P(A) + P(B)$
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📊 공리에서 유도되는 주요 성질</h3>
+      <table>
+        <tr><th>성질</th><th>공식</th><th>직관</th></tr>
+        <tr><td>여사건</td><td>$P(A^c) = 1 - P(A)$</td><td>$A$와 $A^c$를 합치면 $\Omega$</td></tr>
+        <tr><td>공사건</td><td>$P(\emptyset) = 0$</td><td>일어날 수 없는 사건</td></tr>
+        <tr><td>단조성</td><td>$A \subseteq B \Rightarrow P(A) \le P(B)$</td><td>더 큰 사건, 더 높은 확률</td></tr>
+        <tr><td>합집합 확률</td><td>$P(A \cup B) = P(A)+P(B)-P(A \cap B)$</td><td>겹치는 부분 빼주기</td></tr>
+        <tr><td>서로소 합집합</td><td>$P(A_1 \cup \dots \cup A_N) = \sum P(A_i)$</td><td>서로 안 겹치면 그냥 더하기</td></tr>
+      </table>
+      <div class="key-box">
+        <strong>합집합 확률 예시:</strong> 카드 한 장 뽑을 때 "하트이거나 킹일 확률"<br>
+        $P(\text{하트}) = 13/52$, $P(\text{킹}) = 4/52$, $P(\text{하트 킹}) = 1/52$<br>
+        $\Rightarrow P(\text{하트} \cup \text{킹}) = 13/52 + 4/52 - 1/52 = 16/52$
+      </div>
+
+      <h3 style="margin-top:1rem;">이산 균등 확률 법칙 (Discrete Uniform Probability Law)</h3>
+      <p>표본 공간이 유한하고 모든 결과가 동등할 때:</p>
+      <div class="math-block">$$P(A) = \frac{|A|}{|\Omega|}$$</div>
+      <div class="insight-box">💡 주사위 예: $P(\text{짝수}) = \frac{|\{2,4,6\}|}{|\{1,2,3,4,5,6\}|} = \frac{3}{6} = \frac{1}{2}$</div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 3: CONDITIONAL PROB & INDEPENDENCE ===== -->
+  <div class="section" id="tab-cond">
+    <h2>3. 조건부 확률 & 독립성</h2>
+
+    <div class="card">
+      <h3>🔍 조건부 확률 (Conditional Probability)</h3>
+      <p><strong>직관:</strong> "B가 일어났다는 걸 알 때, A가 일어날 확률은?"<br>
+      B가 일어난 것을 알면 표본 공간이 B로 좁혀진다.</p>
+      <div class="math-block">$$P(A|B) = \frac{P(A \cap B)}{P(B)}, \quad P(B) > 0$$</div>
+
+      <div class="key-box">
+        <strong>구체적 예시:</strong> 주사위 두 번 굴릴 때.<br>
+        A = "합이 10 이상", B = "첫 번째가 6"<br>
+        표본 공간: 36가지. $P(B)=6/36=1/6$<br>
+        $P(A \cap B)$ = 합이 10 이상이면서 첫 번째가 6 → (6,4),(6,5),(6,6) → $3/36$<br>
+        $P(A|B) = \frac{3/36}{6/36} = \frac{3}{6} = \frac{1}{2}$
+      </div>
+      <div class="insight-box">💡 조건부 확률도 확률의 3공리를 모두 만족한다 → 비음성, 정규화($P(\Omega|B)=1$), 가법성 성립</div>
+    </div>
+
+    <div class="card">
+      <h3>✖️ 곱셈 법칙 (Multiplication Rule)</h3>
+      <p>조건부 확률 정의를 변형하면:</p>
+      <div class="math-block">$$P(A \cap B) = P(A) \cdot P(B|A) = P(B) \cdot P(A|B)$$</div>
+
+      <h3 style="margin-top:1rem;">N단계 곱셈 법칙</h3>
+      <p>여러 사건이 동시에 일어날 확률을 연쇄 조건부 확률로 분해:</p>
+      <div class="math-block">$$P(A_1 \cap A_2 \cap \cdots \cap A_N) = P(A_1) \cdot P(A_2|A_1) \cdot P(A_3|A_1 \cap A_2) \cdots$$</div>
+      <div class="key-box">
+        <strong>예시:</strong> 카드 3장 비복원 추출, 모두 에이스일 확률<br>
+        $P = \frac{4}{52} \times \frac{3}{51} \times \frac{2}{50} = \frac{24}{132600} \approx 0.000181$<br>
+        각 단계에서 조건부로 계산 → 곱셈 법칙!
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔗 독립성 (Independence)</h3>
+      <p><strong>직관:</strong> A가 일어나든 말든 B의 확률에 영향이 없다면 두 사건은 독립!</p>
+
+      <div class="math-block">$$A \perp B \iff P(A \cap B) = P(A) \cdot P(B)$$</div>
+      <p>이는 $P(A|B) = P(A)$ 및 $P(B|A) = P(B)$와 동치.</p>
+
+      <div class="warn-box">
+        ⚠️ <strong>독립 ≠ 서로소!</strong><br>
+        서로소($A \cap B = \emptyset$): 동시에 일어날 수 없음<br>
+        독립($P(A \cap B)=P(A)P(B)$): 한 사건이 다른 사건에 영향 없음<br>
+        두 사건이 서로소이면 오히려 의존적이다! (하나가 일어나면 다른 하나는 절대 안 일어남)
+      </div>
+
+      <h3 style="margin-top:1rem;">독립성의 파생 결과</h3>
+      <div class="insight-box">
+        $A$와 $B$가 독립이면, 다음도 모두 독립:<br>
+        $A$와 $B^c$ / $A^c$와 $B$ / $A^c$와 $B^c$
+      </div>
+
+      <h3 style="margin-top:1rem;">상호 독립 (Mutual Independence) — 3개 이상</h3>
+      <p>$A, B, C$가 상호 독립이 되려면 다음 <strong>4가지 조건 모두</strong> 만족해야 함:</p>
+      <div class="code-block">P(A∩B) = P(A)·P(B)
+P(A∩C) = P(A)·P(C)
+P(B∩C) = P(B)·P(C)
+P(A∩B∩C) = P(A)·P(B)·P(C)   ← 이것 하나만으론 부족!</div>
+      <div class="warn-box">⚠️ $P(A \cap B \cap C) = P(A)P(B)P(C)$만 만족해도 쌍별(Pairwise) 독립이 자동으로 되지는 않는다!</div>
+    </div>
+
+    <div class="card">
+      <h3>🔀 조건부 독립 (Conditional Independence)</h3>
+      <p>사건 $C$가 주어졌을 때 $A$와 $B$가 독립:</p>
+      <div class="math-block">$$P(A \cap B | C) = P(A|C) \cdot P(B|C)$$</div>
+      <div class="warn-box">
+        ⚠️ 조건부 독립 ≠ 무조건부 독립! 둘 사이에 함의 관계 없음.<br>
+        · 조건부 독립이어도 무조건 독립이 아닐 수 있다<br>
+        · 무조건 독립이어도 조건부 독립이 아닐 수 있다
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 4: BAYES ===== -->
+  <div class="section" id="tab-bayes">
+    <h2>4. 전확률 정리 & 베이즈 정리</h2>
+
+    <div class="card">
+      <h3>🧩 전확률 정리 (Total Probability Theorem)</h3>
+      <p><strong>언제 씀?</strong> $P(B)$를 직접 계산하기 어려울 때, 원인별로 분해해서 계산!</p>
+      <p>$A_1, \dots, A_n$이 $\Omega$의 분할(Partition)이면:</p>
+      <div class="math-block">$$P(B) = \sum_{i=1}^{n} P(B|A_i) \cdot P(A_i)$$</div>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 600 130" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:600px">
+          <!-- Partition boxes A1, A2, A3 -->
+          <rect x="20" y="30" width="120" height="70" rx="6" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="1"/>
+          <rect x="155" y="30" width="120" height="70" rx="6" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="1"/>
+          <rect x="290" y="30" width="120" height="70" rx="6" fill="var(--bg-warning)" stroke="var(--border-warning)" stroke-width="1"/>
+          <text x="80" y="70" text-anchor="middle" font-size="13" fill="var(--text-info)" font-weight="500">A₁</text>
+          <text x="215" y="70" text-anchor="middle" font-size="13" fill="var(--text-success)" font-weight="500">A₂</text>
+          <text x="350" y="70" text-anchor="middle" font-size="13" fill="var(--text-warning)" font-weight="500">A₃</text>
+
+          <!-- Arrows to B -->
+          <line x1="80" y1="100" x2="510" y2="100" stroke="none"/>
+          <ellipse cx="510" cy="65" rx="60" ry="40" fill="var(--bg-danger)" stroke="var(--border-danger)" stroke-width="1" opacity="0.7"/>
+          <text x="510" y="70" text-anchor="middle" font-size="13" fill="var(--text-danger)" font-weight="500">B</text>
+
+          <line x1="140" y1="65" x2="448" y2="65" stroke="var(--text-info)" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="4,2"/>
+          <line x1="275" y1="65" x2="450" y2="65" stroke="var(--text-success)" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="4,2"/>
+          <line x1="410" y1="65" x2="450" y2="65" stroke="var(--text-warning)" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="4,2"/>
+
+          <text x="270" y="122" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.5">A₁, A₂, A₃ 는 분할 (Partition) — 서로소이고 합집합 = Ω</text>
+        </svg>
+      </div>
+
+      <div class="key-box">
+        <strong>예시:</strong> 공장 A(60%), B(40%) 생산. 불량률: A=2%, B=5%.<br>
+        전체 불량품 확률?<br>
+        $P(\text{불량}) = P(\text{불량}|A) \cdot P(A) + P(\text{불량}|B) \cdot P(B)$<br>
+        $= 0.02 \times 0.6 + 0.05 \times 0.4 = 0.012 + 0.020 = 0.032$ (3.2%)
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔄 베이즈 정리 (Bayes' Theorem)</h3>
+      <p><strong>직관:</strong> "결과를 보고 원인의 확률을 역으로 추론!" — 이것이 베이즈의 핵심!</p>
+      <p>$A_1, \dots, A_n$이 분할일 때, 사건 $B$가 관찰되었다면:</p>
+      <div class="math-block">$$P(A_i|B) = \frac{P(B|A_i) \cdot P(A_i)}{\displaystyle\sum_{j=1}^n P(B|A_j) \cdot P(A_j)}$$</div>
+
+      <div class="step-box">
+        <div class="step-label">분자 = 곱셈 법칙</div>
+        $P(A_i \cap B) = P(B|A_i) \cdot P(A_i)$
+      </div>
+      <div class="step-box">
+        <div class="step-label">분모 = 전확률 정리</div>
+        $P(B) = \sum_j P(B|A_j) \cdot P(A_j)$
+      </div>
+
+      <div class="key-box">
+        <strong>위 공장 예시 계속:</strong> 불량품 하나가 발견됐다. 공장 A 제품일 확률?<br>
+        $P(A|\text{불량}) = \dfrac{0.02 \times 0.6}{0.032} = \dfrac{0.012}{0.032} = 0.375$ (37.5%)<br><br>
+        → 불량품의 37.5%가 공장 A 제품. 공장 B는 $1-0.375=62.5\%$.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🤖 나이브 베이즈 분류기 (Naive Bayes Classifier)</h3>
+      <p>베이즈 정리의 머신러닝 응용!</p>
+      <table>
+        <tr><th>용어</th><th>기호</th><th>의미</th></tr>
+        <tr><td>관측치/증거 (Evidence)</td><td>$x$</td><td>관찰할 수 있는 데이터의 특징</td></tr>
+        <tr><td>라벨/범주 (Label)</td><td>$y$</td><td>예측하고 싶은 범주</td></tr>
+        <tr><td>사전 확률 (Prior)</td><td>$p(y)$</td><td>증거 없이 알고 있는 범주의 확률</td></tr>
+        <tr><td>우도 (Likelihood)</td><td>$p(x|y)$</td><td>라벨이 주어졌을 때 관측치 확률</td></tr>
+        <tr><td>사후 확률 (Posterior)</td><td>$p(y|x)$</td><td>증거를 본 후 라벨의 확률 ← 우리가 원하는 것!</td></tr>
+      </table>
+      <div class="math-block">$$p(y|x) = \frac{p(x|y) \cdot p(y)}{p(x)}$$</div>
+
+      <h3 style="margin-top:1rem;">MAP 추정 & 나이브 가정</h3>
+      <p><strong>MAP (Maximum a Posteriori):</strong> 사후 확률을 최대화하는 라벨 선택</p>
+      <div class="math-block">$$y^* = \arg\max_y P(y|x)$$</div>
+      <div class="insight-box">
+        <strong>나이브 가정:</strong> 라벨이 주어졌을 때 각 특징이 서로 독립이라 가정<br>
+        $p(x_1, x_2 | y) = p(x_1|y) \cdot p(x_2|y)$<br>
+        현실에서 항상 맞지는 않지만, 계산이 훨씬 단순해짐 → "naive(순진한)"이라는 이름
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 5: RANDOM VARIABLES ===== -->
+  <div class="section" id="tab-rv">
+    <h2>5. 이산 확률 변수 (Discrete Random Variables)</h2>
+
+    <div class="card">
+      <h3>📌 확률 변수란?</h3>
+      <p>표본 공간의 결과를 실수로 바꾸는 함수: $X: \Omega \rightarrow \mathbb{R}$</p>
+      <div class="insight-box">
+        💡 직관: 주사위를 굴리면 $\Omega = \{$앞면,뒷면$\}$인데, 앞=1, 뒷=0으로 숫자에 대응시키면 그게 확률 변수!
+      </div>
+      <div class="key-box">
+        <strong>PMF (확률 질량 함수, Probability Mass Function):</strong><br>
+        $p_X(x) = P(X = x)$ — 이산 확률 변수가 특정 값을 가질 확률<br>
+        조건: ① 모든 $x$에서 $p_X(x) \ge 0$, ② $\sum_x p_X(x) = 1$
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📈 기댓값 (Expected Value / Mean)</h3>
+      <p>확률 변수가 "평균적으로" 취하는 값 — 확률을 가중치로 한 가중평균</p>
+      <div class="math-block">$$E[X] = \sum_x x \cdot P(X=x)$$</div>
+
+      <div class="key-box">
+        <strong>예시:</strong> 동전 앞면=2점, 뒷면=-1점, 각 확률 1/2<br>
+        $E[X] = 2 \times \frac{1}{2} + (-1) \times \frac{1}{2} = 1 - 0.5 = 0.5$점
+      </div>
+
+      <h3 style="margin-top:1rem;">확률 변수 함수의 기댓값 법칙</h3>
+      <div class="math-block">$$E[g(X)] = \sum_x g(x) \cdot p_X(x)$$</div>
+
+      <h3 style="margin-top:1rem;">기댓값의 선형성 (Linearity of Expectation)</h3>
+      <div class="grid-2">
+        <div class="math-block" style="font-size:13px;">$E[X+Y] = E[X]+E[Y]$</div>
+        <div class="math-block" style="font-size:13px;">$E[aX+b] = aE[X]+b$</div>
+      </div>
+      <div class="insight-box">💡 기댓값의 선형성은 $X$와 $Y$가 독립이 아니어도 성립한다!</div>
+    </div>
+
+    <div class="card">
+      <h3>📊 분산 & 표준편차 (Variance & Standard Deviation)</h3>
+      <p>평균에서 얼마나 퍼져 있는지 측정:</p>
+      <div class="math-block">$$\text{var}(X) = E[(X - E[X])^2] = E[X^2] - (E[X])^2$$</div>
+      <div class="math-block">$$\text{std}(X) = \sqrt{\text{var}(X)} = \sigma_X$$</div>
+
+      <div class="key-box">
+        <strong>빠른 계산 공식:</strong> $\text{var}(X) = E[X^2] - (E[X])^2$<br><br>
+        <strong>예시:</strong> 주사위 1개, 기댓값 $E[X] = 3.5$<br>
+        $E[X^2] = \frac{1+4+9+16+25+36}{6} = \frac{91}{6} \approx 15.167$<br>
+        $\text{var}(X) = 15.167 - 3.5^2 = 15.167 - 12.25 = 2.917$
+      </div>
+
+      <h3 style="margin-top:1rem;">선형 변환에서 분산</h3>
+      <div class="math-block">$$\text{var}(aX+b) = a^2 \cdot \text{var}(X)$$</div>
+      <div class="warn-box">⚠️ 상수 $b$를 더해도 분산은 변하지 않는다! 평균이 이동할 뿐.</div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 6: DISTRIBUTIONS ===== -->
+  <div class="section" id="tab-dist">
+    <h2>6. 5가지 대표 이산 분포</h2>
+
+    <div class="card">
+      <h3>비교 요약표</h3>
+      <table>
+        <tr><th>분포</th><th>모델링 대상</th><th>파라미터</th><th>$E[X]$</th><th>$\text{var}(X)$</th></tr>
+        <tr><td><span class="badge badge-blue">이산 균등</span></td><td>동등 확률 선택</td><td>$a, b$</td><td>$\frac{a+b}{2}$</td><td>$\frac{(b-a)(b-a+2)}{12}$</td></tr>
+        <tr><td><span class="badge badge-green">베르누이</span></td><td>성공/실패 1회</td><td>$p$</td><td>$p$</td><td>$p(1-p)$</td></tr>
+        <tr><td><span class="badge badge-orange">이항</span></td><td>$n$번 중 성공 횟수</td><td>$n, p$</td><td>$np$</td><td>$np(1-p)$</td></tr>
+        <tr><td><span class="badge badge-red">기하</span></td><td>첫 성공까지 시도 횟수</td><td>$p$</td><td>$\frac{1}{p}$</td><td>$\frac{1-p}{p^2}$</td></tr>
+        <tr><td><span class="badge" style="background:var(--bg-tertiary);color:var(--text-secondary);border:0.5px solid var(--border-secondary);">포아송</span></td><td>희귀 사건 발생 횟수</td><td>$\lambda$</td><td>$\lambda$</td><td>$\lambda$</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="badge badge-blue">1</span> 이산 균등 분포 (Discrete Uniform)</h3>
+      <p>$a$부터 $b$까지 정수값을 동일한 확률로 가짐.</p>
+      <div class="math-block">$$P(X=k) = \frac{1}{b-a+1}, \quad k = a, a+1, \dots, b$$</div>
+      <div class="key-box">예: 주사위 — $a=1, b=6$ → $P(X=k) = 1/6$ for $k \in \{1,\dots,6\}$</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="badge badge-green">2</span> 베르누이 분포 (Bernoulli)</h3>
+      <p>결과가 성공(1) 또는 실패(0) 단 두 가지인 1회 시도.</p>
+      <div class="grid-2">
+        <div class="math-block" style="font-size:13px;">$P(X=1) = p$<br>$P(X=0) = 1-p$</div>
+        <div>
+          <div class="step-box"><div class="step-label">기댓값</div>$E[X] = p$</div>
+          <div class="step-box"><div class="step-label">분산</div>$\text{var}(X) = p(1-p)$</div>
+        </div>
+      </div>
+      <div class="insight-box">💡 이항 분포의 기본 단위! 이항 = 베르누이 시도 $n$번의 합.</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="badge badge-orange">3</span> 이항 분포 (Binomial)</h3>
+      <p>성공 확률 $p$인 독립 시도를 $n$번 했을 때 <strong>성공 횟수</strong>.</p>
+      <div class="math-block">$$P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}, \quad k = 0, 1, \dots, n$$</div>
+      <div class="math-block">$$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$</div>
+
+      <div class="key-box">
+        <strong>예시:</strong> 동전 4번 던질 때 앞면이 정확히 2번 나올 확률?<br>
+        $P(X=2) = \binom{4}{2} (0.5)^2 (0.5)^2 = 6 \times 0.25 \times 0.25 = 6/16 = 0.375$
+      </div>
+
+      <h3 style="margin-top:1rem;">형태 특성</h3>
+      <table>
+        <tr><th>조건</th><th>모양</th></tr>
+        <tr><td>$p = 0.5$</td><td>$n/2$를 중심으로 대칭</td></tr>
+        <tr><td>$p < 0.5$</td><td>0 쪽으로 오른쪽 꼬리 (Right-skewed)</td></tr>
+        <tr><td>$p > 0.5$</td><td>$n$ 쪽으로 왼쪽 꼬리 (Left-skewed)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="badge badge-red">4</span> 기하 분포 (Geometric)</h3>
+      <p>성공 확률 $p$인 시도를 반복할 때, <strong>첫 번째 성공까지의 총 시도 횟수</strong>.</p>
+      <div class="math-block">$$P(X=k) = (1-p)^{k-1} p, \quad k = 1, 2, 3, \dots$$</div>
+
+      <div class="key-box">
+        <strong>예시:</strong> 주사위를 굴려 처음으로 6이 나올 때까지 시도 횟수. $p=1/6$.<br>
+        $P(X=1) = 1/6 \approx 0.167$<br>
+        $P(X=2) = (5/6)^1 \times 1/6 \approx 0.139$<br>
+        $P(X=3) = (5/6)^2 \times 1/6 \approx 0.116$<br>
+        → 등비수열 형태로 감소! 공비 = $(1-p) = 5/6$
+      </div>
+      <div class="insight-box">
+        💡 <strong>기하분포의 PMF는 항상 단조 감소한다</strong> — 오래 기다릴수록 그 정확한 횟수에서 처음 성공할 확률은 작아진다.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="badge" style="background:var(--bg-tertiary);color:var(--text-secondary);border:0.5px solid var(--border-secondary);">5</span> 포아송 분포 (Poisson)</h3>
+      <p><strong>언제?</strong> $n$이 매우 크고, $p$가 매우 작을 때 이항분포의 근사. 모수 $\lambda = np$.</p>
+      <div class="math-block">$$P(X=k) = e^{-\lambda} \frac{\lambda^k}{k!}, \quad k = 0, 1, 2, \dots$$</div>
+
+      <div class="key-box">
+        <strong>예시:</strong> 어떤 사이트에 시간당 평균 3건의 오류 발생. $\lambda = 3$.<br>
+        정확히 0건 발생 확률? $P(X=0) = e^{-3} \frac{3^0}{0!} = e^{-3} \approx 0.0498$ (4.98%)<br>
+        정확히 2건? $P(X=2) = e^{-3} \frac{9}{2} \approx 0.224$ (22.4%)
+      </div>
+
+      <h3 style="margin-top:1rem;">형태 특성</h3>
+      <table>
+        <tr><th>조건</th><th>PMF 모양</th></tr>
+        <tr><td>$\lambda < 1$</td><td>$k=0$에서 최대, 단조 감소</td></tr>
+        <tr><td>$\lambda > 1$</td><td>$k \approx \lambda$ 근처에서 최대, 증가 후 감소</td></tr>
+        <tr><td>$\lambda = np$ (이항 근사)</td><td>$n \ge 20, p \le 0.05$ 일 때 좋은 근사</td></tr>
+      </table>
+      <div class="warn-box">⚠️ 포아송 분포에서 기댓값 = 분산 = $\lambda$! 이 성질은 시험에 자주 나온다.</div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div class="section" id="tab-quiz">
+    <h2>연습 문제 (Practice Quiz)</h2>
+
+    <div id="score-card">
+      <div id="score-text">0 / 10</div>
+      <div id="score-msg"></div>
+      <button class="reset-btn" onclick="resetQuiz()">다시 풀기</button>
+    </div>
+
+    <div class="q-container" id="q1">
+      <div class="q-num">Q1 of 10</div>
+      <div class="q-text">집합 $S = \{a, b, c\}$의 멱집합(Power Set)의 크기는?</div>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">A. 3</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">B. 6</button>
+      <button class="quiz-btn" onclick="answer('q1',this,true)">C. 8</button>
+      <button class="quiz-btn" onclick="answer('q1',this,false)">D. 9</button>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="q-container" id="q2">
+      <div class="q-num">Q2 of 10</div>
+      <div class="q-text">확률의 3공리 중 "정규화(Normalization)" 공리는?</div>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">A. $P(A) \ge 0$</button>
+      <button class="quiz-btn" onclick="answer('q2',this,true)">B. $P(\Omega) = 1$</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">C. $P(A \cup B) = P(A) + P(B)$ (단, $A \cap B = \emptyset$)</button>
+      <button class="quiz-btn" onclick="answer('q2',this,false)">D. $P(A^c) = 1 - P(A)$</button>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="q-container" id="q3">
+      <div class="q-num">Q3 of 10</div>
+      <div class="q-text">주사위를 한 번 굴릴 때 이미 홀수가 나왔다고 알려졌다. 이때 3이 나왔을 확률 $P(3|\text{홀수})$는?</div>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">A. 1/6</button>
+      <button class="quiz-btn" onclick="answer('q3',this,true)">B. 1/3</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">C. 1/2</button>
+      <button class="quiz-btn" onclick="answer('q3',this,false)">D. 2/3</button>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="q-container" id="q4">
+      <div class="q-num">Q4 of 10</div>
+      <div class="q-text">사건 $A$와 $B$가 독립(Independent)일 때 항상 성립하는 식은?</div>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">A. $A \cap B = \emptyset$</button>
+      <button class="quiz-btn" onclick="answer('q4',this,true)">B. $P(A \cap B) = P(A) \cdot P(B)$</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">C. $P(A \cup B) = 1$</button>
+      <button class="quiz-btn" onclick="answer('q4',this,false)">D. $P(A) = P(B)$</button>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <div class="q-container" id="q5">
+      <div class="q-num">Q5 of 10</div>
+      <div class="q-text">공장 A(70%)와 B(30%)가 제품을 생산한다. A의 불량률 3%, B의 불량률 10%일 때, 제품 하나를 랜덤으로 뽑았을 때 불량일 확률은?</div>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">A. 0.039</button>
+      <button class="quiz-btn" onclick="answer('q5',this,true)">B. 0.051</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">C. 0.065</button>
+      <button class="quiz-btn" onclick="answer('q5',this,false)">D. 0.130</button>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="q-container" id="q6">
+      <div class="q-num">Q6 of 10</div>
+      <div class="q-text">동전을 5번 던졌을 때 앞면이 정확히 3번 나올 확률은? ($p = 0.5$)</div>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">A. 3/32</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">B. 8/32</button>
+      <button class="quiz-btn" onclick="answer('q6',this,true)">C. 10/32</button>
+      <button class="quiz-btn" onclick="answer('q6',this,false)">D. 15/32</button>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <div class="q-container" id="q7">
+      <div class="q-num">Q7 of 10</div>
+      <div class="q-text">기하 분포 $X \sim \text{Geom}(p)$의 기댓값 $E[X]$는?</div>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">A. $p$</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">B. $1-p$</button>
+      <button class="quiz-btn" onclick="answer('q7',this,true)">C. $1/p$</button>
+      <button class="quiz-btn" onclick="answer('q7',this,false)">D. $p/(1-p)$</button>
+      <div class="quiz-feedback" id="q7-fb"></div>
+    </div>
+
+    <div class="q-container" id="q8">
+      <div class="q-num">Q8 of 10</div>
+      <div class="q-text">포아송 분포 $X \sim \text{Poisson}(\lambda)$에서 $E[X]$와 $\text{var}(X)$의 관계는?</div>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">A. $E[X] = \lambda$, $\text{var}(X) = \lambda^2$</button>
+      <button class="quiz-btn" onclick="answer('q8',this,true)">B. $E[X] = \text{var}(X) = \lambda$</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">C. $E[X] = \lambda^2$, $\text{var}(X) = \lambda$</button>
+      <button class="quiz-btn" onclick="answer('q8',this,false)">D. $E[X] = 1/\lambda$, $\text{var}(X) = \lambda$</button>
+      <div class="quiz-feedback" id="q8-fb"></div>
+    </div>
+
+    <div class="q-container" id="q9">
+      <div class="q-num">Q9 of 10</div>
+      <div class="q-text">$Y = 3X + 2$일 때, $\text{var}(Y)$를 $\text{var}(X)$로 표현하면?</div>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">A. $3 \cdot \text{var}(X) + 2$</button>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">B. $3 \cdot \text{var}(X)$</button>
+      <button class="quiz-btn" onclick="answer('q9',this,true)">C. $9 \cdot \text{var}(X)$</button>
+      <button class="quiz-btn" onclick="answer('q9',this,false)">D. $9 \cdot \text{var}(X) + 4$</button>
+      <div class="quiz-feedback" id="q9-fb"></div>
+    </div>
+
+    <div class="q-container" id="q10">
+      <div class="q-num">Q10 of 10</div>
+      <div class="q-text">나이브 베이즈 분류기의 "나이브(Naive) 가정"이란?</div>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">A. 사전 확률이 모두 동등하다고 가정</button>
+      <button class="quiz-btn" onclick="answer('q10',this,true)">B. 라벨이 주어졌을 때 각 관측 특징이 서로 조건부 독립이라 가정</button>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">C. 사후 확률의 합이 1이라고 가정</button>
+      <button class="quiz-btn" onclick="answer('q10',this,false)">D. 모든 사건이 서로소라고 가정</button>
+      <div class="quiz-feedback" id="q10-fb"></div>
+    </div>
+
+  </div><!-- end quiz -->
+</div><!-- end container -->
+
+<script>
+const feedbacks = {
+  q1:  "✓ |멱집합| = 2^|S| = 2³ = 8. 부분집합: ∅,{a},{b},{c},{a,b},{a,c},{b,c},{a,b,c}",
+  q2:  "✓ Normalization: P(Ω) = 1. 전체 공간의 확률은 반드시 1.",
+  q3:  "✓ 홀수={1,3,5}, P(3∩홀수)=1/6, P(홀수)=3/6=1/2. → P(3|홀수)=(1/6)/(1/2)=1/3",
+  q4:  "✓ 독립의 정의: P(A∩B)=P(A)·P(B). 서로소(∩=∅)와 혼동 금지!",
+  q5:  "✓ 전확률 정리: 0.03×0.7 + 0.10×0.3 = 0.021 + 0.030 = 0.051",
+  q6:  "✓ C(5,3)×(1/2)^5 = 10×(1/32) = 10/32 = 0.3125",
+  q7:  "✓ E[X] = 1/p. 성공 확률 p=1/6이면 평균 6번 시도해야 첫 성공.",
+  q8:  "✓ 포아송: E[X] = var(X) = λ. 기댓값=분산=파라미터λ. 시험 단골!",
+  q9:  "✓ var(aX+b) = a²·var(X). a=3 → 3²=9. 상수 b=2는 분산에 영향 없음.",
+  q10: "✓ 나이브 가정: P(x₁,x₂|y) = P(x₁|y)·P(x₂|y). 라벨 조건 하에 특징들이 독립."
+};
+
+let score = 0, answered = 0;
+const total = 10;
+
+function answer(qid, btn, isCorrect) {
+  const c = document.getElementById(qid);
+  if (c.dataset.done) return;
+  c.dataset.done = '1';
+  c.querySelectorAll('.quiz-btn').forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('onclick').includes('true')) b.classList.add('correct');
+  });
+  if (!isCorrect) btn.classList.add('wrong');
+  else score++;
+  answered++;
+
+  const fb = document.getElementById(qid + '-fb');
+  fb.style.display = 'block';
+  fb.style.background = isCorrect ? 'var(--bg-success)' : 'var(--bg-danger)';
+  fb.style.color = isCorrect ? 'var(--text-success)' : 'var(--text-danger)';
+  fb.textContent = feedbacks[qid];
+
+  if (answered === total) setTimeout(showScore, 500);
+}
+
+function showScore() {
+  const card = document.getElementById('score-card');
+  card.style.display = 'block';
+  document.getElementById('score-text').textContent = score + ' / ' + total;
+  const msgs = ['더 열심히! 개념을 다시 읽어보자 💪', '조금 더! 틀린 문제 위주로 복습해봐', '잘했어! 거의 완벽해 👍', '완벽! 중간고사 준비 완료 🎉'];
+  document.getElementById('score-msg').textContent = msgs[score <= 4 ? 0 : score <= 6 ? 1 : score <= 8 ? 2 : 3];
+  card.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  score = 0; answered = 0;
+  document.getElementById('score-card').style.display = 'none';
+  document.querySelectorAll('.q-container').forEach(c => {
+    delete c.dataset.done;
+    c.querySelectorAll('.quiz-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    const fb = c.querySelector('.quiz-feedback');
+    if (fb) fb.style.display = 'none';
+  });
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>

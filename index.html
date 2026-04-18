@@ -21,8 +21,11 @@
     --border-info: #b5d4f4;
     --border-success: #c0dd97;
     --border-warning: #fac775;
+    --border-purple: #c9b8f0;
     --text-warning: #854f0b;
     --bg-warning: #fdf3e0;
+    --bg-purple: #f3effe;
+    --text-purple: #5b3fa5;
     --radius-md: 8px;
     --radius-lg: 12px;
     --font-sans: system-ui, -apple-system, sans-serif;
@@ -35,17 +38,20 @@
       --bg-info: #0c2a4a;
       --bg-success: #0a2a12;
       --bg-warning: #2a1a04;
+      --bg-purple: #1a0f3a;
       --text-primary: #e8e7e0;
       --text-secondary: #a0a098;
       --text-tertiary: #68685e;
       --text-info: #5ba0e8;
       --text-success: #5aaa6a;
       --text-warning: #d08830;
+      --text-purple: #9b7ae8;
       --border-tertiary: rgba(255,255,255,0.08);
       --border-secondary: rgba(255,255,255,0.14);
       --border-info: #1a4a7a;
       --border-success: #1a4a22;
       --border-warning: #5a3a0a;
+      --border-purple: #3a2a6a;
     }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -110,6 +116,9 @@
 
   .week-card.na { border-left: 3px solid var(--border-warning); }
   .week-card.na .wk-num { color: var(--text-warning); }
+
+  .week-card.prob { border-left: 3px solid var(--border-purple); }
+  .week-card.prob .wk-num { color: var(--text-purple); }
 </style>
 </head>
 <body>
@@ -181,6 +190,18 @@
       </a>
     </div>
   </div>
+
+  <div class="subject-section">
+    <div class="subject-title">🎲 Probability &amp; Statistics</div>
+    <div class="week-grid">
+      <a href="prob-midterm.html" class="week-card prob">
+        <div class="wk-num">Midterm Review</div>
+        <div class="wk-title">중간고사 총정리</div>
+        <div class="wk-sub">집합 · 확률 공리 · 조건부 · 독립 · 베이즈 · 확률변수 · 5대 분포</div>
+      </a>
+    </div>
+  </div>
+
 </div>
 
 </body>
