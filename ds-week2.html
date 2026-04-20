@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Structures — Week 2: ADT & Algorithm</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eeedea;
+    --bg-info: #eaf2fc;
+    --bg-success: #eaf3de;
+    --bg-warning: #fdf3e0;
+    --bg-danger: #fdf0f0;
+    --text-primary: #1a1a18;
+    --text-secondary: #5c5c56;
+    --text-tertiary: #8c8c84;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-warning: #854f0b;
+    --text-danger: #a32d2d;
+    --border-tertiary: rgba(0,0,0,0.08);
+    --border-secondary: rgba(0,0,0,0.14);
+    --border-primary: rgba(0,0,0,0.22);
+    --border-info: #b5d4f4;
+    --border-success: #c0dd97;
+    --border-warning: #fac775;
+    --border-danger: #f7c1c1;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: 'SFMono-Regular', 'Consolas', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #262624;
+      --bg-tertiary: #2e2e2c;
+      --bg-info: #0c2a4a;
+      --bg-success: #0a2a12;
+      --bg-warning: #2a1a04;
+      --bg-danger: #2a0808;
+      --text-primary: #e8e7e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #68685e;
+      --text-info: #5ba0e8;
+      --text-success: #5aaa6a;
+      --text-warning: #d08830;
+      --text-danger: #e06060;
+      --border-tertiary: rgba(255,255,255,0.08);
+      --border-secondary: rgba(255,255,255,0.14);
+      --border-primary: rgba(255,255,255,0.22);
+      --border-info: #1a4a7a;
+      --border-success: #1a4a22;
+      --border-warning: #5a3a0a;
+      --border-danger: #5a1818;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .site-header {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border-tertiary);
+    padding: .75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .site-header a { text-decoration: none; font-size: 13px; color: var(--text-secondary); font-weight: 400; }
+  .site-header a:hover { color: var(--text-primary); }
+  .sep { color: var(--text-tertiary); font-size: 13px; }
+  .header-title { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .page-title { margin-bottom: 1.5rem; }
+  .page-title .eyebrow { font-size: 12px; color: var(--text-tertiary); font-weight: 400; margin-bottom: .35rem; letter-spacing: .04em; }
+  .page-title h1 { font-size: 22px; font-weight: 500; line-height: 1.3; }
+  .page-title .sub { font-size: 13px; color: var(--text-secondary); margin-top: .35rem; }
+  .tab-bar {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.5px solid var(--border-tertiary);
+  }
+  .tab {
+    font-size: 13px; padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background: transparent;
+    font-family: var(--font-sans);
+    transition: all .12s;
+    font-weight: 400;
+  }
+  .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .tab.active { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); font-weight: 500; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  h2 { font-size: 18px; font-weight: 500; margin-bottom: 1rem; padding-bottom: .6rem; border-bottom: 0.5px solid var(--border-tertiary); }
+  h3 { font-size: 15px; font-weight: 500; margin-bottom: .5rem; }
+  p { font-size: 14px; margin-bottom: .6rem; }
+  .key-box {
+    border-left: 3px solid var(--border-info);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-info);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-info);
+  }
+  .warn-box {
+    border-left: 3px solid var(--border-danger);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-danger);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-danger);
+  }
+  .insight-box {
+    border-left: 3px solid var(--border-success);
+    padding: .5rem 1rem; margin: .75rem 0;
+    background: var(--bg-success);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-size: 13px; color: var(--text-success);
+  }
+  code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary); padding: 2px 5px;
+    border-radius: 4px; color: var(--text-primary);
+  }
+  .code-block {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem; margin: .75rem 0;
+    line-height: 1.6; overflow-x: auto; white-space: pre;
+    color: var(--text-primary);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: .75rem 0; }
+  th {
+    text-align: left; padding: 7px 10px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-weight: 500; font-size: 12px;
+    border-bottom: 0.5px solid var(--border-secondary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  td { padding: 7px 10px; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+  .badge {
+    display: inline-block; font-size: 12px;
+    padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .badge-blue { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); }
+  .badge-green { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); }
+  .badge-amber { background: var(--bg-warning); color: var(--text-warning); border: 0.5px solid var(--border-warning); }
+  .badge-red { background: var(--bg-danger); color: var(--text-danger); border: 0.5px solid var(--border-danger); }
+
+  /* Array vis for sorting */
+  .arr-row { display: flex; margin: .4rem 0; align-items: center; gap: 8px; font-size: 13px; }
+  .arr-row .label { font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); width: 56px; flex-shrink: 0; }
+  .arr-cells { display: flex; }
+  .arr-cell {
+    border: 0.5px solid var(--border-secondary);
+    padding: 7px 0; width: 38px;
+    text-align: center; background: var(--bg-primary);
+    font-family: var(--font-mono); font-size: 13px;
+  }
+  .arr-cell:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+  .arr-cell:last-child { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .arr-cell + .arr-cell { border-left: none; }
+  .arr-cell.hl-blue { background: var(--bg-info); color: var(--text-info); border-color: var(--border-info); }
+  .arr-cell.hl-amber { background: var(--bg-warning); color: var(--text-warning); border-color: var(--border-warning); }
+  .arr-cell.hl-green { background: var(--bg-success); color: var(--text-success); border-color: var(--border-success); }
+  .arr-cell.hl-red { background: var(--bg-danger); color: var(--text-danger); border-color: var(--border-danger); }
+
+  /* Stack vis */
+  .stack-vis { display: flex; gap: 18px; align-items: flex-end; margin: 1rem 0; flex-wrap: wrap; }
+  .stack-col { text-align: center; }
+  .stack-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; font-family: var(--font-mono); }
+  .stack-frames {
+    display: flex; flex-direction: column-reverse; gap: 2px;
+    width: 60px; min-height: 100px;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: 4px; justify-content: flex-start;
+    background: var(--bg-secondary);
+  }
+  .stack-frame {
+    border: 0.5px solid var(--border-info);
+    background: var(--bg-info); color: var(--text-info);
+    font-size: 13px; font-family: var(--font-mono);
+    text-align: center; padding: 5px 0;
+    border-radius: var(--radius-md);
+  }
+  .stack-frame.top-frame { border-color: var(--border-warning); background: var(--bg-warning); color: var(--text-warning); }
+  .stack-action { font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); margin-top: 5px; }
+
+  /* Quiz */
+  .q-container {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .q-num { font-size: 12px; color: var(--text-tertiary); margin-bottom: .3rem; }
+  .q-text { font-size: 14px; font-weight: 500; margin-bottom: .75rem; }
+  .quiz-btn {
+    display: block; width: 100%;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: 9px 14px; cursor: pointer;
+    font-size: 13px; color: var(--text-primary);
+    text-align: left; margin: 4px 0;
+    transition: all .12s;
+    font-family: var(--font-sans);
+  }
+  .quiz-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+  .quiz-btn.correct { border-color: var(--border-success); background: var(--bg-success); color: var(--text-success); }
+  .quiz-btn.wrong   { border-color: var(--border-danger);  background: var(--bg-danger);  color: var(--text-danger);  }
+  .quiz-feedback { font-size: 13px; margin-top: 8px; padding: 8px 12px; border-radius: var(--radius-md); display: none; }
+  #score-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; text-align: center;
+    margin-bottom: 1.5rem; display: none;
+  }
+  #score-text { font-size: 24px; font-weight: 500; margin-bottom: .4rem; }
+  #score-msg  { font-size: 13px; color: var(--text-secondary); }
+  .reset-btn {
+    margin-top: .75rem;
+    background: transparent;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: 20px; padding: 5px 16px;
+    cursor: pointer; font-size: 13px;
+    color: var(--text-secondary); font-family: var(--font-sans);
+    transition: all .12s;
+  }
+  .reset-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+
+  ul, ol { padding-left: 1.4rem; font-size: 14px; }
+  li { margin-bottom: .3rem; }
+  strong { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html">← Home</a>
+  <span class="sep">/</span>
+  <a href="#">Data Structures</a>
+  <span class="sep">/</span>
+  <span class="header-title">Week 2 — ADT &amp; Algorithm</span>
+</header>
+
+<div class="container">
+  <div class="page-title">
+    <div class="eyebrow">Data Structures · Week 2</div>
+    <h1>Abstract Data Type (ADT) &amp; Algorithm</h1>
+    <div class="sub">알고리즘, 정렬, 재귀, ADT, 복잡도 완벽 정리</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('overview',this)">🗺 Overview</button>
+    <button class="tab" onclick="showTab('sorting',this)">🔢 Sorting</button>
+    <button class="tab" onclick="showTab('recursion',this)">🔄 Recursion</button>
+    <button class="tab" onclick="showTab('adt',this)">📦 ADT</button>
+    <button class="tab" onclick="showTab('complexity',this)">📊 Complexity</button>
+    <button class="tab" onclick="showTab('quiz',this)">🧪 Quiz</button>
+  </div>
+
+  <!-- ===== OVERVIEW ===== -->
+  <div class="section active" id="tab-overview">
+    <h2>소프트웨어 개발 사이클 & 알고리즘 정의</h2>
+
+    <div class="card">
+      <h3>Software Development Cycle</h3>
+      <p>좋은 프로그램은 무작정 코딩부터 시작하지 않아요. 다음 6단계를 따릅니다:</p>
+
+      <!-- SVG diagram for dev cycle -->
+      <svg viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="var(--text-tertiary)"/>
+          </marker>
+        </defs>
+        <!-- boxes -->
+        <g font-family="system-ui" font-size="11" fill="var(--text-primary)">
+          <!-- box 1 -->
+          <rect x="2" y="30" width="90" height="54" rx="7" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="47" y="53" text-anchor="middle" font-weight="500">1. Planning</text>
+          <text x="47" y="68" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">계획 수립</text>
+          <!-- box 2 -->
+          <rect x="110" y="30" width="90" height="54" rx="7" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="155" y="50" text-anchor="middle" font-weight="500">2. Requirement</text>
+          <text x="155" y="63" text-anchor="middle" font-weight="500">Analysis</text>
+          <text x="155" y="76" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">요구분석</text>
+          <!-- box 3 -->
+          <rect x="218" y="30" width="90" height="54" rx="7" fill="var(--bg-warning)" stroke="var(--border-warning)" stroke-width="0.5"/>
+          <text x="263" y="53" text-anchor="middle" font-weight="500">3. Design</text>
+          <text x="263" y="68" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">Algorithm + ADT</text>
+          <!-- box 4 -->
+          <rect x="326" y="30" width="90" height="54" rx="7" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="371" y="53" text-anchor="middle" font-weight="500">4. Implementation</text>
+          <text x="371" y="68" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">코딩 & 디버깅</text>
+          <!-- box 5 -->
+          <rect x="434" y="30" width="90" height="54" rx="7" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="479" y="53" text-anchor="middle" font-weight="500">5. Testing</text>
+          <text x="479" y="68" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">통합 & 검증</text>
+          <!-- box 6 -->
+          <rect x="542" y="30" width="90" height="54" rx="7" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+          <text x="587" y="53" text-anchor="middle" font-weight="500">6. Maintenance</text>
+          <text x="587" y="68" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">유지보수</text>
+        </g>
+        <!-- arrows -->
+        <line x1="93" y1="57" x2="108" y2="57" stroke="var(--text-tertiary)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="201" y1="57" x2="216" y2="57" stroke="var(--text-tertiary)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="309" y1="57" x2="324" y2="57" stroke="var(--text-tertiary)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="417" y1="57" x2="432" y2="57" stroke="var(--text-tertiary)" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="525" y1="57" x2="540" y2="57" stroke="var(--text-tertiary)" stroke-width="1" marker-end="url(#arr)"/>
+      </svg>
+
+      <div class="key-box">⭐ <strong>3단계 Design</strong>이 이 강의의 핵심 — Algorithm 설계 + ADT 정의가 여기서 일어납니다.</div>
+    </div>
+
+    <div class="card">
+      <h3>Algorithm — 정의 & 5가지 요건</h3>
+      <p>알고리즘이란 <strong>특정 작업을 수행하는 유한한(finite) 명령어 집합</strong>입니다. 레시피와 같아요. 요리를 만드는 순서가 명확하고, 언젠가는 끝나야 하죠.</p>
+
+      <table>
+        <tr><th>요건</th><th>의미</th><th>예시</th></tr>
+        <tr><td><strong>Input</strong></td><td>출력을 만들기 위해 사용되는 입력 데이터</td><td>숫자 배열 [5, 3, 8, 6, 2]</td></tr>
+        <tr><td><strong>Output</strong></td><td>알고리즘이 생성하는 결과</td><td>정렬된 배열 [2, 3, 5, 6, 8]</td></tr>
+        <tr><td><strong>Definiteness</strong></td><td>각 명령이 명확하고 모호하지 않아야 함</td><td>"적당히 더해" ← ❌ 모호함</td></tr>
+        <tr><td><strong>Finiteness</strong></td><td>유한한 단계 후 종료되어야 함</td><td>무한루프는 알고리즘이 아님</td></tr>
+        <tr><td><strong>Effectiveness</strong></td><td>불필요하고 중복된 연산이 없어야 함</td><td>x + 0을 반복하는 건 낭비</td></tr>
+      </table>
+
+      <div class="warn-box">⚠️ 무한루프(infinite loop)가 있으면 <strong>Finiteness</strong>를 위반 — 알고리즘이 아닙니다!</div>
+    </div>
+
+    <div class="card">
+      <h3>Sorting — 왜 배울까?</h3>
+      <p>정렬(Sorting)은 데이터를 특정 순서(오름차순 또는 내림차순)로 배치하는 과정입니다. 전화번호부, 검색 결과, 성적표… 어디서나 쓰이죠. 이 강의에서는 4가지 대표 정렬 알고리즘을 배웁니다.</p>
+      <div class="insight-box">💡 정렬 알고리즘은 "어떻게 하면 더 빠르게 정렬할 수 있을까?"라는 Algorithm 설계의 교과서적 예제입니다.</div>
+    </div>
+  </div>
+
+  <!-- ===== SORTING ===== -->
+  <div class="section" id="tab-sorting">
+    <h2>Sorting Algorithms — 4가지 정렬</h2>
+
+    <!-- Selection Sort -->
+    <div class="card">
+      <h3>① Selection Sort (선택 정렬)</h3>
+      <p><strong>핵심 아이디어:</strong> "전체에서 가장 작은 것을 찾아서 맨 앞에 갖다 놓자!" 를 반복합니다.</p>
+      <p>마치 카드를 손에서 꺼낼 때, 가장 낮은 숫자를 골라 왼쪽에 쌓는 것과 같습니다.</p>
+
+      <div class="key-box">🔍 <strong>동작 원리:</strong> 전체를 스캔 → 최솟값 찾기 → 맨 앞 원소와 교환 → 범위 줄이기 반복</div>
+
+      <p><strong>Step-by-step 예시: [5, 3, 8, 6, 2]</strong></p>
+
+      <div class="arr-row">
+        <span class="label">초기</span>
+        <div class="arr-cells">
+          <div class="arr-cell">5</div><div class="arr-cell">3</div><div class="arr-cell">8</div><div class="arr-cell">6</div><div class="arr-cell">2</div>
+        </div>
+      </div>
+      <div class="arr-row">
+        <span class="label">Pass 1</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">2</div><div class="arr-cell">3</div><div class="arr-cell">8</div><div class="arr-cell">6</div><div class="arr-cell hl-amber">5</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← min=2, swap(0,4)</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">Pass 2</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">2</div><div class="arr-cell hl-green">3</div><div class="arr-cell">8</div><div class="arr-cell">6</div><div class="arr-cell">5</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← min=3, 이미 제자리</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">Pass 3</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">2</div><div class="arr-cell hl-green">3</div><div class="arr-cell hl-green">5</div><div class="arr-cell">6</div><div class="arr-cell hl-amber">8</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← min=5, swap(2,4)</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">Pass 4</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">2</div><div class="arr-cell hl-green">3</div><div class="arr-cell hl-green">5</div><div class="arr-cell hl-green">6</div><div class="arr-cell">8</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← min=6, 제자리</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">완료</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">2</div><div class="arr-cell hl-green">3</div><div class="arr-cell hl-green">5</div><div class="arr-cell hl-green">6</div><div class="arr-cell hl-green">8</div>
+        </div>
+      </div>
+
+      <div class="code-block"><span style="color:var(--text-info)">void</span> selectionSort(<span style="color:var(--text-info)">int</span> arr[], <span style="color:var(--text-info)">int</span> n) {
+    <span style="color:var(--text-info)">int</span> min_idx, temp;
+    <span style="color:var(--text-warning)">for</span> (<span style="color:var(--text-info)">int</span> i = 0; i &lt; n - 1; i++) {
+        min_idx = i;                       <span style="color:var(--text-tertiary)">// 현재 위치를 최솟값으로 가정</span>
+        <span style="color:var(--text-warning)">for</span> (<span style="color:var(--text-info)">int</span> j = i + 1; j &lt; n; j++) {
+            <span style="color:var(--text-warning)">if</span> (arr[j] &lt; arr[min_idx])
+                min_idx = j;               <span style="color:var(--text-tertiary)">// 더 작은 값 발견 시 갱신</span>
+        }
+        temp = arr[min_idx];               <span style="color:var(--text-tertiary)">// swap</span>
+        arr[min_idx] = arr[i];
+        arr[i] = temp;
+    }
+}</div>
+      <div class="insight-box">📊 <strong>시간 복잡도: O(n²)</strong> — 항상 이중 루프. n=5이면 약 10번 비교.</div>
+    </div>
+
+    <!-- Bubble Sort -->
+    <div class="card">
+      <h3>② Bubble Sort (버블 정렬)</h3>
+      <p><strong>핵심 아이디어:</strong> 인접한 두 원소를 비교해서 순서가 틀리면 교환하자! 큰 값이 거품처럼 오른쪽으로 떠오릅니다.</p>
+
+      <div class="key-box">🫧 <strong>동작 원리:</strong> 왼쪽부터 이웃한 쌍을 비교 → 역순이면 swap → 한 Pass 끝나면 가장 큰 값이 맨 오른쪽에 정착</div>
+
+      <p><strong>Step-by-step 예시: [5, 3, 8, 6, 2] — Pass 1 과정</strong></p>
+
+      <div class="arr-row">
+        <span class="label">비교 1</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-amber">5</div><div class="arr-cell hl-amber">3</div><div class="arr-cell">8</div><div class="arr-cell">6</div><div class="arr-cell">2</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 5&gt;3, swap</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">비교 2</span>
+        <div class="arr-cells">
+          <div class="arr-cell">3</div><div class="arr-cell hl-amber">5</div><div class="arr-cell hl-amber">8</div><div class="arr-cell">6</div><div class="arr-cell">2</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 5&lt;8, no swap</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">비교 3</span>
+        <div class="arr-cells">
+          <div class="arr-cell">3</div><div class="arr-cell">5</div><div class="arr-cell hl-amber">8</div><div class="arr-cell hl-amber">6</div><div class="arr-cell">2</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 8&gt;6, swap</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">비교 4</span>
+        <div class="arr-cells">
+          <div class="arr-cell">3</div><div class="arr-cell">5</div><div class="arr-cell">6</div><div class="arr-cell hl-amber">8</div><div class="arr-cell hl-amber">2</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 8&gt;2, swap</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">Pass 1 후</span>
+        <div class="arr-cells">
+          <div class="arr-cell">3</div><div class="arr-cell">5</div><div class="arr-cell">6</div><div class="arr-cell">2</div><div class="arr-cell hl-green">8</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 8이 맨 오른쪽 정착!</span>
+      </div>
+
+      <div class="code-block"><span style="color:var(--text-info)">void</span> bubbleSort(<span style="color:var(--text-info)">int</span> arr[], <span style="color:var(--text-info)">int</span> n) {
+    <span style="color:var(--text-info)">int</span> temp, swapped;
+    <span style="color:var(--text-warning)">for</span> (<span style="color:var(--text-info)">int</span> i = 0; i &lt; n - 1; i++) {
+        swapped = 0;
+        <span style="color:var(--text-warning)">for</span> (<span style="color:var(--text-info)">int</span> j = 0; j &lt; n - i - 1; j++) {
+            <span style="color:var(--text-warning)">if</span> (arr[j] &gt; arr[j + 1]) {
+                temp = arr[j]; arr[j] = arr[j+1]; arr[j+1] = temp;
+                swapped = 1;
+            }
+        }
+        <span style="color:var(--text-warning)">if</span> (!swapped) <span style="color:var(--text-warning)">break</span>; <span style="color:var(--text-tertiary)">// 이미 정렬됐으면 조기 종료!</span>
+    }
+}</div>
+      <div class="insight-box">💡 <code>swapped</code> 플래그 덕분에 이미 정렬된 경우 <strong>O(n)</strong>으로 빠르게 종료. 최악은 O(n²).</div>
+    </div>
+
+    <!-- Insertion Sort -->
+    <div class="card">
+      <h3>③ Insertion Sort (삽입 정렬)</h3>
+      <p><strong>핵심 아이디어:</strong> 카드 게임에서 새 카드를 집을 때마다 손에 있는 카드 사이 올바른 위치에 끼워 넣는 것과 같아요.</p>
+
+      <div class="key-box">🃏 <strong>동작 원리:</strong> 현재 원소(key)를 왼쪽 정렬된 구간에서 맞는 자리를 찾아 삽입</div>
+
+      <p><strong>Step-by-step 예시: [5, 3, 8, 6, 2]</strong></p>
+
+      <div class="arr-row">
+        <span class="label">초기</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">5</div><div class="arr-cell">3</div><div class="arr-cell">8</div><div class="arr-cell">6</div><div class="arr-cell">2</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← [5] 정렬됨</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">i=1, key=3</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">3</div><div class="arr-cell hl-green">5</div><div class="arr-cell">8</div><div class="arr-cell">6</div><div class="arr-cell">2</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 3&lt;5, 앞으로</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">i=2, key=8</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">3</div><div class="arr-cell hl-green">5</div><div class="arr-cell hl-green">8</div><div class="arr-cell">6</div><div class="arr-cell">2</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 8&gt;5, 그대로</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">i=3, key=6</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">3</div><div class="arr-cell hl-green">5</div><div class="arr-cell hl-green">6</div><div class="arr-cell hl-green">8</div><div class="arr-cell">2</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 5&lt;6&lt;8, 중간 삽입</span>
+      </div>
+      <div class="arr-row">
+        <span class="label">i=4, key=2</span>
+        <div class="arr-cells">
+          <div class="arr-cell hl-green">2</div><div class="arr-cell hl-green">3</div><div class="arr-cell hl-green">5</div><div class="arr-cell hl-green">6</div><div class="arr-cell hl-green">8</div>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary)">← 맨 앞 삽입</span>
+      </div>
+
+      <div class="code-block"><span style="color:var(--text-info)">void</span> insertionSort(<span style="color:var(--text-info)">int</span> arr[], <span style="color:var(--text-info)">int</span> n) {
+    <span style="color:var(--text-info)">int</span> key, j;
+    <span style="color:var(--text-warning)">for</span> (<span style="color:var(--text-info)">int</span> i = 1; i &lt; n; i++) {
+        key = arr[i];                      <span style="color:var(--text-tertiary)">// 삽입할 원소</span>
+        j = i - 1;
+        <span style="color:var(--text-warning)">while</span> (j &gt;= 0 &amp;&amp; arr[j] &gt; key) {
+            arr[j + 1] = arr[j];          <span style="color:var(--text-tertiary)">// 한 칸씩 오른쪽으로 밀기</span>
+            j--;
+        }
+        arr[j + 1] = key;                 <span style="color:var(--text-tertiary)">// 빈 자리에 key 삽입</span>
+    }
+}</div>
+      <div class="insight-box">💡 <strong>거의 정렬된 데이터</strong>에서 가장 빠름. 실전에서 많이 쓰이는 이유!</div>
+    </div>
+
+    <!-- Merge Sort -->
+    <div class="card">
+      <h3>④ Merge Sort (병합 정렬)</h3>
+      <p><strong>핵심 아이디어:</strong> 분할 정복(Divide & Conquer)! 배열을 반으로 계속 쪼개다가, 다시 합치면서 정렬합니다.</p>
+      <p>비유: 두 팀으로 나눠서 각자 정렬한 다음, 합칠 때 순서대로 합치면 전체가 정렬됩니다.</p>
+
+      <div class="key-box">✂️ <strong>동작 원리:</strong> Divide(반으로 쪼개기) → Conquer(각각 재귀 정렬) → Merge(두 정렬된 배열 합치기)</div>
+
+      <!-- SVG tree diagram for merge sort -->
+      <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <defs>
+          <marker id="marr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="var(--text-tertiary)"/>
+          </marker>
+        </defs>
+        <g font-family="monospace" font-size="11" text-anchor="middle" fill="var(--text-primary)">
+          <!-- Level 0 -->
+          <rect x="220" y="4" width="240" height="26" rx="6" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="340" y="21">5  3  8  6  2</text>
+          <!-- Level 1 -->
+          <rect x="120" y="54" width="110" height="26" rx="6" fill="var(--bg-warning)" stroke="var(--border-warning)" stroke-width="0.5"/>
+          <text x="175" y="71">5  3  8</text>
+          <rect x="450" y="54" width="80" height="26" rx="6" fill="var(--bg-warning)" stroke="var(--border-warning)" stroke-width="0.5"/>
+          <text x="490" y="71">6  2</text>
+          <!-- Level 2 -->
+          <rect x="50" y="104" width="70" height="26" rx="6" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="85" y="121">5  3</text>
+          <rect x="200" y="104" width="40" height="26" rx="6" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="220" y="121">8</text>
+          <rect x="430" y="104" width="40" height="26" rx="6" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="450" y="121">6</text>
+          <rect x="500" y="104" width="40" height="26" rx="6" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="520" y="121">2</text>
+          <!-- Level 3 -->
+          <rect x="20" y="154" width="30" height="26" rx="5" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="35" y="171">5</text>
+          <rect x="60" y="154" width="30" height="26" rx="5" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="75" y="171">3</text>
+          <!-- Merge results -->
+          <rect x="550" y="104" width="90" height="26" rx="6" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+          <text x="595" y="121" fill="var(--text-success)">2  6 ✓</text>
+          <rect x="120" y="154" width="110" height="26" rx="6" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+          <text x="175" y="171" fill="var(--text-success)">3  5  8 ✓</text>
+          <!-- Arrows -->
+          <line x1="340" y1="30" x2="200" y2="52" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="340" y1="30" x2="480" y2="52" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="175" y1="80" x2="100" y2="102" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="175" y1="80" x2="218" y2="102" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="490" y1="80" x2="448" y2="102" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="490" y1="80" x2="518" y2="102" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="85" y1="130" x2="35" y2="152" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="85" y1="130" x2="75" y2="152" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+        </g>
+      </svg>
+
+      <div class="code-block"><span style="color:var(--text-warning)">if</span> (left &lt; right) {
+    <span style="color:var(--text-info)">int</span> mid = left + (right - left) / 2;
+    mergeSort(arr, left, mid);            <span style="color:var(--text-tertiary)">// 왼쪽 반 정렬</span>
+    mergeSort(arr, mid + 1, right);       <span style="color:var(--text-tertiary)">// 오른쪽 반 정렬</span>
+    merge(arr, left, mid, right);         <span style="color:var(--text-tertiary)">// 합치기</span>
+}</div>
+
+      <div class="insight-box">📊 <strong>시간 복잡도: O(n log n)</strong> — Selection/Bubble/Insertion Sort의 O(n²)보다 훨씬 빠릅니다!</div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="card">
+      <h3>🆚 4가지 정렬 비교표</h3>
+      <table>
+        <tr><th>알고리즘</th><th>핵심 동작</th><th>시간복잡도 (평균)</th><th>시간복잡도 (최선)</th><th>특이사항</th></tr>
+        <tr>
+          <td><span class="badge badge-blue">Selection</span></td>
+          <td>최솟값 찾아 앞으로</td>
+          <td>O(n²)</td>
+          <td>O(n²)</td>
+          <td>항상 n² — 개선 없음</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-amber">Bubble</span></td>
+          <td>인접 원소 비교·교환</td>
+          <td>O(n²)</td>
+          <td>O(n)</td>
+          <td>이미 정렬 시 O(n)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">Insertion</span></td>
+          <td>올바른 위치에 삽입</td>
+          <td>O(n²)</td>
+          <td>O(n)</td>
+          <td>거의 정렬된 데이터에 유리</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">Merge</span></td>
+          <td>반 나누고 합치기</td>
+          <td>O(n log n)</td>
+          <td>O(n log n)</td>
+          <td>안정적, 추가 메모리 필요</td>
+        </tr>
+      </table>
+      <div class="warn-box">⚠️ O(n²)과 O(n log n)의 차이: n=1,000,000이라면 → n²=1조 번 연산 vs n log n = 약 2천만 번 연산!</div>
+    </div>
+  </div>
+
+  <!-- ===== RECURSION ===== -->
+  <div class="section" id="tab-recursion">
+    <h2>Recursive Algorithm (재귀 알고리즘)</h2>
+
+    <div class="card">
+      <h3>재귀란 무엇인가?</h3>
+      <p>재귀(Recursion)는 <strong>함수가 자기 자신을 호출</strong>하여 문제를 더 작은 부분 문제(subproblem)로 분해하는 기법입니다.</p>
+      <p>비유: 러시아 마트료시카 인형 — 안을 열면 또 같은 모양의 작은 인형이 나오고, 결국엔 더 이상 쪼갤 수 없는 가장 작은 인형이 나옵니다.</p>
+      <div class="key-box">🔑 <strong>재귀의 필수 조건:</strong> (1) 자기 자신을 호출하는 <em>재귀 케이스</em>, (2) 호출을 멈추는 <em>기저 케이스(base case)</em></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>예시 1: Fibonacci (피보나치)</h3>
+        <p>F(0)=0, F(1)=1, F(n) = F(n-1) + F(n-2)</p>
+        <div class="code-block"><span style="color:var(--text-info)">int</span> fibonacci(<span style="color:var(--text-info)">int</span> n) {
+    <span style="color:var(--text-warning)">if</span> (n == 0) <span style="color:var(--text-warning)">return</span> 0; <span style="color:var(--text-tertiary)">// base</span>
+    <span style="color:var(--text-warning)">if</span> (n == 1) <span style="color:var(--text-warning)">return</span> 1; <span style="color:var(--text-tertiary)">// base</span>
+    <span style="color:var(--text-warning)">return</span> fibonacci(n-1)
+         + fibonacci(n-2); <span style="color:var(--text-tertiary)">// recursive</span>
+}</div>
+        <p style="font-size:13px;color:var(--text-secondary)">F(5) = F(4)+F(3) = ... = 5</p>
+      </div>
+      <div class="card">
+        <h3>예시 2: Merge Sort</h3>
+        <p>배열을 절반으로 쪼개 재귀적으로 정렬하고 합칩니다.</p>
+        <div class="code-block">mergeSort(arr, left, right):
+    mid = (left+right)/2
+    mergeSort(arr, left, mid)  <span style="color:var(--text-tertiary)">// ←재귀</span>
+    mergeSort(arr, mid+1, right) <span style="color:var(--text-tertiary)">// ←재귀</span>
+    merge(arr, left, mid, right)</div>
+        <p style="font-size:13px;color:var(--text-secondary)">재귀가 곧 Merge Sort의 핵심!</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Factorial — 재귀의 스택 동작 이해하기</h3>
+      <p>factorial(4) = 4 × factorial(3) = 4 × 3 × factorial(2) = ... = 4 × 3 × 2 × 1 = 24</p>
+
+      <!-- Stack frames visualization -->
+      <div class="stack-vis">
+        <div class="stack-col">
+          <div class="stack-label">호출 스택</div>
+          <div class="stack-frames">
+            <div class="stack-frame">factorial(0)</div>
+            <div class="stack-frame">factorial(1)</div>
+            <div class="stack-frame">factorial(2)</div>
+            <div class="stack-frame">factorial(3)</div>
+            <div class="stack-frame top-frame">factorial(4) ← TOP</div>
+          </div>
+          <div class="stack-action">쌓임 (재귀 호출)</div>
+        </div>
+        <div style="font-size:22px;padding-bottom:30px;color:var(--text-tertiary)">→</div>
+        <div class="stack-col">
+          <div class="stack-label">반환 순서</div>
+          <div class="stack-frames" style="justify-content:flex-end">
+            <div class="stack-frame top-frame">return 1 ← 시작</div>
+          </div>
+          <div class="stack-action">풀림 (return 전파)</div>
+        </div>
+        <div style="font-size:13px;color:var(--text-secondary);max-width:200px;padding-bottom:20px">
+          factorial(0) → 1<br>
+          factorial(1) → 1×1 = 1<br>
+          factorial(2) → 2×1 = 2<br>
+          factorial(3) → 3×2 = 6<br>
+          factorial(4) → 4×6 = <strong>24</strong>
+        </div>
+      </div>
+
+      <div class="code-block"><span style="color:var(--text-info)">int</span> factorial(<span style="color:var(--text-info)">int</span> n) {
+    <span style="color:var(--text-warning)">if</span> (n == 0) <span style="color:var(--text-warning)">return</span> 1;          <span style="color:var(--text-tertiary)">// Base case: 더 이상 쪼갤 수 없음</span>
+    <span style="color:var(--text-warning)">return</span> n * factorial(n - 1);    <span style="color:var(--text-tertiary)">// Recursive case</span>
+}</div>
+    </div>
+
+    <div class="card">
+      <h3>재귀 알고리즘 장단점</h3>
+      <div class="grid-2">
+        <div>
+          <p><strong>✅ 장점</strong></p>
+          <ul>
+            <li>알고리즘을 자연스럽게 표현 가능</li>
+            <li>코드가 짧고 가독성이 높음</li>
+            <li>작성·디버깅 시간이 줄어듦</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>❌ 단점</strong></p>
+          <ul>
+            <li>함수 호출마다 스택 프레임 생성 → <strong>메모리 더 사용</strong></li>
+            <li>반복문(iterative) 방식보다 <strong>느릴 수 있음</strong></li>
+            <li>스택 오버플로우(Stack Overflow) 위험</li>
+          </ul>
+        </div>
+      </div>
+      <div class="warn-box">⚠️ 재귀 깊이가 너무 깊으면 스택 메모리가 가득 차 프로그램이 crash! 항상 <strong>base case</strong>를 먼저 설계하세요.</div>
+    </div>
+  </div>
+
+  <!-- ===== ADT ===== -->
+  <div class="section" id="tab-adt">
+    <h2>Abstract Data Type (ADT)</h2>
+
+    <div class="card">
+      <h3>왜 ADT가 필요한가?</h3>
+      <p>ADT란 <strong>데이터의 내부 구현 방식에 상관없이</strong> 동일한 인터페이스(interface)로 조작할 수 있게 하는 개념입니다.</p>
+      <p>비유: TV 리모컨처럼! 안에 회로가 어떻게 생겼든 버튼만 알면 채널을 바꿀 수 있죠. 사용자는 내부 구현을 몰라도 됩니다.</p>
+
+      <!-- ADT diagram SVG -->
+      <svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <g font-family="system-ui" font-size="12" fill="var(--text-primary)">
+          <!-- Application -->
+          <rect x="10" y="50" width="110" height="60" rx="8" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="65" y="75" text-anchor="middle" font-weight="500">Application</text>
+          <text x="65" y="92" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">Program</text>
+
+          <!-- Interface -->
+          <rect x="160" y="20" width="120" height="120" rx="8" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="220" y="42" text-anchor="middle" font-weight="500" fill="var(--text-info)">Interface</text>
+          <rect x="172" y="50" width="96" height="22" rx="4" fill="var(--bg-primary)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="220" y="65" text-anchor="middle" font-size="11">IsEmpty</text>
+          <rect x="172" y="76" width="96" height="22" rx="4" fill="var(--bg-primary)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="220" y="91" text-anchor="middle" font-size="11">Add</text>
+          <rect x="172" y="102" width="96" height="22" rx="4" fill="var(--bg-primary)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="220" y="117" text-anchor="middle" font-size="11">Remove / Traverse</text>
+
+          <!-- Implementations -->
+          <rect x="330" y="10" width="120" height="42" rx="6" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+          <text x="390" y="27" text-anchor="middle" font-size="11" fill="var(--text-success)">Array</text>
+          <text x="390" y="43" text-anchor="middle" font-size="10" fill="var(--text-success)">구현 A</text>
+
+          <rect x="330" y="60" width="120" height="42" rx="6" fill="var(--bg-warning)" stroke="var(--border-warning)" stroke-width="0.5"/>
+          <text x="390" y="77" text-anchor="middle" font-size="11" fill="var(--text-warning)">Linked List</text>
+          <text x="390" y="93" text-anchor="middle" font-size="10" fill="var(--text-warning)">구현 B</text>
+
+          <rect x="330" y="110" width="120" height="42" rx="6" fill="var(--bg-secondary)" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="390" y="127" text-anchor="middle" font-size="11">Hash Table</text>
+          <text x="390" y="143" text-anchor="middle" font-size="10" fill="var(--text-tertiary)">구현 C</text>
+
+          <!-- Arrows -->
+          <line x1="122" y1="80" x2="158" y2="80" stroke="var(--text-tertiary)" stroke-width="1" marker-end="url(#arr)"/>
+          <line x1="282" y1="50" x2="328" y2="30" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="282" y1="80" x2="328" y2="80" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+          <line x1="282" y1="110" x2="328" y2="130" stroke="var(--text-tertiary)" stroke-width="0.8"/>
+        </g>
+      </svg>
+
+      <div class="key-box">⭐ ADT는 <strong>"무엇(What)을 할 수 있나"</strong>를 정의하고, 구현은 <strong>"어떻게(How) 하나"</strong>를 결정합니다. 사용자는 What만 알면 됩니다.</div>
+    </div>
+
+    <div class="card">
+      <h3>주요 ADT 종류</h3>
+      <table>
+        <tr><th>ADT</th><th>변형</th><th>핵심 연산</th></tr>
+        <tr><td><strong>List</strong></td><td>Ordered / Unordered / Indexed</td><td>Insert, Delete, Search</td></tr>
+        <tr><td><strong>Queue</strong></td><td>Simple / Priority / Circular / Deque</td><td>Enqueue, Dequeue</td></tr>
+        <tr><td><strong>Stack</strong></td><td>Register Stack / Memory Stack</td><td>Push, Pop</td></tr>
+      </table>
+      <p style="font-size:13px;color:var(--text-secondary)">공통 인터페이스: <code>IsEmpty</code>, <code>Add</code>, <code>Remove</code>, <code>Traverse</code></p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Stack ADT</h3>
+        <p><strong>LIFO</strong> — Last In, First Out (나중에 들어온 것이 먼저 나감)</p>
+        <p>비유: 접시 쌓기. 마지막에 올린 접시를 먼저 꺼냅니다.</p>
+
+        <div class="stack-vis">
+          <div class="stack-col">
+            <div class="stack-label">empty</div>
+            <div class="stack-frames"></div>
+            <div class="stack-action">초기</div>
+          </div>
+          <div class="stack-col">
+            <div class="stack-label">push(1)</div>
+            <div class="stack-frames">
+              <div class="stack-frame top-frame">1</div>
+            </div>
+            <div class="stack-action">push</div>
+          </div>
+          <div class="stack-col">
+            <div class="stack-label">push(2,3)</div>
+            <div class="stack-frames">
+              <div class="stack-frame">1</div>
+              <div class="stack-frame">2</div>
+              <div class="stack-frame top-frame">3</div>
+            </div>
+            <div class="stack-action">push×2</div>
+          </div>
+          <div class="stack-col">
+            <div class="stack-label">pop()</div>
+            <div class="stack-frames">
+              <div class="stack-frame">1</div>
+              <div class="stack-frame top-frame">2</div>
+            </div>
+            <div class="stack-action">→ 3 반환</div>
+          </div>
+        </div>
+
+        <p style="font-size:13px"><strong>실제 사용 예:</strong> 웹 브라우저 뒤로가기, 함수 호출 스택, 실행 취소(Undo)</p>
+      </div>
+
+      <div class="card">
+        <h3>Queue ADT</h3>
+        <p><strong>FIFO</strong> — First In, First Out (먼저 들어온 것이 먼저 나감)</p>
+        <p>비유: 은행 대기줄. 먼저 온 사람이 먼저 서비스를 받습니다.</p>
+
+        <!-- Queue SVG -->
+        <svg viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+          <g font-family="monospace" font-size="11" fill="var(--text-primary)">
+            <text x="5" y="18" fill="var(--text-tertiary)" font-size="10">HEAD (dequeue 방향)</text>
+            <rect x="5" y="25" width="40" height="36" rx="5" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+            <text x="25" y="47" text-anchor="middle" fill="var(--text-success)">A</text>
+            <rect x="47" y="25" width="40" height="36" rx="5" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+            <text x="67" y="47" text-anchor="middle">B</text>
+            <rect x="89" y="25" width="40" height="36" rx="5" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+            <text x="109" y="47" text-anchor="middle">C</text>
+            <rect x="131" y="25" width="40" height="36" rx="5" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+            <text x="151" y="47" text-anchor="middle">D</text>
+            <text x="180" y="47" fill="var(--text-tertiary)">← enqueue</text>
+            <text x="5" y="72" fill="var(--text-success)" font-size="10">A가 먼저 dequeue됨</text>
+          </g>
+        </svg>
+
+        <p style="font-size:13px"><strong>실제 사용 예:</strong> 프린터 대기열, CPU 프로세스 스케줄링, 네트워크 패킷 처리</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMPLEXITY ===== -->
+  <div class="section" id="tab-complexity">
+    <h2>Performance Evaluation — 성능 평가</h2>
+
+    <div class="card">
+      <h3>프로그램 성능 평가 기준</h3>
+      <p>좋은 프로그램이란? 단순히 "돌아가는" 프로그램이 아닙니다.</p>
+      <table>
+        <tr><th>기준</th><th>질문</th></tr>
+        <tr><td>정확성</td><td>명세를 만족하는가?</td></tr>
+        <tr><td>가독성</td><td>코드가 읽기 쉬운가?</td></tr>
+        <tr><td>시간 효율</td><td>얼마나 빠른가?</td></tr>
+        <tr><td>공간 효율</td><td>메모리를 얼마나 쓰는가?</td></tr>
+      </table>
+
+      <div class="grid-2">
+        <div class="key-box">
+          <strong>Machine-dependent</strong><br>
+          실제 실행 시간 측정<br>
+          → 환경마다 다름 (CPU, OS 등)
+        </div>
+        <div class="insight-box">
+          <strong>Machine-independent</strong> ✅<br>
+          Space Complexity<br>
+          Time Complexity
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Space Complexity (공간 복잡도)</h3>
+      <p>알고리즘이 실행될 때 필요한 <strong>메모리 공간의 총량</strong>입니다.</p>
+
+      <div class="grid-2">
+        <div>
+          <p><strong>Fixed Space (고정 공간)</strong></p>
+          <ul>
+            <li>입력 크기와 <em>무관</em>한 상수 공간</li>
+            <li>코드 자체, 상수값, static 변수</li>
+            <li>예: int i; int temp; → 항상 8 bytes</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Variable Space (가변 공간)</strong></p>
+          <ul>
+            <li>입력 크기에 <em>따라 변하는</em> 공간</li>
+            <li>재귀 스택 프레임, 동적 배열 등</li>
+            <li>예: 재귀 n번 → n개의 스택 프레임</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1rem">📝 예제: sum() vs recursive_sum()</h3>
+      <div class="grid-2">
+        <div class="code-block"><span style="color:var(--text-info)">int</span> sum(<span style="color:var(--text-info)">int</span> list[], <span style="color:var(--text-info)">int</span> n) {
+    <span style="color:var(--text-info)">int</span> i;
+    <span style="color:var(--text-info)">int</span> temp_sum = 0;
+    <span style="color:var(--text-warning)">for</span> (i=0; i&lt;n; i++)
+        temp_sum += list[i];
+    <span style="color:var(--text-warning)">return</span> temp_sum;
+}<span style="color:var(--text-tertiary)">
+// Fixed: list*, n, i, temp_sum = 4×4 = 16 bytes
+// Variable: 없음 (0)</span></div>
+        <div class="code-block"><span style="color:var(--text-info)">int</span> recursive_sum(<span style="color:var(--text-info)">int</span> list[], <span style="color:var(--text-info)">int</span> n) {
+    <span style="color:var(--text-warning)">if</span> (n)
+        <span style="color:var(--text-warning)">return</span> recursive_sum(list, n-1)
+             + list[n-1];
+    <span style="color:var(--text-warning)">return</span> 0;
+}<span style="color:var(--text-tertiary)">
+// Fixed: list*, n = 2×4 = 8 bytes
+// Variable: list*, n, return_addr = 3×4 × n번
+// → 재귀 깊이 n만큼 스택 쌓임!</span></div>
+      </div>
+      <div class="warn-box">⚠️ recursive_sum은 n이 커질수록 스택 메모리 <strong>n배</strong> 증가! 반복문 sum()이 공간 효율적입니다.</div>
+    </div>
+
+    <div class="card">
+      <h3>Time Complexity (시간 복잡도)</h3>
+      <p>알고리즘이 입력 크기 n에 대해 <strong>실행하는 기본 연산(primitive operation)의 수</strong>입니다.</p>
+
+      <h3 style="margin-top:.75rem">📝 예제: sum() vs recursive_sum() 시간 복잡도</h3>
+      <div class="grid-2">
+        <div>
+          <p><strong>sum()</strong></p>
+          <ul style="font-size:13px">
+            <li>변수 선언: 2 steps</li>
+            <li>Loop 조건 체크: n+1 steps</li>
+            <li>더하기: n steps</li>
+            <li>return: 1 step</li>
+            <li>= <strong>2n + 4 steps → O(n)</strong></li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>recursive_sum()</strong></p>
+          <ul style="font-size:13px">
+            <li>if 체크: n+1 steps</li>
+            <li>재귀 return: n steps</li>
+            <li>최종 return: 1 step</li>
+            <li>= <strong>2n + 2 steps → O(n)</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div class="insight-box">💡 두 함수 모두 O(n)! 하지만 공간 복잡도는 다릅니다. 알고리즘 선택 시 시간과 공간을 모두 고려해야 합니다.</div>
+    </div>
+
+    <div class="card">
+      <h3>Asymptotic Analysis & Big-O 표기법</h3>
+      <p><strong>점근적 분석(Asymptotic Analysis)</strong>은 입력 크기 n이 충분히 클 때 알고리즘의 성능 경향을 수학적으로 표현합니다.</p>
+
+      <div class="grid-2">
+        <div class="key-box">
+          <strong>Big-O (O)</strong> — 상한(Upper Bound)<br>
+          f(n) = O(g(n)) iff f(n) ≤ c·g(n), n &gt; n₀<br>
+          <em>"f()는 g()보다 빠르게 증가하지 않는다"</em>
+        </div>
+        <div class="key-box">
+          <strong>Big-Ω (Omega)</strong> — 하한(Lower Bound)<br>
+          f(n) = Ω(g(n)) iff f(n) ≥ c·g(n), n &gt; n₀<br>
+          <em>"f()는 g()보다 느리게 증가하지 않는다"</em>
+        </div>
+      </div>
+      <div class="key-box">
+        <strong>Big-Θ (Theta)</strong> — 상한 + 하한 동시 (가장 정확)<br>
+        f(n) = Θ(g(n)) iff c₁·g(n) ≤ f(n) ≤ c₂·g(n), n &gt; n₀<br>
+        <em>"f()와 g()는 같은 성장 속도를 가진다" — Big-O보다 더 정확한 표현</em>
+      </div>
+
+      <h3 style="margin-top:.75rem">Big-O 예제</h3>
+      <div class="code-block"><strong>예제 1: f(n) = 7n + 3 → O(n)</strong>
+c=8, n₀=3으로 설정하면: 7n+3 ≤ 8n (n &gt; 3)  ✅
+
+<strong>예제 2: f(n) = 3n³ + 7n + 5 → O(n³)</strong>
+n &gt; 1일 때: 3n³ + 7n + 5 ≤ (3+7+5)n³ = 15n³
+∴ c=15, n₀=1  ✅
+
+<strong>핵심 규칙:</strong> 최고차항의 차수만 남기고 계수·상수는 무시!</div>
+
+      <h3 style="margin-top:.75rem">복잡도 성장 속도 순위 (느린 → 빠름)</h3>
+
+      <!-- SVG growth chart -->
+      <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:.75rem 0">
+        <g font-family="system-ui" font-size="11" fill="var(--text-primary)">
+          <!-- axes -->
+          <line x1="40" y1="170" x2="580" y2="170" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <line x1="40" y1="10" x2="40" y2="170" stroke="var(--border-secondary)" stroke-width="0.5"/>
+          <text x="310" y="190" text-anchor="middle" fill="var(--text-tertiary)">Input Size (n)</text>
+          <text x="10" y="90" fill="var(--text-tertiary)" font-size="10" writing-mode="tb">Operations</text>
+          <!-- complexity bars: ranked -->
+          <!-- O(1) -->
+          <rect x="55" y="158" width="60" height="12" rx="3" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+          <text x="85" y="168" text-anchor="middle" font-size="10" fill="var(--text-success)">O(1)</text>
+          <!-- O(log n) -->
+          <rect x="125" y="148" width="60" height="22" rx="3" fill="var(--bg-success)" stroke="var(--border-success)" stroke-width="0.5"/>
+          <text x="155" y="163" text-anchor="middle" font-size="10" fill="var(--text-success)">O(log n)</text>
+          <!-- O(n) -->
+          <rect x="195" y="130" width="60" height="40" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="225" y="155" text-anchor="middle" font-size="10">O(n)</text>
+          <!-- O(n log n) -->
+          <rect x="265" y="108" width="60" height="62" rx="3" fill="var(--bg-info)" stroke="var(--border-info)" stroke-width="0.5"/>
+          <text x="295" y="140" text-anchor="middle" font-size="10">O(n log n)</text>
+          <!-- O(n²) -->
+          <rect x="335" y="74" width="60" height="96" rx="3" fill="var(--bg-warning)" stroke="var(--border-warning)" stroke-width="0.5"/>
+          <text x="365" y="125" text-anchor="middle" font-size="10" fill="var(--text-warning)">O(n²)</text>
+          <!-- O(2^n) -->
+          <rect x="405" y="34" width="60" height="136" rx="3" fill="var(--bg-danger)" stroke="var(--border-danger)" stroke-width="0.5"/>
+          <text x="435" y="105" text-anchor="middle" font-size="10" fill="var(--text-danger)">O(2ⁿ)</text>
+          <!-- O(n!) -->
+          <rect x="475" y="14" width="60" height="156" rx="3" fill="var(--bg-danger)" stroke="var(--border-danger)" stroke-width="0.5"/>
+          <text x="505" y="90" text-anchor="middle" font-size="10" fill="var(--text-danger)">O(n!)</text>
+          <!-- Labels -->
+          <text x="55" y="142" font-size="10" fill="var(--text-success)">빠름 ✅</text>
+          <text x="475" y="8" font-size="10" fill="var(--text-danger)">느림 ❌</text>
+        </g>
+      </svg>
+
+      <table>
+        <tr><th>표기</th><th>이름</th><th>예시 알고리즘</th><th>n=1000일 때</th></tr>
+        <tr><td>O(1)</td><td>상수</td><td>배열 인덱스 접근</td><td>1</td></tr>
+        <tr><td>O(log n)</td><td>로그</td><td>Binary Search</td><td>~10</td></tr>
+        <tr><td>O(n)</td><td>선형</td><td>Linear Search</td><td>1,000</td></tr>
+        <tr><td>O(n log n)</td><td>선형로그</td><td>Merge Sort</td><td>~10,000</td></tr>
+        <tr><td>O(n²)</td><td>이차</td><td>Selection/Bubble/Insertion Sort</td><td>1,000,000</td></tr>
+        <tr><td>O(2ⁿ)</td><td>지수</td><td>Fibonacci (단순재귀)</td><td>2^1000 ≈ ∞</td></tr>
+        <tr><td>O(n!)</td><td>팩토리얼</td><td>TSP 전수탐색</td><td>1000! ≈ ∞</td></tr>
+      </table>
+      <div class="warn-box">⚠️ O(2ⁿ)이나 O(n!) 알고리즘은 n=50만 되어도 현실적으로 실행 불가능합니다!</div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div class="section" id="tab-quiz">
+    <h2>🧪 Quiz — 핵심 개념 확인</h2>
+
+    <div id="score-card">
+      <div id="score-text"></div>
+      <div id="score-msg"></div>
+      <button class="reset-btn" onclick="resetQuiz()">🔄 다시 풀기</button>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-container" id="q1">
+      <div class="q-num">Q1 / 10</div>
+      <div class="q-text">알고리즘의 5가지 요건 중 "명령어가 명확하고 모호하지 않아야 한다"는 요건은?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q1',false)">Finiteness</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q1',true)">Definiteness</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q1',false)">Effectiveness</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q1',false)">Input</button>
+      <div class="quiz-feedback" id="fb-q1">✅ Definiteness — "definite"는 "명확한"이라는 뜻. 각 명령이 단 하나의 의미를 가져야 합니다.</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-container" id="q2">
+      <div class="q-num">Q2 / 10</div>
+      <div class="q-text">Selection Sort에서 각 Pass마다 하는 핵심 동작은?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q2',false)">인접 원소를 비교해서 교환한다</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q2',false)">현재 원소를 올바른 위치에 삽입한다</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q2',true)">나머지 원소 중 최솟값을 찾아 현재 위치와 교환한다</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q2',false)">배열을 반으로 나누고 합친다</button>
+      <div class="quiz-feedback" id="fb-q2">✅ Selection Sort = 최솟값 선택 → swap. "Selection"은 "선택"!</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-container" id="q3">
+      <div class="q-num">Q3 / 10</div>
+      <div class="q-text">Bubble Sort의 최선(Best Case) 시간 복잡도는? (swapped 플래그 적용 시)</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q3',false)">O(n²)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q3',true)">O(n)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q3',false)">O(log n)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q3',false)">O(n log n)</button>
+      <div class="quiz-feedback" id="fb-q3">✅ 이미 정렬된 배열에서 swapped=0이므로 첫 번째 Pass 후 바로 종료 → O(n)!</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-container" id="q4">
+      <div class="q-num">Q4 / 10</div>
+      <div class="q-text">Merge Sort의 평균 시간 복잡도는?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q4',false)">O(n)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q4',false)">O(n²)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q4',true)">O(n log n)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q4',false)">O(log n)</button>
+      <div class="quiz-feedback" id="fb-q4">✅ Merge Sort는 분할 O(log n)번 × 각 단계 병합 O(n) = O(n log n)!</div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-container" id="q5">
+      <div class="q-num">Q5 / 10</div>
+      <div class="q-text">재귀 알고리즘에서 반드시 있어야 하는 것은?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q5',false)">전역 변수</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q5',true)">Base case (기저 조건)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q5',false)">이중 루프</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q5',false)">포인터</button>
+      <div class="quiz-feedback" id="fb-q5">✅ Base case 없으면 무한 재귀 → Stack Overflow! 항상 종료 조건을 먼저 설계하세요.</div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="q-container" id="q6">
+      <div class="q-num">Q6 / 10</div>
+      <div class="q-text">ADT(Abstract Data Type)의 핵심 목적은?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q6',false)">최대한 빠른 알고리즘을 구현하기 위해</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q6',true)">내부 구현 방식에 상관없이 동일한 인터페이스로 데이터를 조작하기 위해</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q6',false)">메모리 사용량을 최소화하기 위해</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q6',false)">코드 줄 수를 줄이기 위해</button>
+      <div class="quiz-feedback" id="fb-q6">✅ ADT는 "What"(무엇을 할 수 있나)만 노출하고 "How"(어떻게 구현)는 숨깁니다. 추상화의 핵심!</div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="q-container" id="q7">
+      <div class="q-num">Q7 / 10</div>
+      <div class="q-text">Stack ADT의 특성으로 올바른 것은?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q7',false)">FIFO — First In, First Out</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q7',true)">LIFO — Last In, First Out</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q7',false)">Random Access — 임의 위치 접근</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q7',false)">Priority — 우선순위에 따라 꺼냄</button>
+      <div class="quiz-feedback" id="fb-q7">✅ Stack = LIFO. 마지막에 push한 것이 제일 먼저 pop됩니다. 접시 쌓기를 기억하세요!</div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="q-container" id="q8">
+      <div class="q-num">Q8 / 10</div>
+      <div class="q-text">f(n) = 3n³ + 7n + 5의 Big-O 표기는?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q8',false)">O(n)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q8',false)">O(n²)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q8',true)">O(n³)</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q8',false)">O(3n³)</button>
+      <div class="quiz-feedback" id="fb-q8">✅ Big-O는 최고차항만! 3n³+7n+5에서 가장 빠르게 증가하는 항은 n³. 계수 3은 무시.</div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="q-container" id="q9">
+      <div class="q-num">Q9 / 10</div>
+      <div class="q-text">iterative sum()과 recursive_sum()을 비교할 때, recursive_sum()의 단점은?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q9',false)">시간 복잡도가 O(n²)이다</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q9',true)">재귀 호출로 인한 Variable Space가 n에 비례해 늘어난다</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q9',false)">코드가 더 복잡하고 길다</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q9',false)">정확한 결과를 보장하지 못한다</button>
+      <div class="quiz-feedback" id="fb-q9">✅ 재귀 호출마다 스택 프레임(list*, n, return_address = 3×4 bytes)이 쌓여서 Variable Space = O(n)!</div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="q-container" id="q10">
+      <div class="q-num">Q10 / 10</div>
+      <div class="q-text">Big-Θ(Theta)가 Big-O, Big-Ω보다 더 "정확한" 이유는?</div>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q10',false)">계산이 더 쉽기 때문에</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q10',false)">상수 계수까지 포함하기 때문에</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q10',true)">상한과 하한을 동시에 표현해 성장 속도를 정확히 한정하기 때문에</button>
+      <button class="quiz-btn" onclick="checkAnswer(this,'q10',false)">최선의 경우만 나타내기 때문에</button>
+      <div class="quiz-feedback" id="fb-q10">✅ Θ(g(n)) = O(g(n)) AND Ω(g(n)). 위아래 모두 같은 g로 샌드위치처럼 묶기 때문에 가장 정확!</div>
+    </div>
+
+  </div><!-- end quiz section -->
+
+</div><!-- end container -->
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+let answered = {};
+let total = 10;
+
+function checkAnswer(btn, qid, isCorrect) {
+  if (answered[qid]) return;
+  answered[qid] = true;
+
+  const container = document.getElementById(qid);
+  const btns = container.querySelectorAll('.quiz-btn');
+  const fb = document.getElementById('fb-' + qid);
+
+  btns.forEach(b => {
+    b.disabled = true;
+    if (b === btn) {
+      b.classList.add(isCorrect ? 'correct' : 'wrong');
+    }
+  });
+
+  if (!isCorrect) {
+    // highlight correct answer
+    btns.forEach(b => {
+      if (b.onclick && b.onclick.toString().includes('true')) {
+        b.classList.add('correct');
+      }
+    });
+  }
+
+  fb.style.display = 'block';
+  fb.style.background = isCorrect ? 'var(--bg-success)' : 'var(--bg-danger)';
+  fb.style.color = isCorrect ? 'var(--text-success)' : 'var(--text-danger)';
+
+  if (Object.keys(answered).length === total) showScore();
+}
+
+function showScore() {
+  let correct = 0;
+  const qids = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10'];
+  qids.forEach(qid => {
+    const container = document.getElementById(qid);
+    if (container.querySelector('.quiz-btn.correct:not(.wrong)')) {
+      // if there's a correct btn that was clicked by user
+    }
+  });
+  // count correct answers
+  document.querySelectorAll('.quiz-btn.correct').forEach(btn => {
+    if (!btn.classList.contains('wrong')) correct++;
+  });
+  // simpler: count from feedback colors
+  correct = document.querySelectorAll('.quiz-feedback[style*="success"]').length;
+
+  const card = document.getElementById('score-card');
+  const text = document.getElementById('score-text');
+  const msg  = document.getElementById('score-msg');
+  card.style.display = 'block';
+  text.textContent = correct + ' / ' + total + ' 정답';
+  if (correct === total) msg.textContent = '🎉 완벽! 모든 개념을 마스터했습니다!';
+  else if (correct >= 7) msg.textContent = '👍 훌륭해요! 조금만 더 복습하면 완벽합니다.';
+  else if (correct >= 5) msg.textContent = '📖 절반 이상! 취약한 부분을 다시 확인해보세요.';
+  else msg.textContent = '💪 처음부터 다시 공부해봐요. 할 수 있어요!';
+  card.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  answered = {};
+  document.getElementById('score-card').style.display = 'none';
+  document.querySelectorAll('.quiz-btn').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('correct', 'wrong');
+  });
+  document.querySelectorAll('.quiz-feedback').forEach(f => f.style.display = 'none');
+}
+</script>
+</body>
+</html>
