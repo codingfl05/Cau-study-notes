@@ -883,6 +883,58 @@ bool search_recursive(Node *head, int key) {
     </div>
 
     <div class="card">
+      <h3>💡 핵심 개념 — 왜 <code>**</code> (이중 포인터)인가?</h3>
+      <p style="font-size:13px;">함수에 변수를 넘기면 C는 항상 <strong>복사본</strong>을 넘긴다. 그래서 <em>바꾸고 싶은 대상의 주소</em>를 넘겨야 원본이 바뀐다.</p>
+
+      <div class="key-box">
+        <strong>규칙 하나로 정리:</strong><br>
+        포인터가 가리키는 <strong>안의 값</strong>을 바꾸려면 → <code>*</code> 하나로 충분<br>
+        <strong>포인터 자체(head)</strong>를 바꾸려면 → <code>**</code> 필요
+      </div>
+
+      <div class="code-block">// 싱글 포인터로 받으면?
+void insertAtHead(Node *head_ref, int new_data) {
+    head_ref = new_node;  // 복사본만 바뀜 — main의 head는 그대로!
+}
+
+// 이중 포인터로 받아야 head 자체를 바꿀 수 있음
+void insertAtHead(Node **head_ref, int new_data) {
+    (*head_ref) = new_node;  // main의 head가 직접 바뀜 ✅
+}</div>
+
+      <div style="margin:.75rem 0;">
+        <div style="font-size:12px;color:var(--text-tertiary);font-family:monospace;margin-bottom:6px;">메모리 구조로 보기</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;font-family:monospace;font-size:12px;">
+          <div style="background:var(--bg-secondary);border:0.5px solid var(--border-secondary);border-radius:var(--radius-md);padding:.6rem 1rem;">
+            <div style="color:var(--text-tertiary);font-size:11px;margin-bottom:4px;">main의 메모리</div>
+            <div style="color:var(--text-info);">head &nbsp;<span style="color:var(--text-tertiary);">(주소: 0x100)</span></div>
+            <div style="color:var(--text-primary);">값: 0x200 &nbsp;<span style="color:var(--text-tertiary);">← 첫 노드 주소</span></div>
+          </div>
+          <div style="align-self:center;color:var(--text-tertiary);">→ &amp;head 전달 →</div>
+          <div style="background:var(--bg-secondary);border:0.5px solid var(--border-secondary);border-radius:var(--radius-md);padding:.6rem 1rem;">
+            <div style="color:var(--text-tertiary);font-size:11px;margin-bottom:4px;">함수 안</div>
+            <div style="color:var(--text-info);">head_ref = 0x100</div>
+            <div style="color:var(--text-primary);">*head_ref = 0x200 &nbsp;<span style="color:var(--text-tertiary);">← head의 값</span></div>
+          </div>
+        </div>
+      </div>
+
+      <table>
+        <tr><th>함수</th><th>head 자체 바뀌나?</th><th>포인터</th></tr>
+        <tr><td><code>insertAtHead</code></td><td>✅ 새 노드가 head 됨</td><td><code>**</code></td></tr>
+        <tr><td><code>insertAtEnd</code></td><td>❌ head 그대로, 마지막 노드만 이음</td><td><code>*</code></td></tr>
+        <tr><td><code>insertAfterPosition</code></td><td>❌ 중간 노드끼리만 이음</td><td><code>*</code></td></tr>
+        <tr><td><code>deleteNode</code></td><td>✅ 첫 노드 삭제 시 head가 다음 노드로 바뀜</td><td><code>**</code></td></tr>
+        <tr><td><code>deleteList</code></td><td>✅ 마지막에 head = NULL로 바꿈</td><td><code>**</code></td></tr>
+        <tr><td><code>printList</code></td><td>❌ 읽기만 함</td><td><code>*</code></td></tr>
+      </table>
+
+      <div class="insight-box">
+        <strong>배열과 다른 점:</strong> 배열은 <code>int arr[]</code>로 넘겨도 내부 요소가 바뀐다 — 이미 배열 안의 값을 바꾸는 것이기 때문. 반면 linked list에서 <code>head = new_node</code>는 포인터 자체를 교체하는 것이라 <code>**</code>가 필요하다.
+      </div>
+    </div>
+
+    <div class="card">
       <h3>Insertion (삽입) — 3가지 위치</h3>
 
       <!-- Insert at beginning -->
